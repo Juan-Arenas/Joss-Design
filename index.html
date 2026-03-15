@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Joss Design — Curso</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#0a0a0f;--surface:#111118;--surface2:#16161f;--surface3:#1d1d28;
+      --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+      --accent:#c8ff57;--accent2:#7c5cfc;--text:#f0f0f5;--muted:#6b6b80;
+      --green:#22c55e;--yellow:#fbbf24;--red:#ef4444;--sidebar-w:272px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow-x:hidden}
+
+    /* ══ SECURITY WALL — content is hidden by default in CSS too ══ */
+    #protected-content{display:none}
+    #protected-content.unlocked{display:flex;flex:1}
+
+    /* ══ MODAL ══════════════════════════════════════ */
+    .modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(5,5,10,.88);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
+    .modal-overlay.open{opacity:1;pointer-events:all}
+    .modal{width:100%;max-width:490px;background:var(--surface);border:1px solid var(--border2);border-radius:24px;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.75);transform:translateY(22px) scale(.97);transition:transform .3s}
+    .modal-overlay.open .modal{transform:translateY(0) scale(1)}
+    .modal-head{background:linear-gradient(135deg,#0d0d1a,#131328 55%,#180f3a);padding:28px 28px 20px;position:relative;overflow:hidden}
+    .modal-head::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -10%,rgba(124,92,252,.45) 0%,transparent 65%)}
+    .modal-close{position:absolute;top:14px;right:14px;z-index:2;width:30px;height:30px;border-radius:50%;border:1px solid var(--border2);background:rgba(255,255,255,.05);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:background .2s,color .2s}
+    .modal-close:hover{background:rgba(255,255,255,.12);color:var(--text)}
+    .modal-brand{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.2rem;letter-spacing:-.02em;color:var(--text);position:relative;z-index:1}
+    .modal-brand span{color:var(--accent)}
+    .modal-tagline{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:3px;position:relative;z-index:1}
+    .modal-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface)}
+    .modal-tab{flex:1;padding:12px 10px;text-align:center;font-size:.76rem;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;letter-spacing:.05em;text-transform:uppercase;transition:color .2s,border-color .2s;display:flex;align-items:center;justify-content:center;gap:6px}
+    .modal-tab.active{color:var(--accent);border-color:var(--accent)}
+    .modal-body{padding:22px 26px 26px;max-height:82vh;overflow-y:auto}
+    .modal-body::-webkit-scrollbar{width:3px}
+    .modal-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+    /* forms */
+    .mform{display:none}.mform.active{display:block}
+    .flabel{display:block;font-size:.67rem;font-weight:700;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-bottom:6px}
+    .finput{width:100%;padding:11px 13px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:13px}
+    .finput:focus{border-color:rgba(200,255,87,.4);box-shadow:0 0 0 3px rgba(200,255,87,.08)}
+    .finput::placeholder{color:var(--muted)}
+    .fmsg{margin-top:10px;padding:10px 13px;border-radius:8px;font-size:.8rem;display:none;line-height:1.5}
+    .fmsg.ok{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#4ade80;display:block}
+    .fmsg.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#f87171;display:block}
+    .fmsg.inf{background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.3);color:#a78bfa;display:block}
+    .btn-main{width:100%;padding:13px;background:var(--accent);color:#000;font-family:'Montserrat',sans-serif;font-weight:800;font-size:.88rem;letter-spacing:.04em;border:none;border-radius:11px;cursor:pointer;transition:opacity .2s,transform .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-main:hover{opacity:.86;transform:translateY(-1px)}
+    .btn-main:disabled{opacity:.35;cursor:not-allowed;transform:none}
+    .btn-ghost{width:100%;padding:11px;background:transparent;border:1px solid var(--border2);color:var(--text);border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.84rem;cursor:pointer;transition:border-color .2s,color .2s;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-ghost:hover{border-color:rgba(200,255,87,.35);color:var(--accent)}
+
+    /* payment method grid */
+    .pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+    .pay-opt{padding:14px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:border-color .2s,background .2s;text-align:center}
+    .pay-opt:hover{border-color:rgba(200,255,87,.22);background:rgba(200,255,87,.03)}
+    .pay-opt.selected{border-color:var(--accent);background:rgba(200,255,87,.06)}
+    .pay-opt .po-icon{width:32px;height:32px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center}
+    .pay-opt .po-icon svg{width:26px;height:26px}
+    .pay-opt .po-name{font-family:'Montserrat',sans-serif;font-size:.74rem;font-weight:700;color:var(--text)}
+    .pay-opt .po-sub{font-size:.63rem;color:var(--muted);margin-top:2px}
+
+    /* payment detail */
+    .pay-detail{display:none;animation:fadeUp .3s ease both}
+    .pay-detail.show{display:block}
+    .pay-card{background:var(--surface2);border:1px solid var(--border2);border-radius:14px;padding:16px;margin-bottom:13px}
+    .pay-card-title{font-size:.63rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+    .pay-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);gap:8px}
+    .pay-row:last-child{border:none}
+    .pr-label{font-size:.73rem;color:var(--muted);white-space:nowrap}
+    .pr-val{font-family:'Montserrat',sans-serif;font-size:.82rem;font-weight:700;color:var(--text);letter-spacing:.02em}
+    .copy-btn{padding:4px 10px;border-radius:6px;background:rgba(200,255,87,.09);border:1px solid rgba(200,255,87,.18);color:var(--accent);font-size:.63rem;font-weight:700;cursor:pointer;transition:background .2s;white-space:nowrap;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px}
+    .copy-btn:hover{background:rgba(200,255,87,.18)}
+    .copy-btn.copied{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.28);color:#4ade80}
+    .pay-hero{text-align:center;padding:12px 0 6px}
+    .pay-method-name{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.5rem;margin-bottom:4px}
+    .yape-color{background:linear-gradient(135deg,#7b2ff7,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .plin-color{background:linear-gradient(135deg,#00bcd4,#006064);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .pp-color{background:linear-gradient(135deg,#003087,#009cde);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .big-number{font-size:1.4rem;font-weight:800;color:var(--text);letter-spacing:.05em;margin:6px 0 3px;font-family:'Montserrat',sans-serif}
+    .price-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;background:rgba(200,255,87,.07);border:1px solid rgba(200,255,87,.18);border-radius:999px;font-size:.8rem;font-weight:700;color:var(--accent);font-family:'Montserrat',sans-serif;margin-top:7px}
+    .pay-steps{list-style:none;margin:10px 0 0}
+    .pay-steps li{display:flex;gap:9px;align-items:flex-start;font-size:.79rem;color:var(--muted);padding:6px 0;border-bottom:1px solid var(--border);line-height:1.4}
+    .pay-steps li:last-child{border:none}
+    .snum{width:19px;height:19px;flex-shrink:0;border-radius:50%;background:rgba(200,255,87,.1);border:1px solid rgba(200,255,87,.2);display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:800;color:var(--accent);margin-top:1px}
+
+    /* ORDER BOX */
+    .order-box{background:linear-gradient(135deg,rgba(124,92,252,.1),rgba(200,255,87,.06));border:1px solid rgba(124,92,252,.25);border-radius:12px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .order-box .ob-label{font-size:.65rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+    .order-box .ob-num{font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:800;color:var(--text);letter-spacing:.04em}
+
+    /* WHATSAPP BUTTON */
+    .btn-wa{width:100%;padding:12px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.28);color:#4ddb88;border-radius:11px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.84rem;cursor:pointer;transition:background .2s,transform .15s;display:flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;margin-top:8px}
+    .btn-wa:hover{background:rgba(37,211,102,.22);transform:translateY(-1px)}
+    .btn-wa svg{width:18px;height:18px;flex-shrink:0}
+
+    /* STATUS CHECKLIST */
+    .status-track{margin:16px 0 4px;display:flex;flex-direction:column;gap:0}
+    .st-step{display:flex;align-items:flex-start;gap:12px;position:relative;padding-bottom:16px}
+    .st-step:last-child{padding-bottom:0}
+    .st-step::before{content:'';position:absolute;left:13px;top:28px;bottom:0;width:1px;background:var(--border)}
+    .st-step:last-child::before{display:none}
+    .st-icon{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+    .st-icon.done{background:rgba(200,255,87,.15);border:1.5px solid rgba(200,255,87,.4)}
+    .st-icon.done svg{color:var(--accent);width:13px;height:13px}
+    .st-icon.active{background:rgba(124,92,252,.15);border:1.5px solid rgba(124,92,252,.4);animation:pulseIcon 1.8s infinite}
+    .st-icon.active svg{color:#a78bfa;width:13px;height:13px}
+    .st-icon.pending{background:var(--surface2);border:1.5px solid var(--border2)}
+    .st-icon.pending svg{color:var(--muted);width:13px;height:13px}
+    @keyframes pulseIcon{0%,100%{box-shadow:0 0 0 0 rgba(124,92,252,.4)}50%{box-shadow:0 0 0 5px rgba(124,92,252,0)}}
+    .st-info{padding-top:3px}
+    .st-title{font-size:.82rem;font-weight:600;color:var(--text)}
+    .st-title.muted{color:var(--muted)}
+    .st-sub{font-size:.72rem;color:var(--muted);margin-top:2px;line-height:1.4}
+
+    /* affiliate toggle */
+    .aff-toggle{display:flex;align-items:center;gap:7px;font-size:.75rem;color:var(--muted);cursor:pointer;margin:2px 0 11px;user-select:none}
+    .aff-toggle:hover{color:var(--text)}
+    #aff-wrap{display:none}
+    .back-link{font-size:.73rem;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-top:9px}
+    .back-link:hover{color:var(--accent)}
+    .divider-or{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:.7rem;color:var(--muted)}
+    .divider-or::before,.divider-or::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    /* ══ ADMIN SCREEN ══════════════════════════════ */
+    #admin-screen{position:fixed;inset:0;z-index:400;background:var(--bg);display:none;flex-direction:column}
+    #admin-screen.visible{display:flex}
+    .adm-top{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 30px;display:flex;align-items:center;justify-content:space-between}
+    .adm-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:.92rem;display:flex;align-items:center;gap:9px}
+    .adm-badge{padding:2px 9px;border-radius:999px;background:rgba(239,68,68,.14);border:1px solid rgba(239,68,68,.28);font-size:.6rem;font-weight:700;color:#f87171;letter-spacing:.08em;text-transform:uppercase}
+    .adm-body{flex:1;overflow-y:auto;padding:24px 28px}
+    .adm-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1080px}
+    .adm-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+    .adm-card-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.78rem;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-bottom:13px;display:flex;align-items:center;gap:7px}
+    .dot{width:7px;height:7px;border-radius:50%}.dy{background:var(--yellow)}.dg{background:var(--green)}.dp{background:var(--accent2)}
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;max-width:1080px;margin-bottom:20px}
+    .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+    .stat-n{font-family:'Montserrat',sans-serif;font-size:1.8rem;font-weight:900;color:var(--accent)}
+    .stat-l{font-size:.66rem;color:var(--muted);margin-top:2px}
+    .pi-list{display:flex;flex-direction:column;gap:8px}
+    .pi-item{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .pi-em{font-weight:600;font-size:.82rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .pi-meta{font-size:.67rem;color:var(--muted);margin-top:2px}
+    .pi-order{font-family:'Montserrat',sans-serif;font-size:.65rem;font-weight:700;color:var(--accent2);margin-top:2px}
+    .pi-method{font-size:.64rem;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(124,92,252,.13);border:1px solid rgba(124,92,252,.22);color:#a78bfa;margin-top:3px;display:inline-block}
+    .pi-acts{display:flex;gap:5px;flex-shrink:0}
+    .bapprove,.breject{padding:5px 10px;border-radius:7px;font-size:.68rem;font-weight:700;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px}
+    .bapprove{background:rgba(34,197,94,.14);color:#4ade80;border:1px solid rgba(34,197,94,.28)}
+    .bapprove:hover{background:rgba(34,197,94,.24)}
+    .breject{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.22)}
+    .breject:hover{background:rgba(239,68,68,.2)}
+    .apr-list{display:flex;flex-direction:column;gap:7px;max-height:280px;overflow-y:auto}
+    .apr-item{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface2);border-radius:10px;font-size:.79rem}
+    .chk{width:17px;height:17px;border-radius:50%;background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.28);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .chk svg{width:9px;height:9px;color:#4ade80}
+    .brev{padding:3px 9px;border-radius:6px;background:transparent;border:1px solid var(--border2);color:var(--muted);font-size:.63rem;cursor:pointer}
+    .brev:hover{border-color:var(--red);color:var(--red)}
+    .aff-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface2);border-radius:9px;margin-bottom:7px;font-size:.79rem}
+    .aff-code{font-family:'Montserrat',sans-serif;font-weight:700;color:var(--accent2)}
+    .btn-add-aff{width:100%;padding:9px;background:rgba(124,92,252,.09);border:1px dashed rgba(124,92,252,.32);color:var(--accent2);border-radius:9px;font-size:.76rem;font-weight:600;cursor:pointer;transition:background .2s;font-family:'DM Sans',sans-serif;margin-top:3px;display:flex;align-items:center;justify-content:center;gap:6px}
+    .btn-add-aff:hover{background:rgba(124,92,252,.18)}
+    .btn-adm-exit{padding:7px 16px;background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:9px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:border-color .2s;display:flex;align-items:center;gap:6px}
+    .btn-adm-exit:hover{border-color:var(--accent);color:var(--accent)}
+    .empty-st{text-align:center;padding:22px;color:var(--muted);font-size:.79rem}
+    .empty-st svg{width:28px;height:28px;opacity:.3;margin-bottom:8px}
+
+    /* ══ SIDEBAR ════════════════════════════════════ */
+    .sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;overflow-y:auto}
+    .sb-logo{padding:24px 20px 16px;border-bottom:1px solid var(--border)}
+    .sb-brand{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.05rem;letter-spacing:-.02em;color:var(--text)}
+    .sb-brand span{color:var(--accent)}
+    .sb-tag{font-size:.63rem;color:var(--muted);margin-top:2px;letter-spacing:.09em;text-transform:uppercase}
+    .sb-actions{padding:13px 13px 5px;display:flex;flex-direction:column;gap:7px}
+    .sb-btn-buy{display:flex;align-items:center;justify-content:center;gap:7px;padding:11px 13px;border-radius:11px;background:var(--accent);color:#000;font-family:'Montserrat',sans-serif;font-weight:800;font-size:.78rem;letter-spacing:.04em;cursor:pointer;border:none;transition:opacity .2s,transform .15s}
+    .sb-btn-buy:hover{opacity:.84;transform:translateY(-1px)}
+    .sb-btn-buy svg{width:15px;height:15px}
+    .sb-btn-login{display:flex;align-items:center;justify-content:center;gap:7px;padding:10px 13px;border-radius:11px;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:600;font-size:.78rem;cursor:pointer;border:1px solid var(--border2);transition:border-color .2s,color .2s}
+    .sb-btn-login:hover{border-color:rgba(200,255,87,.32);color:var(--accent)}
+    .sb-btn-login svg{width:14px;height:14px}
+    .sb-divider{height:1px;background:var(--border);margin:9px 13px}
+    .sb-section{padding:16px 13px 5px}
+    .sb-sec-label{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:0 7px;margin-bottom:6px}
+    .nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;cursor:pointer;transition:background .2s,color .2s;font-size:.84rem;color:var(--muted);user-select:none}
+    .nav-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+    .nav-item.active{background:rgba(200,255,87,.08);color:var(--accent)}
+    .nav-item svg{width:16px;height:16px;flex-shrink:0;opacity:.6}
+    .nav-item.active svg{opacity:1}
+    .sb-user{margin:11px 13px 0;padding:11px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:11px;display:none}
+    .sb-user.visible{display:block}
+    .su-lbl{font-size:.6rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+    .su-em{font-size:.78rem;color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .su-badge{display:inline-flex;align-items:center;gap:4px;margin-top:5px;padding:2px 8px;background:rgba(34,197,94,.09);border:1px solid rgba(34,197,94,.2);border-radius:999px;font-size:.59rem;font-weight:700;color:#4ade80}
+    .su-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:#4ade80}
+    .sb-footer{margin-top:auto;padding:13px;border-top:1px solid var(--border)}
+    .btn-logout{width:100%;padding:8px;background:transparent;border:1px solid var(--border2);color:var(--muted);border-radius:9px;font-size:.74rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:border-color .2s,color .2s;display:none;align-items:center;justify-content:center;gap:6px}
+    .btn-logout.visible{display:flex}
+    .btn-logout:hover{border-color:#ff6b6b;color:#ff6b6b}
+    .btn-logout svg{width:13px;height:13px}
+
+    /* ══ MAIN ══════════════════════════════════════ */
+    .main{margin-left:var(--sidebar-w);flex:1;min-height:100vh;display:flex;flex-direction:column}
+    .topbar{padding:26px 42px 0;display:flex;align-items:flex-start;justify-content:space-between}
+    .page-header h1{font-family:'Montserrat',sans-serif;font-size:2rem;font-weight:900;letter-spacing:-.03em;line-height:1.1}
+    .page-header h1 em{font-style:normal;color:var(--accent)}
+    .page-header p{margin-top:7px;font-size:.87rem;color:var(--muted);max-width:400px}
+    .live-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(124,92,252,.13);border:1px solid rgba(124,92,252,.3);border-radius:999px;font-size:.68rem;font-weight:600;color:#b09cff;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+    .live-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#7c5cfc;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+    .content{padding:30px 42px 54px;flex:1}
+    .panel{display:none;animation:fadeUp .35s ease both}.panel.active{display:block}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+    .sec-title{font-family:'Montserrat',sans-serif;font-size:.7rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+    .sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    /* video grid */
+    .video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:16px}
+    .video-card{background:var(--surface2);border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;position:relative;transition:transform .25s,border-color .25s,box-shadow .25s}
+    .video-card.unlocked:hover{transform:translateY(-4px);border-color:rgba(200,255,87,.24);box-shadow:0 12px 38px rgba(0,0,0,.4),0 0 0 1px rgba(200,255,87,.1)}
+    .video-card.locked{cursor:default}
+    .video-thumb{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .vc1 .video-thumb{background:linear-gradient(135deg,#1a1a2e,#16213e 50%,#0f3460)}
+    .vc1 .video-thumb::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 40%,rgba(124,92,252,.3) 0%,transparent 60%),radial-gradient(circle at 75% 70%,rgba(200,255,87,.1) 0%,transparent 50%)}
+    .vc2 .video-thumb{background:linear-gradient(135deg,#0d1b2a,#1b2838,#2a3a50)}
+    .vc2 .video-thumb::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 60% 30%,rgba(200,255,87,.2) 0%,transparent 60%),radial-gradient(circle at 20% 70%,rgba(124,92,252,.2) 0%,transparent 50%)}
+    .vc3 .video-thumb{background:linear-gradient(135deg,#1a0a2e,#2d1b54,#3d2470)}
+    .vc3 .video-thumb::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(200,255,87,.14) 0%,transparent 60%)}
+    .vc4 .video-thumb{background:linear-gradient(135deg,#0a1628,#0e2040,#152e54)}
+    .vc4 .video-thumb::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 40% 60%,rgba(124,92,252,.14) 0%,transparent 55%)}
+    .play-btn{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;transition:transform .2s,background .2s;position:relative;z-index:1}
+    .video-card.unlocked:hover .play-btn{background:var(--accent);transform:scale(1.1)}
+    .play-btn svg{fill:white;width:15px;height:15px;margin-left:3px}
+    .video-card.unlocked:hover .play-btn svg{fill:#000}
+    .vnum{position:absolute;top:10px;left:10px;font-family:'Montserrat',sans-serif;font-size:.6rem;font-weight:700;color:rgba(255,255,255,.38);letter-spacing:.1em;z-index:1}
+    .video-info{padding:13px 15px 15px}
+    .vtag{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+    .video-info h3{font-family:'Montserrat',sans-serif;font-size:.87rem;font-weight:700;line-height:1.35;color:var(--text)}
+    .vmeta{margin-top:8px;display:flex;align-items:center;gap:7px;font-size:.69rem;color:var(--muted)}
+    .vdot{width:3px;height:3px;border-radius:50%;background:var(--muted)}
+    .cs-badge{position:absolute;top:10px;right:10px;padding:3px 9px;background:rgba(255,200,0,.14);border:1px solid rgba(255,200,0,.28);border-radius:999px;font-size:.57rem;font-weight:700;color:#ffd60a;letter-spacing:.06em;text-transform:uppercase}
+    .lock-overlay{position:absolute;inset:0;border-radius:16px;background:rgba(10,10,15,.75);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;z-index:3}
+    .lock-overlay svg{width:20px;height:20px;color:var(--muted);opacity:.65}
+    .lock-overlay span{font-size:.68rem;color:var(--muted);font-weight:500}
+    .lo-btn{margin-top:3px;padding:6px 14px;border-radius:8px;background:var(--accent);color:#000;font-family:'Montserrat',sans-serif;font-weight:800;font-size:.66rem;letter-spacing:.04em;cursor:pointer;border:none;transition:opacity .2s;display:flex;align-items:center;gap:5px}
+    .lo-btn:hover{opacity:.84}
+    .lo-btn svg{width:11px;height:11px}
+
+    /* redes */
+    .redes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:16px}
+    .red-card{border-radius:18px;padding:26px 22px;display:flex;flex-direction:column;gap:13px;border:1px solid var(--border);cursor:pointer;transition:transform .25s,box-shadow .25s;position:relative;overflow:hidden;text-decoration:none}
+    .red-card:hover{transform:translateY(-4px)}
+    .red-card::before{content:'';position:absolute;inset:0;opacity:.08;transition:opacity .3s}
+    .red-card:hover::before{opacity:.14}
+    .red-card.tiktok{background:linear-gradient(145deg,#0e0e14,#161620)}
+    .red-card.tiktok::before{background:linear-gradient(135deg,#69C9D0,#EE1D52 50%,#010101)}
+    .red-card.tiktok:hover{box-shadow:0 16px 50px rgba(238,29,82,.2),0 0 0 1px rgba(238,29,82,.18)}
+    .red-card.whatsapp{background:linear-gradient(145deg,#0e130e,#141f14)}
+    .red-card.whatsapp::before{background:linear-gradient(135deg,#25D366,#128C7E)}
+    .red-card.whatsapp:hover{box-shadow:0 16px 50px rgba(37,211,102,.2),0 0 0 1px rgba(37,211,102,.18)}
+    .red-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+    .red-card.tiktok .red-icon{background:linear-gradient(135deg,rgba(105,201,208,.18),rgba(238,29,82,.18));border:1px solid rgba(238,29,82,.28)}
+    .red-card.whatsapp .red-icon{background:rgba(37,211,102,.13);border:1px solid rgba(37,211,102,.28)}
+    .red-icon svg{width:22px;height:22px}
+    .red-info{position:relative;z-index:1}
+    .r-plat{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+    .red-card.tiktok .r-plat{color:#EE1D52}.red-card.whatsapp .r-plat{color:#25D366}
+    .r-handle{font-family:'Montserrat',sans-serif;font-size:1.15rem;font-weight:800;color:var(--text);letter-spacing:-.02em}
+    .r-sub{font-size:.72rem;color:var(--muted);margin-top:3px}
+    .red-cta{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:600;padding:6px 13px;border-radius:8px;align-self:flex-start;position:relative;z-index:1;transition:gap .2s;text-decoration:none}
+    .red-card.tiktok .red-cta{background:rgba(238,29,82,.12);color:#ff6b8a;border:1px solid rgba(238,29,82,.2)}
+    .red-card.whatsapp .red-cta{background:rgba(37,211,102,.09);color:#4ddb88;border:1px solid rgba(37,211,102,.2)}
+    .red-card:hover .red-cta{gap:9px}
+    .rring{position:absolute;right:-26px;bottom:-26px;width:120px;height:120px;border-radius:50%;border:1px solid;opacity:.07}
+    .rring2{position:absolute;right:-45px;bottom:-45px;width:180px;height:180px;border-radius:50%;border:1px solid;opacity:.04}
+    .red-card.tiktok .rring,.red-card.tiktok .rring2{border-color:#EE1D52}
+    .red-card.whatsapp .rring,.red-card.whatsapp .rring2{border-color:#25D366}
+
+    /* placeholder */
+    .placeholder-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:290px;text-align:center;gap:13px}
+    .ph-icon{width:64px;height:64px;border-radius:16px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center}
+    .ph-icon svg{width:26px;height:26px;color:var(--muted)}
+    .placeholder-panel h2{font-family:'Montserrat',sans-serif;font-size:1.25rem;font-weight:800}
+    .placeholder-panel p{color:var(--muted);font-size:.84rem;max-width:270px;line-height:1.6}
+    .pill{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:999px;font-size:.68rem;color:var(--muted)}
+    .pill svg{width:11px;height:11px}
+  </style>
+</head>
+<body>
+
+<!-- ════════ MODAL ════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+ <div class="modal" id="modal-box">
+  <div class="modal-head">
+   <button class="modal-close" onclick="closeModal()">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+   </button>
+   <div class="modal-brand">JOSS <span>DESIGN</span></div>
+   <div class="modal-tagline">Plataforma de Cursos</div>
+  </div>
+  <div class="modal-tabs">
+   <div class="modal-tab active" id="tab-buy" onclick="switchModal('buy')">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+     Comprar Curso
+   </div>
+   <div class="modal-tab" id="tab-login" onclick="switchModal('login')">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+     Ya tengo acceso
+   </div>
+  </div>
+  <div class="modal-body">
+
+   <!-- LOGIN -->
+   <div class="mform" id="mform-login">
+    <label class="flabel">Correo electrónico</label>
+    <input class="finput" id="l-email" type="email" placeholder="tu@correo.com"/>
+    <label class="flabel">Contraseña</label>
+    <input class="finput" id="l-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="btn-main" onclick="doLogin()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+      Ingresar al curso
+    </button>
+    <div class="fmsg" id="l-msg"></div>
+    <div style="margin-top:11px;text-align:center;font-size:.73rem;color:var(--muted)">
+     ¿Sin cuenta? <span style="color:var(--accent);cursor:pointer;font-weight:700" onclick="switchModal('buy')">Comprar curso</span>
+    </div>
+   </div>
+
+   <!-- COMPRAR -->
+   <div class="mform active" id="mform-buy">
+
+    <!-- PASO 1: método -->
+    <div id="buy-s1">
+     <p style="font-size:.8rem;color:var(--muted);margin-bottom:13px;line-height:1.5">Selecciona tu método de pago preferido. Todos los pagos son verificados manualmente en menos de 24 horas.</p>
+     <div class="pay-grid">
+      <div class="pay-opt" id="po-yape" onclick="selectMethod('yape')">
+       <div class="po-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+         <circle cx="12" cy="12" r="11" fill="#7b2ff7" opacity=".15"/>
+         <path d="M8 6l4 6 4-6" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+         <path d="M12 12v6" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+       </div>
+       <div class="po-name">Yape</div><div class="po-sub">Pago rápido</div>
+      </div>
+      <div class="pay-opt" id="po-plin" onclick="selectMethod('plin')">
+       <div class="po-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+         <circle cx="12" cy="12" r="11" fill="#00bcd4" opacity=".12"/>
+         <path d="M7 12h10M12 7v10" stroke="#00bcd4" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+       </div>
+       <div class="po-name">Plin</div><div class="po-sub">Pago rápido</div>
+      </div>
+      <div class="pay-opt" id="po-bcp" onclick="selectMethod('bcp')">
+       <div class="po-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+         <rect x="2" y="6" width="20" height="13" rx="2" fill="#e53935" opacity=".15"/>
+         <rect x="2" y="6" width="20" height="13" rx="2" stroke="#e53935" stroke-width="1.5"/>
+         <path d="M2 10h20" stroke="#e53935" stroke-width="1.5"/>
+         <rect x="5" y="14" width="4" height="2" rx="1" fill="#e53935"/>
+        </svg>
+       </div>
+       <div class="po-name">BCP</div><div class="po-sub">Transferencia</div>
+      </div>
+      <div class="pay-opt" id="po-paypal" onclick="selectMethod('paypal')">
+       <div class="po-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+         <circle cx="12" cy="12" r="11" fill="#003087" opacity=".12"/>
+         <path d="M8 17h2l1-3h2.5c2 0 3.5-1 3.5-3s-1.5-3-3.5-3H9L8 17z" stroke="#009cde" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+       </div>
+       <div class="po-name">PayPal</div><div class="po-sub">Internacional</div>
+      </div>
+     </div>
+     <button class="btn-main" onclick="goToStep2()" id="btn-step2" disabled>
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+       Continuar al pago
+     </button>
+     <div class="fmsg" id="b1-msg"></div>
+    </div>
+
+    <!-- PASO 2: datos + confirmación -->
+    <div id="buy-s2" style="display:none">
+
+     <!-- número de orden -->
+     <div class="order-box">
+      <div>
+       <div class="ob-label">Número de orden</div>
+       <div class="ob-num" id="order-num">—</div>
+      </div>
+      <button class="copy-btn" onclick="copyText(document.getElementById('order-num').textContent,this)">
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+       Copiar
+      </button>
+     </div>
+
+     <!-- YAPE -->
+     <div class="pay-detail" id="pd-yape">
+      <div class="pay-card">
+       <div class="pay-hero">
+        <div class="pay-method-name yape-color">yape</div>
+        <div class="big-number">915 150 077</div>
+        <div style="font-size:.76rem;color:var(--muted)">Josb Design</div>
+        <div class="price-pill" id="pp-yape">
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+         Precio por confirmar
+        </div>
+       </div>
+      </div>
+     </div>
+
+     <!-- PLIN -->
+     <div class="pay-detail" id="pd-plin">
+      <div class="pay-card">
+       <div class="pay-hero">
+        <div class="pay-method-name plin-color">plin</div>
+        <div class="big-number">915 150 077</div>
+        <div style="font-size:.76rem;color:var(--muted)">Josb Design</div>
+        <div class="price-pill" id="pp-plin">
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+         Precio por confirmar
+        </div>
+       </div>
+      </div>
+     </div>
+
+     <!-- BCP -->
+     <div class="pay-detail" id="pd-bcp">
+      <div class="pay-card">
+       <div class="pay-card-title">Datos de transferencia BCP</div>
+       <div class="pay-row">
+        <span class="pr-label">Cuenta Soles</span>
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+         <span class="pr-val">47502132284080</span>
+         <button class="copy-btn" onclick="copyText('47502132284080',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copiar
+         </button>
+        </div>
+       </div>
+       <div class="pay-row">
+        <span class="pr-label">CCI</span>
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+         <span class="pr-val" style="font-size:.74rem">00247510213228408027</span>
+         <button class="copy-btn" onclick="copyText('00247510213228408027',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copiar
+         </button>
+        </div>
+       </div>
+       <div class="pay-row"><span class="pr-label">Titular</span><span class="pr-val">Josb Design</span></div>
+       <div style="text-align:center;margin-top:10px">
+        <div class="price-pill" id="pp-bcp">
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+         Precio por confirmar
+        </div>
+       </div>
+      </div>
+     </div>
+
+     <!-- PAYPAL -->
+     <div class="pay-detail" id="pd-paypal">
+      <div class="pay-card">
+       <div class="pay-hero">
+        <div class="pay-method-name pp-color">PayPal</div>
+        <div class="big-number" style="font-size:1rem;letter-spacing:0">blackjosue113@gmail.com</div>
+        <button class="copy-btn" style="margin:8px auto 0;display:flex" onclick="copyText('blackjosue113@gmail.com',this)">
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copiar correo
+        </button>
+        <div class="price-pill" id="pp-paypal" style="margin-top:10px">
+         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+         Precio por confirmar
+        </div>
+       </div>
+      </div>
+     </div>
+
+     <!-- instrucciones comunes -->
+     <ul class="pay-steps">
+      <li><span class="snum">1</span>Realiza el pago con el método seleccionado por el monto indicado.</li>
+      <li><span class="snum">2</span>En el concepto / mensaje escribe tu correo electrónico y el número de orden.</li>
+      <li><span class="snum">3</span>Completa el formulario abajo y haz clic en "Ya pagué" para generar el mensaje de WhatsApp.</li>
+      <li><span class="snum">4</span>Envía el comprobante por WhatsApp. Activamos tu acceso en menos de 24 h.</li>
+     </ul>
+
+     <!-- campos -->
+     <label class="flabel">Tu correo electrónico</label>
+     <input class="finput" id="b-email" type="email" placeholder="tu@correo.com"/>
+     <div class="aff-toggle" onclick="toggleAff()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      ¿Tienes código de afiliado?
+     </div>
+     <div id="aff-wrap">
+      <label class="flabel">Código de afiliado</label>
+      <input class="finput" id="b-aff" type="text" placeholder="Ej: JOSS10"/>
+     </div>
+     <label class="flabel">Crea tu contraseña de acceso</label>
+     <input class="finput" id="b-pass" type="password" placeholder="Mínimo 6 caracteres"/>
+
+     <button class="btn-main" id="btn-submit" onclick="submitPurchase()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><polyline points="20 6 9 17 4 12"/></svg>
+      Ya pagué — guardar solicitud
+     </button>
+     <div class="fmsg" id="b2-msg"></div>
+
+     <!-- WhatsApp CTA (aparece tras envío) -->
+     <div id="wa-cta" style="display:none">
+      <div class="divider-or">o envía tu comprobante aquí</div>
+      <a id="wa-link" href="#" target="_blank" class="btn-wa">
+       <svg viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+       Enviar comprobante por WhatsApp
+      </a>
+
+      <!-- status tracker -->
+      <div style="margin-top:16px;padding:14px 16px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px">
+       <div style="font-size:.67rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Estado de tu solicitud</div>
+       <div class="status-track">
+        <div class="st-step">
+         <div class="st-icon done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+         <div class="st-info"><div class="st-title">Pago realizado</div><div class="st-sub">Completaste el pago y enviaste la solicitud.</div></div>
+        </div>
+        <div class="st-step">
+         <div class="st-icon active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+         <div class="st-info"><div class="st-title">En revisión</div><div class="st-sub">Verificando tu comprobante de pago. Menos de 24 h.</div></div>
+        </div>
+        <div class="st-step">
+         <div class="st-icon pending"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+         <div class="st-info"><div class="st-title st-title muted">Acceso activado</div><div class="st-sub">Recibirás un mensaje de WhatsApp cuando esté listo.</div></div>
+        </div>
+       </div>
+      </div>
+     </div>
+
+     <span class="back-link" onclick="goBackToS1()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Cambiar método de pago
+     </span>
+    </div>
+
+   </div><!-- /mform-buy -->
+  </div><!-- /modal-body -->
+ </div>
+</div>
+
+<!-- ════════ ADMIN ════════ -->
+<div id="admin-screen">
+ <div class="adm-top">
+  <div class="adm-title">
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+   Panel de Administración — Joss Design
+   <span class="adm-badge">Admin</span>
+  </div>
+  <button class="btn-adm-exit" onclick="exitAdmin()">
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+   Volver al sitio
+  </button>
+ </div>
+ <div class="adm-body">
+  <div class="stats-row" id="adm-stats"></div>
+  <div class="adm-grid" id="adm-grid"></div>
+ </div>
+</div>
+
+<!-- ════════ APP ════════ -->
+<div id="protected-content">
+
+ <!-- SIDEBAR -->
+ <aside class="sidebar">
+  <div class="sb-logo">
+   <div class="sb-brand">JOSS <span>DESIGN</span></div>
+   <div class="sb-tag">Plataforma de Cursos</div>
+  </div>
+  <div class="sb-user" id="sb-user">
+   <div class="su-lbl">Sesión activa</div>
+   <div class="su-em" id="sb-email">—</div>
+   <div class="su-badge">Acceso verificado</div>
+  </div>
+  <div class="sb-actions" id="sb-actions">
+   <button class="sb-btn-buy" onclick="openModal('buy')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+    Comprar Curso
+   </button>
+   <button class="sb-btn-login" onclick="openModal('login')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    Ya tengo acceso
+   </button>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-section">
+   <div class="sb-sec-label">Contenido</div>
+   <div class="nav-item active" onclick="showPanel('videos',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><polygon points="10,8 16,11 10,14" fill="currentColor" stroke="none"/></svg>
+    Videos
+   </div>
+   <div class="nav-item" onclick="showPanel('instalacion',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Instalación
+   </div>
+   <div class="nav-item" onclick="showPanel('redes',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    Redes
+   </div>
+  </div>
+  <div class="sb-footer">
+   <button class="btn-logout" id="btn-logout" onclick="doLogout()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+    Cerrar sesión
+   </button>
+   <div style="margin-top:9px;font-size:.6rem;color:var(--muted);text-align:center">© 2025 Joss Design</div>
+  </div>
+ </aside>
+
+ <!-- MAIN -->
+ <main class="main">
+  <div class="topbar">
+   <div class="page-header" id="page-header">
+    <h1>Mis <em>Videos</em></h1>
+    <p>Aprende diseño e inteligencia artificial con Joss Design.</p>
+   </div>
+   <div class="live-badge">En curso</div>
+  </div>
+  <div class="content">
+
+   <!-- VIDEOS -->
+   <div class="panel active" id="panel-videos">
+    <div class="sec-title">Módulos del curso</div>
+    <div class="video-grid">
+
+     <div class="video-card vc1" id="vc1">
+      <div class="video-thumb"><span class="vnum">01</span><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+      <div class="video-info"><div class="vtag">Módulo 01</div><h3>Introducción</h3><div class="vmeta"><span>Joss Design</span><span class="vdot"></span><span>Inicio del curso</span></div></div>
+     </div>
+
+     <div class="video-card vc2" id="vc2">
+      <div class="video-thumb"><span class="vnum">02</span><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+      <div class="video-info"><div class="vtag">Módulo 02</div><h3>Manejo de los Prompts en Gemini</h3><div class="vmeta"><span>Joss Design</span><span class="vdot"></span><span>IA &amp; Prompts</span></div></div>
+     </div>
+
+     <div class="video-card vc3" id="vc3">
+      <div class="video-thumb"><span class="vnum">03</span><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+      <div class="video-info"><div class="vtag">Módulo 03</div><h3>Cómo Incorporar la IA en tus Diseños</h3><div class="vmeta"><span>Joss Design</span><span class="vdot"></span><span>Diseño + IA</span></div></div>
+     </div>
+
+     <div class="video-card vc4" id="vc4">
+      <div class="video-thumb"><span class="vnum">04</span><span class="cs-badge">Próximamente</span><div class="play-btn" style="opacity:.33;pointer-events:none"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+      <div class="video-info"><div class="vtag">Módulo 04</div><h3>Video 4 — Próximamente</h3><div class="vmeta"><span>Joss Design</span><span class="vdot"></span><span>En preparación</span></div></div>
+     </div>
+
+    </div>
+   </div>
+
+   <!-- INSTALACION -->
+   <div class="panel" id="panel-instalacion">
+    <div class="sec-title">Instalación</div>
+    <div class="placeholder-panel">
+     <div class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/><path d="M15.54 8.46a5 5 0 010 7.07M8.46 8.46a5 5 0 000 7.07"/></svg></div>
+     <h2>Contenido en preparación</h2>
+     <p>Esta sección estará disponible muy pronto con guías de instalación y recursos.</p>
+     <div class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Próximamente</div>
+    </div>
+   </div>
+
+   <!-- REDES -->
+   <div class="panel" id="panel-redes">
+    <div class="sec-title">Redes sociales</div>
+    <div class="redes-grid">
+     <a class="red-card tiktok" href="https://www.tiktok.com/@josb.design" target="_blank">
+      <div class="rring"></div><div class="rring2"></div>
+      <div class="red-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.77.01 2.89 2.89 0 012.89-2.9c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-6.13 6.33 6.34 6.34 0 0012.67 0V8.68a8.18 8.18 0 004.78 1.53V6.76a4.85 4.85 0 01-1.01-.07z" fill="#EE1D52"/><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.77.01 2.89 2.89 0 012.89-2.9c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-6.13 6.33 6.34 6.34 0 0012.67 0V8.68a8.18 8.18 0 004.78 1.53V6.76a4.85 4.85 0 01-1.01-.07z" fill="#69C9D0" opacity=".45"/></svg></div>
+      <div class="red-info"><div class="r-plat">TikTok</div><div class="r-handle">@josb.design</div><div class="r-sub">Contenido diario de diseño e IA</div></div>
+      <span class="red-cta">Ver perfil <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+     </a>
+     <a class="red-card whatsapp" href="https://wa.me/51915150077" target="_blank">
+      <div class="rring"></div><div class="rring2"></div>
+      <div class="red-icon"><svg viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
+      <div class="red-info"><div class="r-plat">WhatsApp</div><div class="r-handle">+51 915 150 077</div><div class="r-sub">Consultas y soporte directo</div></div>
+      <span class="red-cta">Escribir <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+     </a>
+    </div>
+   </div>
+
+  </div>
+ </main>
+</div><!-- /protected-content -->
+
+<script>
+// ═══════════════════════════ DB ═══════════════════════════
+const DB={
+  get:k=>{try{return JSON.parse(localStorage.getItem('jd3_'+k))}catch{return null}},
+  set:(k,v)=>localStorage.setItem('jd3_'+k,JSON.stringify(v))
+};
+const getUsers  =()=>DB.get('u')||{};
+const getPending=()=>DB.get('p')||[];
+const getAffs   =()=>DB.get('a')||{JOSS10:0,DESIGN20:0};
+const getCurrent=()=>DB.get('c')||null;
+const saveUsers  =v=>DB.set('u',v);
+const savePending=v=>DB.set('p',v);
+const saveAffs   =v=>DB.set('a',v);
+const saveCurrent=v=>DB.set('c',v);
+
+// ensure admin
+(()=>{const u=getUsers();if(!u['admin@jossdesign.com']){u['admin@jossdesign.com']={pass:'admin1234',role:'admin',since:'-'};saveUsers(u);}})();
+
+// ═══════════════════════════ SECURITY ═══════════════════════════
+// Content is hidden in CSS. Only this JS unlocks it for verified users.
+function revealApp(){
+  document.getElementById('protected-content').classList.add('unlocked');
+}
+
+// ═══════════════════════════ MODAL ═══════════════════════════
+function openModal(tab){
+  document.getElementById('modal-overlay').classList.add('open');
+  switchModal(tab||'buy');
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open')}
+function closeModalOutside(e){if(e.target===document.getElementById('modal-overlay'))closeModal()}
+function switchModal(tab){
+  document.getElementById('tab-buy').classList.toggle('active',tab==='buy');
+  document.getElementById('tab-login').classList.toggle('active',tab==='login');
+  document.getElementById('mform-buy').classList.toggle('active',tab==='buy');
+  document.getElementById('mform-login').classList.toggle('active',tab==='login');
+}
+
+// ═══════════════════════════ HELPERS ═══════════════════════════
+function fmsg(id,txt,type){const e=document.getElementById(id);e.className='fmsg '+type;e.textContent=txt;}
+function clearMsg(id){const e=document.getElementById(id);if(e)e.className='fmsg';}
+function copyText(txt,btn){
+  navigator.clipboard.writeText(txt).then(()=>{
+    const orig=btn.innerHTML;
+    btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="10" height="10"><polyline points="20 6 9 17 4 12"/></svg>¡Copiado!`;
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.innerHTML=orig;btn.classList.remove('copied')},2000);
+  }).catch(()=>{
+    // fallback
+    const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    const orig=btn.innerHTML;btn.innerHTML='¡Copiado!';btn.classList.add('copied');
+    setTimeout(()=>{btn.innerHTML=orig;btn.classList.remove('copied')},2000);
+  });
+}
+
+function generateOrderNum(){
+  const ts=Date.now().toString(36).toUpperCase();
+  const rand=Math.random().toString(36).substring(2,6).toUpperCase();
+  return 'JD-'+ts+'-'+rand;
+}
+
+// ═══════════════════════════ PAYMENT FLOW ═══════════════════════════
+let selMethod='', currentOrder='';
+
+function selectMethod(m){
+  selMethod=m;
+  document.querySelectorAll('.pay-opt').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('po-'+m).classList.add('selected');
+  document.getElementById('btn-step2').disabled=false;
+  clearMsg('b1-msg');
+}
+
+function goToStep2(){
+  if(!selMethod)return fmsg('b1-msg','Selecciona un método de pago.','err');
+  currentOrder=generateOrderNum();
+  document.getElementById('order-num').textContent=currentOrder;
+  document.getElementById('buy-s1').style.display='none';
+  document.getElementById('buy-s2').style.display='block';
+  document.querySelectorAll('.pay-detail').forEach(el=>el.classList.remove('show'));
+  document.getElementById('pd-'+selMethod).classList.add('show');
+  const price=DB.get('price')||'Consultar con admin';
+  ['yape','plin','bcp','paypal'].forEach(m=>{
+    const el=document.getElementById('pp-'+m);
+    if(el){
+      el.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Precio: ${price}`;
+    }
+  });
+}
+
+function goBackToS1(){
+  document.getElementById('buy-s2').style.display='none';
+  document.getElementById('buy-s1').style.display='block';
+  document.getElementById('wa-cta').style.display='none';
+  document.getElementById('btn-submit').disabled=false;
+  clearMsg('b2-msg');
+}
+
+function toggleAff(){
+  const w=document.getElementById('aff-wrap');
+  w.style.display=w.style.display==='none'?'block':'none';
+}
+
+function submitPurchase(){
+  const email=document.getElementById('b-email').value.trim().toLowerCase();
+  const pass =document.getElementById('b-pass').value;
+  const aff  =document.getElementById('b-aff').value.trim().toUpperCase();
+  clearMsg('b2-msg');
+
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return fmsg('b2-msg','Ingresa un correo válido.','err');
+  if(pass.length<6)return fmsg('b2-msg','La contraseña debe tener al menos 6 caracteres.','err');
+
+  const users=getUsers();
+  if(users[email]){
+    if(users[email].role==='approved')return fmsg('b2-msg','Este correo ya tiene acceso activo. Usa "Ya tengo acceso".','inf');
+    if(users[email].role==='pending') return fmsg('b2-msg','Ya tienes una solicitud en proceso. Espera la confirmación.','inf');
+  }
+  if(aff){const affs=getAffs();if(!affs.hasOwnProperty(aff))return fmsg('b2-msg','Código de afiliado no válido.','err');}
+
+  // save pending
+  const pending=getPending();
+  pending.push({email,pass,method:selMethod,affiliate:aff||null,order:currentOrder,date:new Date().toLocaleString('es'),ts:Date.now()});
+  savePending(pending);
+  if(aff){const affs=getAffs();affs[aff]=(affs[aff]||0)+1;saveAffs(affs);}
+
+  // build WhatsApp pre-filled message
+  const methodNames={yape:'Yape',plin:'Plin',bcp:'BCP / Transferencia',paypal:'PayPal'};
+  const waMsg=encodeURIComponent(
+    `Hola Joss Design! 👋\n\nAcabo de realizar el pago del curso.\n\n📧 Correo: ${email}\n🔢 Orden: ${currentOrder}\n💳 Método: ${methodNames[selMethod]}\n\nAdjunto mi comprobante de pago. ¡Quedo atento a la confirmación!`
+  );
+  document.getElementById('wa-link').href=`https://wa.me/51915150077?text=${waMsg}`;
+  document.getElementById('wa-cta').style.display='block';
+  document.getElementById('btn-submit').disabled=true;
+  fmsg('b2-msg','✅ Solicitud guardada. Ahora envía tu comprobante por WhatsApp para activar tu acceso.','ok');
+}
+
+// ═══════════════════════════ LOGIN ═══════════════════════════
+function doLogin(){
+  const email=document.getElementById('l-email').value.trim().toLowerCase();
+  const pass =document.getElementById('l-pass').value;
+  clearMsg('l-msg');
+  if(!email||!pass)return fmsg('l-msg','Completa todos los campos.','err');
+  const users=getUsers();
+  if(!users[email])return fmsg('l-msg','Correo no encontrado. ¿Ya pagaste y enviaste el comprobante?','err');
+  if(users[email].pass!==pass)return fmsg('l-msg','Contraseña incorrecta.','err');
+  if(users[email].role==='pending')return fmsg('l-msg','Tu comprobante aún está en revisión. Te avisaremos pronto.','inf');
+  if(users[email].role==='admin'){saveCurrent(email);closeModal();openAdmin();return;}
+  if(users[email].role!=='approved')return fmsg('l-msg','Acceso denegado.','err');
+  saveCurrent(email);
+  closeModal();
+  setLoggedIn(email);
+}
+
+function doLogout(){saveCurrent(null);location.reload();}
+
+function setLoggedIn(email){
+  revealApp();
+  document.getElementById('sb-user').classList.add('visible');
+  document.getElementById('sb-email').textContent=email;
+  document.getElementById('sb-actions').style.display='none';
+  document.getElementById('btn-logout').classList.add('visible');
+  applyUnlockToCards();
+}
+
+// ═══════════════════════════ LOCK OVERLAYS ═══════════════════════════
+function applyLockOverlays(){
+  revealApp(); // show the page structure (sidebar, layout)
+  ['vc1','vc2','vc3'].forEach(id=>{
+    const card=document.getElementById(id);
+    if(!card||card.querySelector('.lock-overlay'))return;
+    card.classList.add('locked');
+    const lo=document.createElement('div');
+    lo.className='lock-overlay';
+    lo.innerHTML=`
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      <span>Contenido exclusivo</span>
+      <button class="lo-btn" onclick="openModal('buy')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+        Comprar curso
+      </button>`;
+    card.appendChild(lo);
+  });
+}
+
+function applyUnlockToCards(){
+  document.querySelectorAll('.video-card').forEach(vc=>{
+    vc.classList.remove('locked');
+    vc.classList.add('unlocked');
+    const lo=vc.querySelector('.lock-overlay');
+    if(lo)lo.remove();
+  });
+}
+
+// ═══════════════════════════ ADMIN ═══════════════════════════
+function openAdmin(){
+  document.getElementById('admin-screen').classList.add('visible');
+  renderAdmin();
+}
+function exitAdmin(){
+  document.getElementById('admin-screen').classList.remove('visible');
+  setLoggedIn('admin@jossdesign.com');
+}
+
+function renderAdmin(){
+  const users=getUsers(),pending=getPending(),affs=getAffs();
+  const approved=Object.entries(users).filter(([,u])=>u.role==='approved');
+  const mLabel={yape:'Yape',plin:'Plin',bcp:'BCP',paypal:'PayPal'};
+
+  document.getElementById('adm-stats').innerHTML=`
+    <div class="stat-box"><div class="stat-n">${pending.length}</div><div class="stat-l">Pendientes</div></div>
+    <div class="stat-box"><div class="stat-n">${approved.length}</div><div class="stat-l">Con Acceso</div></div>
+    <div class="stat-box"><div class="stat-n">${Object.keys(affs).length}</div><div class="stat-l">Afiliados</div></div>
+  `;
+
+  const chkIcon=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+  const pendingHTML=pending.length===0
+    ?`<div class="empty-st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="20 6 9 17 4 12"/></svg><div>Sin solicitudes pendientes</div></div>`
+    :pending.map((p,i)=>`
+      <div class="pi-item">
+        <div style="flex:1;min-width:0">
+          <div class="pi-em">${p.email}</div>
+          <div class="pi-meta">${p.date}</div>
+          <div class="pi-order">${p.order||'—'}</div>
+          <span class="pi-method">${mLabel[p.method]||p.method}${p.affiliate?' · '+p.affiliate:''}</span>
+        </div>
+        <div class="pi-acts">
+          <button class="bapprove" onclick="approvePending(${i})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg>Aprobar
+          </button>
+          <button class="breject" onclick="rejectPending(${i})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>`).join('');
+
+  const approvedHTML=approved.length===0
+    ?`<div class="empty-st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div>Ningún usuario aprobado aún</div></div>`
+    :approved.filter(([e])=>e!=='admin@jossdesign.com').map(([email,u])=>`
+      <div class="apr-item">
+        <div class="chk">${chkIcon}</div>
+        <div style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.79rem">${email}</div>
+        <div style="font-size:.65rem;color:var(--muted);margin-right:6px;white-space:nowrap">${u.since||'—'}</div>
+        <button class="brev" onclick="revokeAccess('${email}')">Revocar</button>
+      </div>`).join('');
+
+  const affHTML=Object.entries(affs).map(([code,uses])=>`
+    <div class="aff-item">
+      <span class="aff-code">${code}</span>
+      <span style="font-size:.68rem;color:var(--muted)">${uses} uso${uses!==1?'s':''}</span>
+      <button class="brev" onclick="deleteAffiliate('${code}')">Eliminar</button>
+    </div>`).join('');
+
+  document.getElementById('adm-grid').innerHTML=`
+    <div class="adm-card">
+      <div class="adm-card-title"><span class="dot dy"></span>Solicitudes pendientes (${pending.length})</div>
+      <div class="pi-list">${pendingHTML}</div>
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title"><span class="dot dg"></span>Usuarios con acceso (${approved.length})</div>
+      <div class="apr-list">${approvedHTML}</div>
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title"><span class="dot dp"></span>Códigos de afiliado</div>
+      ${affHTML}
+      <button class="btn-add-aff" onclick="addAffiliate()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar código
+      </button>
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+        Configuración
+      </div>
+      <label class="flabel">Precio del curso</label>
+      <input class="finput" id="price-inp" type="text" placeholder="Ej: S/ 49" value="${DB.get('price')||''}"/>
+      <button class="btn-main" onclick="savePrice()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar precio
+      </button>
+      <div class="fmsg" id="price-msg"></div>
+    </div>
+  `;
+}
+
+function approvePending(i){
+  const p=getPending()[i];const u=getUsers();
+  u[p.email]={pass:p.pass,role:'approved',since:new Date().toLocaleDateString('es'),affiliate:p.affiliate,method:p.method,order:p.order};
+  saveUsers(u);const arr=getPending();arr.splice(i,1);savePending(arr);renderAdmin();
+}
+function rejectPending(i){
+  if(!confirm('¿Rechazar esta solicitud?'))return;
+  const arr=getPending();arr.splice(i,1);savePending(arr);renderAdmin();
+}
+function revokeAccess(email){
+  if(!confirm('¿Revocar acceso de '+email+'?'))return;
+  const u=getUsers();delete u[email];saveUsers(u);renderAdmin();
+}
+function addAffiliate(){
+  const code=prompt('Nuevo código (mayúsculas, sin espacios):');
+  if(!code)return;const clean=code.trim().toUpperCase().replace(/\s+/g,'');
+  if(!clean)return;const a=getAffs();a[clean]=0;saveAffs(a);renderAdmin();
+}
+function deleteAffiliate(code){
+  if(!confirm('¿Eliminar código '+code+'?'))return;
+  const a=getAffs();delete a[code];saveAffs(a);renderAdmin();
+}
+function savePrice(){
+  const v=document.getElementById('price-inp').value.trim();
+  DB.set('price',v);
+  fmsg('price-msg','✓ Precio guardado','ok');
+  setTimeout(()=>document.getElementById('price-msg').className='fmsg',2500);
+}
+
+// ═══════════════════════════ NAV ═══════════════════════════
+const pageHeaders={
+  videos:{title:'Mis <em>Videos</em>',sub:'Aprende diseño e inteligencia artificial con Joss Design.'},
+  instalacion:{title:'<em>Instalación</em>',sub:'Guías y recursos para configurar tu entorno.'},
+  redes:{title:'Nuestras <em>Redes</em>',sub:'Conéctate con Joss Design en todas las plataformas.'}
+};
+function showPanel(name,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  const h=pageHeaders[name];
+  document.getElementById('page-header').innerHTML=`<h1>${h.title}</h1><p>${h.sub}</p>`;
+}
+
+// ═══════════════════════════ INIT ═══════════════════════════
+(()=>{
+  const cur=getCurrent();
+  const users=getUsers();
+  if(cur&&users[cur]){
+    if(users[cur].role==='admin'){revealApp();openAdmin();}
+    else if(users[cur].role==='approved'){setLoggedIn(cur);}
+    else{saveCurrent(null);applyLockOverlays();}
+  } else {
+    saveCurrent(null);
+    applyLockOverlays();
+  }
+})();
+</script>
+</body>
+</html>
