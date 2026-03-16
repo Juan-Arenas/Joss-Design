@@ -3,587 +3,1147 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Joss Design — Admin</title>
+<title>Joss Design — Curso</title>
 <link rel="icon" type="image/png" href="Joss.png"/>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<script src="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js"
+  kr-public-key="19131378:publickey_FCreyHUK1syQokKpjc9lFXmSsWR1tdP1qOMnaekvTBLeS"
+  kr-language="es-PE"
+  kr-post-url-success="about:blank"></script>
+<link rel="stylesheet" href="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/classic-reset.min.css"/>
+<link rel="stylesheet" href="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/classic.min.css"/>
 <style>
 :root{
-  --bg:#06060d;--surface:#0d0d17;--surface2:#12121e;--surface3:#181826;
+  --bg:#07070d;--surface:#0f0f18;--surface2:#151520;--surface3:#1b1b29;
   --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);
-  --accent:#c8ff57;--accent2:#7c5cfc;--text:#eeeef5;--muted:#565670;
-  --green:#22c55e;--yellow:#fbbf24;--red:#ef4444;
+  --accent:#c8ff57;--accent2:#7c5cfc;--text:#eeeef5;--muted:#5e5e78;
+  --green:#22c55e;--red:#ef4444;--yellow:#fbbf24;--sw:276px;
+  --radius:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow-x:hidden}
 
-/* ── LOGIN ── */
-#login-gate{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
-#login-gate.hidden{display:none}
-.gate-wrap{width:100%;max-width:380px}
-.gate-logo{text-align:center;margin-bottom:24px}
-.gate-logo-img{width:52px;height:52px;border-radius:14px;overflow:hidden;margin:0 auto 10px;background:var(--surface2)}
-.gate-logo-img img{width:100%;height:100%;object-fit:cover}
-.gate-logo-brand{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.1rem;color:var(--text)}
-.gate-logo-brand span{color:var(--accent)}
-.gate-logo-sub{font-size:.67rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
-.gate-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.65)}
-.gate-head{background:linear-gradient(135deg,#09091a,#0f0f28 55%,#14083a);padding:24px 24px 18px;position:relative;overflow:hidden;text-align:center}
-.gate-head::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -30%,rgba(124,92,252,.55) 0%,transparent 65%)}
-.gate-icon{width:48px;height:48px;border-radius:13px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.22);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;position:relative;z-index:1}
-.gate-icon svg{width:20px;height:20px;color:#f87171}
-.gate-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1rem;position:relative;z-index:1}
-.gate-sub{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-top:2px;position:relative;z-index:1}
-.gate-body{padding:22px 22px 24px}
+/* ── SECURITY ── */
+#app{display:none;flex:1;min-width:0}
+#app.on{display:flex}
+
+/* ══ SIDEBAR ══ */
+.sidebar{
+  width:var(--sw);min-height:100vh;background:var(--surface);
+  border-right:1px solid var(--border);display:flex;flex-direction:column;
+  position:fixed;left:0;top:0;bottom:0;z-index:200;overflow-y:auto;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.sb-logo{padding:24px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-logo-img{width:34px;height:34px;border-radius:9px;overflow:hidden;flex-shrink:0;background:var(--surface2)}
+.sb-logo-img img{width:100%;height:100%;object-fit:cover}
+.sb-logo-txt .brand{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1rem;color:var(--text);letter-spacing:-.01em}
+.sb-logo-txt .brand span{color:var(--accent)}
+.sb-logo-txt .tag{font-size:.58rem;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-top:1px}
+
+.sb-user{margin:12px 12px 0;padding:12px 13px;background:linear-gradient(135deg,rgba(124,92,252,.08),rgba(200,255,87,.04));border:1px solid rgba(124,92,252,.2);border-radius:var(--radius);display:none}
+.sb-user.on{display:block}
+.su-lbl{font-size:.58rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.su-em{font-size:.79rem;color:var(--text);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.su-badge{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 9px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.22);border-radius:999px;font-size:.58rem;font-weight:700;color:#4ade80}
+.su-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:#4ade80;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.sb-actions{padding:12px 12px 4px;display:flex;flex-direction:column;gap:7px}
+.sb-buy{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 14px;border-radius:var(--radius);
+  background:var(--accent);color:#000;
+  font-family:'Montserrat',sans-serif;font-weight:800;font-size:.8rem;
+  letter-spacing:.04em;cursor:pointer;border:none;
+  transition:opacity .2s,transform .15s,box-shadow .2s;
+  box-shadow:0 4px 20px rgba(200,255,87,.2);
+}
+.sb-buy:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 6px 28px rgba(200,255,87,.32)}
+.sb-buy svg{width:14px;height:14px}
+.sb-login{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 14px;border-radius:var(--radius);
+  background:transparent;color:var(--muted);
+  font-family:'DM Sans',sans-serif;font-weight:600;font-size:.79rem;
+  cursor:pointer;border:1px solid var(--border2);
+  transition:border-color .2s,color .2s,background .2s;
+}
+.sb-login:hover{border-color:rgba(200,255,87,.3);color:var(--accent);background:rgba(200,255,87,.04)}
+.sb-login svg{width:13px;height:13px}
+
+.sb-div{height:1px;background:var(--border);margin:10px 12px}
+.sb-sec{padding:14px 12px 4px}
+.sb-sec-lbl{font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:0 8px;margin-bottom:7px}
+.nav-item{
+  display:flex;align-items:center;gap:9px;padding:9px 11px;
+  border-radius:10px;cursor:pointer;
+  transition:background .2s,color .2s;
+  font-size:.85rem;color:var(--muted);user-select:none;
+}
+.nav-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.nav-item.active{background:rgba(200,255,87,.08);color:var(--accent)}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;opacity:.55}
+.nav-item.active svg{opacity:1}
+
+.sb-foot{margin-top:auto;padding:13px;border-top:1px solid var(--border)}
+.btn-logout{
+  width:100%;padding:9px;background:transparent;
+  border:1px solid var(--border2);color:var(--muted);
+  border-radius:10px;font-size:.74rem;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:border-color .2s,color .2s;
+  display:none;align-items:center;justify-content:center;gap:6px;
+}
+.btn-logout.on{display:flex}
+.btn-logout:hover{border-color:#ff6b6b;color:#ff6b6b}
+.btn-logout svg{width:13px;height:13px}
+
+/* ── MOBILE HEADER ── */
+.mob-header{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:190;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 16px;height:56px;align-items:center;justify-content:space-between;
+}
+.mob-brand{font-family:'Montserrat',sans-serif;font-weight:900;font-size:.95rem;color:var(--text);display:flex;align-items:center;gap:8px}
+.mob-brand img{width:26px;height:26px;border-radius:7px;object-fit:cover}
+.mob-brand span{color:var(--accent)}
+.mob-right{display:flex;align-items:center;gap:9px}
+.mob-buy{
+  display:flex;align-items:center;gap:5px;padding:7px 13px;
+  background:var(--accent);color:#000;
+  font-family:'Montserrat',sans-serif;font-weight:800;font-size:.72rem;
+  border-radius:9px;cursor:pointer;border:none;
+}
+.hamburger{width:36px;height:36px;border-radius:9px;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-direction:column;gap:4px;padding:9px}
+.hamburger span{display:block;width:16px;height:1.5px;background:var(--text);border-radius:2px;transition:transform .3s,opacity .3s}
+.hamburger.open span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+.sb-backdrop{display:none;position:fixed;inset:0;z-index:195;background:rgba(0,0,0,.65);backdrop-filter:blur(6px)}
+.sb-backdrop.on{display:block}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sw);flex:1;min-height:100vh;display:flex;flex-direction:column;min-width:0}
+.topbar{padding:28px 44px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.page-header h1{font-family:'Montserrat',sans-serif;font-size:2.1rem;font-weight:900;letter-spacing:-.03em;line-height:1.1}
+.page-header h1 em{font-style:normal;color:var(--accent)}
+.page-header p{margin-top:8px;font-size:.87rem;color:var(--muted);max-width:400px;line-height:1.6}
+.live-badge{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 13px;
+  background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.25);
+  border-radius:999px;font-size:.68rem;font-weight:600;color:#b09cff;
+  letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;flex-shrink:0;
+}
+.live-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#7c5cfc;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+.content{padding:30px 44px 56px;flex:1}
+.panel{display:none;animation:fadeUp .35s ease both}.panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.sec-title{
+  font-family:'Montserrat',sans-serif;font-size:.69rem;font-weight:700;
+  color:var(--muted);letter-spacing:.11em;text-transform:uppercase;
+  margin-bottom:18px;display:flex;align-items:center;gap:10px;
+}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── VIDEO GRID ── */
+.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+.video-card{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:18px;overflow:hidden;cursor:pointer;position:relative;
+  transition:transform .3s,border-color .3s,box-shadow .3s;
+}
+.video-card.unlocked:hover{
+  transform:translateY(-5px);
+  border-color:rgba(200,255,87,.22);
+  box-shadow:0 16px 48px rgba(0,0,0,.45),0 0 0 1px rgba(200,255,87,.1);
+}
+.video-card.locked{cursor:default}
+.video-thumb{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.vc1 .video-thumb{background:linear-gradient(135deg,#12122a,#0d1a3a,#0a2855)}
+.vc1 .video-thumb::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 25% 35%,rgba(124,92,252,.35) 0%,transparent 55%),radial-gradient(circle at 78% 72%,rgba(200,255,87,.12) 0%,transparent 45%)}
+.vc2 .video-thumb{background:linear-gradient(135deg,#0a1520,#122030,#1a2d45)}
+.vc2 .video-thumb::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 65% 28%,rgba(200,255,87,.18) 0%,transparent 55%),radial-gradient(circle at 15% 68%,rgba(124,92,252,.22) 0%,transparent 45%)}
+.vc3 .video-thumb{background:linear-gradient(135deg,#160825,#251244,#301860)}
+.vc3 .video-thumb::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,rgba(200,255,87,.16) 0%,transparent 55%)}
+.vc4 .video-thumb{background:linear-gradient(135deg,#080e20,#0b1835,#0f2248)}
+.vc4 .video-thumb::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 38% 58%,rgba(124,92,252,.18) 0%,transparent 50%)}
+.play-btn{
+  width:50px;height:50px;border-radius:50%;
+  background:rgba(255,255,255,.08);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s,background .2s;position:relative;z-index:1;
+}
+.video-card.unlocked:hover .play-btn{background:var(--accent);transform:scale(1.12)}
+.play-btn svg{fill:white;width:16px;height:16px;margin-left:3px}
+.video-card.unlocked:hover .play-btn svg{fill:#000}
+.vnum{position:absolute;top:11px;left:11px;font-family:'Montserrat',sans-serif;font-size:.59rem;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:.1em;z-index:1}
+.video-info{padding:14px 16px 16px}
+.vtag{font-size:.59rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+.video-info h3{font-family:'Montserrat',sans-serif;font-size:.88rem;font-weight:700;line-height:1.35;color:var(--text)}
+.vmeta{margin-top:9px;display:flex;align-items:center;gap:7px;font-size:.69rem;color:var(--muted)}
+.vdot{width:3px;height:3px;border-radius:50%;background:var(--muted)}
+.cs-badge{position:absolute;top:11px;right:11px;padding:3px 9px;background:rgba(255,200,0,.12);border:1px solid rgba(255,200,0,.26);border-radius:999px;font-size:.57rem;font-weight:700;color:#ffd60a;letter-spacing:.06em;text-transform:uppercase}
+.lock-overlay{
+  position:absolute;inset:0;border-radius:18px;
+  background:rgba(7,7,13,.78);backdrop-filter:blur(5px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;z-index:3;
+}
+.lock-overlay svg{width:20px;height:20px;color:var(--muted);opacity:.6}
+.lock-overlay span{font-size:.68rem;color:var(--muted);font-weight:500}
+.lo-btn{
+  margin-top:4px;padding:7px 16px;border-radius:9px;
+  background:var(--accent);color:#000;
+  font-family:'Montserrat',sans-serif;font-weight:800;font-size:.67rem;
+  letter-spacing:.04em;cursor:pointer;border:none;
+  display:flex;align-items:center;gap:5px;
+  transition:opacity .2s,transform .15s;
+}
+.lo-btn:hover{opacity:.85;transform:scale(1.03)}
+.lo-btn svg{width:11px;height:11px}
+
+/* ── REDES ── */
+.redes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:18px}
+.red-card{border-radius:18px;padding:26px 22px;display:flex;flex-direction:column;gap:13px;border:1px solid var(--border);cursor:pointer;transition:transform .28s,box-shadow .28s;position:relative;overflow:hidden;text-decoration:none}
+.red-card:hover{transform:translateY(-5px)}
+.red-card::before{content:'';position:absolute;inset:0;opacity:.07;transition:opacity .3s}
+.red-card:hover::before{opacity:.13}
+.red-card.tiktok{background:linear-gradient(150deg,#0d0d16,#14141f)}
+.red-card.tiktok::before{background:linear-gradient(135deg,#69C9D0,#EE1D52 50%,#010101)}
+.red-card.tiktok:hover{box-shadow:0 18px 56px rgba(238,29,82,.18),0 0 0 1px rgba(238,29,82,.16)}
+.red-card.whatsapp{background:linear-gradient(150deg,#0c130c,#121c12)}
+.red-card.whatsapp::before{background:linear-gradient(135deg,#25D366,#128C7E)}
+.red-card.whatsapp:hover{box-shadow:0 18px 56px rgba(37,211,102,.18),0 0 0 1px rgba(37,211,102,.16)}
+.red-icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.red-card.tiktok .red-icon{background:linear-gradient(135deg,rgba(105,201,208,.16),rgba(238,29,82,.16));border:1px solid rgba(238,29,82,.26)}
+.red-card.whatsapp .red-icon{background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.26)}
+.red-icon svg{width:22px;height:22px}
+.red-info{position:relative;z-index:1}
+.r-plat{font-size:.59rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.red-card.tiktok .r-plat{color:#EE1D52}.red-card.whatsapp .r-plat{color:#25D366}
+.r-handle{font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.r-sub{font-size:.71rem;color:var(--muted);margin-top:3px}
+.red-cta{display:inline-flex;align-items:center;gap:5px;font-size:.73rem;font-weight:600;padding:7px 13px;border-radius:9px;align-self:flex-start;position:relative;z-index:1;transition:gap .2s;text-decoration:none}
+.red-card.tiktok .red-cta{background:rgba(238,29,82,.1);color:#ff6b8a;border:1px solid rgba(238,29,82,.18)}
+.red-card.whatsapp .red-cta{background:rgba(37,211,102,.08);color:#4ddb88;border:1px solid rgba(37,211,102,.18)}
+.red-card:hover .red-cta{gap:9px}
+.rring{position:absolute;right:-28px;bottom:-28px;width:125px;height:125px;border-radius:50%;border:1px solid;opacity:.07}
+.rring2{position:absolute;right:-48px;bottom:-48px;width:190px;height:190px;border-radius:50%;border:1px solid;opacity:.04}
+.red-card.tiktok .rring,.red-card.tiktok .rring2{border-color:#EE1D52}
+.red-card.whatsapp .rring,.red-card.whatsapp .rring2{border-color:#25D366}
+
+/* ── PLACEHOLDER ── */
+.ph-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:290px;text-align:center;gap:14px}
+.ph-icon{width:64px;height:64px;border-radius:18px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center}
+.ph-icon svg{width:25px;height:25px;color:var(--muted)}
+.ph-panel h2{font-family:'Montserrat',sans-serif;font-size:1.2rem;font-weight:800}
+.ph-panel p{color:var(--muted);font-size:.83rem;max-width:260px;line-height:1.6}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:999px;font-size:.68rem;color:var(--muted)}
+
+/* ══ CHECKOUT MODAL ══ */
+.co-overlay{
+  position:fixed;inset:0;z-index:600;
+  background:rgba(4,4,10,.93);backdrop-filter:blur(14px);
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.co-overlay.open{opacity:1;pointer-events:all}
+.co-modal{
+  width:100%;max-width:510px;background:var(--surface);
+  border:1px solid var(--border2);border-radius:22px;overflow:hidden;
+  box-shadow:0 48px 120px rgba(0,0,0,.85);
+  transform:translateY(22px) scale(.97);transition:transform .32s;
+  max-height:93vh;display:flex;flex-direction:column;
+}
+.co-overlay.open .co-modal{transform:translateY(0) scale(1)}
+
+.co-head{
+  background:linear-gradient(150deg,#0b0b1c,#10102a 50%,#160d38);
+  padding:20px 24px 16px;position:relative;overflow:hidden;flex-shrink:0;
+}
+.co-head::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -25%,rgba(124,92,252,.5) 0%,transparent 65%)}
+.co-close{
+  position:absolute;top:13px;right:13px;z-index:2;
+  width:28px;height:28px;border-radius:50%;
+  border:1px solid var(--border2);background:rgba(255,255,255,.04);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);transition:background .2s,color .2s;
+}
+.co-close:hover{background:rgba(255,255,255,.1);color:var(--text)}
+.co-head-inner{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
+.co-head-logo{width:32px;height:32px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--surface2)}
+.co-head-logo img{width:100%;height:100%;object-fit:cover}
+.co-brand{font-family:'Montserrat',sans-serif;font-weight:900;font-size:.95rem;color:var(--text)}
+.co-brand span{color:var(--accent)}
+.co-tagline{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-top:1px}
+.co-secure{display:inline-flex;align-items:center;gap:4px;margin-left:auto;padding:3px 9px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.18);border-radius:999px;font-size:.58rem;font-weight:700;color:#4ade80;white-space:nowrap}
+.co-secure svg{width:9px;height:9px}
+
+.co-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.co-tab{flex:1;padding:11px 8px;text-align:center;font-size:.71rem;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;letter-spacing:.05em;text-transform:uppercase;transition:color .2s,border-color .2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.co-tab.active{color:var(--accent);border-color:var(--accent)}
+.co-tab svg{width:13px;height:13px}
+.co-body{padding:20px 22px 22px;overflow-y:auto;flex:1}
+.co-body::-webkit-scrollbar{width:3px}
+.co-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.co-form{display:none}.co-form.active{display:block}
+
+/* ── FORM ELEMENTS ── */
 .flabel{display:block;font-size:.63rem;font-weight:700;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
-.finput{width:100%;padding:10px 13px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.86rem;outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:12px}
+.finput{
+  width:100%;padding:10px 13px;background:var(--surface2);
+  border:1px solid var(--border2);border-radius:10px;
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:.87rem;
+  outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:12px;
+}
 .finput:focus{border-color:rgba(200,255,87,.38);box-shadow:0 0 0 3px rgba(200,255,87,.07)}
 .finput::placeholder{color:var(--muted)}
-.btn-main{width:100%;padding:12px;background:var(--accent);color:#000;font-family:'Montserrat',sans-serif;font-weight:800;font-size:.86rem;letter-spacing:.04em;border:none;border-radius:11px;cursor:pointer;transition:opacity .2s,transform .15s;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 18px rgba(200,255,87,.18)}
-.btn-main:hover{opacity:.86;transform:translateY(-1px)}
-.fmsg{margin-top:8px;padding:8px 11px;border-radius:8px;font-size:.76rem;display:none}
-.fmsg.err{background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.22);color:#f87171;display:block}
+select.finput{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235e5e78' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+select.finput option{background:#151520}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fmsg{margin-top:9px;padding:10px 13px;border-radius:9px;font-size:.79rem;display:none;line-height:1.5}
 .fmsg.ok{background:rgba(34,197,94,.09);border:1px solid rgba(34,197,94,.22);color:#4ade80;display:block}
+.fmsg.err{background:rgba(239,68,68,.09);border:1px solid rgba(239,68,68,.22);color:#f87171;display:block}
+.fmsg.inf{background:rgba(124,92,252,.09);border:1px solid rgba(124,92,252,.25);color:#a78bfa;display:block}
+.fmsg.warn{background:rgba(251,191,36,.09);border:1px solid rgba(251,191,36,.22);color:#fbbf24;display:block}
 
-/* ── ADMIN APP ── */
-#admin-app{display:none;min-height:100vh;flex-direction:column}
-#admin-app.on{display:flex}
-
-.top-bar{
-  background:var(--surface);border-bottom:1px solid var(--border);
-  padding:0 28px;height:58px;display:flex;align-items:center;
-  justify-content:space-between;position:sticky;top:0;z-index:50;
+.btn-main{
+  width:100%;padding:13px;background:var(--accent);color:#000;
+  font-family:'Montserrat',sans-serif;font-weight:800;font-size:.88rem;
+  letter-spacing:.04em;border:none;border-radius:12px;cursor:pointer;
+  transition:opacity .2s,transform .15s,box-shadow .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 4px 20px rgba(200,255,87,.18);
 }
-.top-left{display:flex;align-items:center;gap:12px}
-.top-logo{width:30px;height:30px;border-radius:8px;overflow:hidden;background:var(--surface2)}
-.top-logo img{width:100%;height:100%;object-fit:cover}
-.top-brand{font-family:'Montserrat',sans-serif;font-weight:900;font-size:.95rem;color:var(--text)}
-.top-brand span{color:var(--accent)}
-.adm-badge{padding:3px 10px;border-radius:999px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.24);font-size:.6rem;font-weight:700;color:#f87171;letter-spacing:.08em;text-transform:uppercase}
-.top-time{font-size:.7rem;color:var(--muted)}
-.btn-out{padding:7px 14px;background:transparent;border:1px solid var(--border2);color:var(--muted);border-radius:9px;font-size:.74rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:border-color .2s,color .2s;display:flex;align-items:center;gap:5px}
-.btn-out:hover{border-color:#ff6b6b;color:#ff6b6b}
-.btn-out svg{width:12px;height:12px}
+.btn-main:hover{opacity:.87;transform:translateY(-1px);box-shadow:0 6px 28px rgba(200,255,87,.28)}
+.btn-main:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
 
-.body{padding:26px;flex:1}
-.body-inner{max-width:1100px;margin:0 auto}
+/* ── ORDER SUMMARY ── */
+.order-summary{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:13px;padding:15px 16px;margin-bottom:18px;
+}
+.os-title{font-size:.62rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:11px;display:flex;align-items:center;gap:6px}
+.os-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)}
+.os-row:last-child{border:none;padding-top:10px;margin-top:2px}
+.os-label{font-size:.79rem;color:var(--muted)}
+.os-val{font-size:.79rem;color:var(--text);font-weight:600}
+.os-total-label{font-family:'Montserrat',sans-serif;font-size:.84rem;font-weight:800}
+.os-total-val{font-family:'Montserrat',sans-serif;font-size:1.05rem;font-weight:900;color:var(--accent)}
 
-/* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:26px}
-.sc{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:17px 20px;position:relative;overflow:hidden}
-.sc::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;border-radius:2px 0 0 2px}
-.sc.sy::before{background:var(--yellow)}.sc.sg::before{background:var(--green)}.sc.sp::before{background:var(--accent2)}.sc.sa::before{background:var(--accent)}
-.sc-n{font-family:'Montserrat',sans-serif;font-size:2rem;font-weight:900;color:var(--text)}
-.sc-l{font-size:.65rem;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.07em}
+/* ── PAYMENT METHOD PILLS ── */
+.pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.pm-pill{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 10px;border-radius:11px;
+  background:var(--surface2);border:1.5px solid var(--border);
+  cursor:pointer;transition:border-color .2s,background .2s;
+  font-size:.76rem;font-weight:600;color:var(--muted);
+}
+.pm-pill:hover{border-color:rgba(200,255,87,.2);color:var(--text)}
+.pm-pill.sel{border-color:var(--accent);background:rgba(200,255,87,.06);color:var(--text)}
+.pm-pill svg{width:18px;height:18px;flex-shrink:0}
 
-/* QUICK APPROVE */
-.quick-box{
+/* ── IZIPAY ── */
+.izipay-brand-bar{
+  display:flex;align-items:center;gap:10px;padding:10px 13px;
+  background:rgba(227,6,19,.07);border:1px solid rgba(227,6,19,.18);
+  border-radius:10px;margin-bottom:13px;
+}
+.izipay-brand-bar svg{width:24px;height:24px;flex-shrink:0}
+.izipay-brand-bar div strong{font-size:.8rem;color:var(--text);display:block}
+.izipay-brand-bar div span{font-size:.68rem;color:var(--muted)}
+.izipay-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:12px}
+.spinner{width:32px;height:32px;border:2.5px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.izipay-loading p{font-size:.78rem;color:var(--muted)}
+.izipay-error-box{padding:13px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);border-radius:10px;font-size:.79rem;color:#f87171;margin-bottom:12px;display:none}
+.izipay-error-box.show{display:block}
+
+/* ── MANUAL METHODS ── */
+.manual-hero{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:13px;padding:16px;margin-bottom:13px;text-align:center;
+}
+.mh-name{font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.35rem;margin-bottom:5px}
+.yape-c{background:linear-gradient(135deg,#7b2ff7,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.plin-c{background:linear-gradient(135deg,#00bcd4,#00838f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pp-c{background:linear-gradient(135deg,#003087,#009cde);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.mh-num{font-size:1.25rem;font-weight:800;color:var(--text);letter-spacing:.05em;margin:5px 0 3px;font-family:'Montserrat',sans-serif}
+.mh-sub{font-size:.73rem;color:var(--muted)}
+.price-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;background:rgba(200,255,87,.07);border:1px solid rgba(200,255,87,.17);border-radius:999px;font-size:.77rem;font-weight:700;color:var(--accent);font-family:'Montserrat',sans-serif;margin-top:7px}
+
+.pay-steps{list-style:none;margin:10px 0 0}
+.pay-steps li{display:flex;gap:8px;align-items:flex-start;font-size:.77rem;color:var(--muted);padding:5px 0;border-bottom:1px solid var(--border);line-height:1.45}
+.pay-steps li:last-child{border:none}
+.snum{width:18px;height:18px;flex-shrink:0;border-radius:50%;background:rgba(200,255,87,.09);border:1px solid rgba(200,255,87,.18);display:flex;align-items:center;justify-content:center;font-size:.56rem;font-weight:800;color:var(--accent);margin-top:1px}
+
+/* ── ORDER BOX ── */
+.order-box{
   background:linear-gradient(135deg,rgba(124,92,252,.09),rgba(200,255,87,.05));
-  border:1px solid rgba(124,92,252,.22);border-radius:16px;
-  padding:18px 22px;margin-bottom:26px;
-}
-.qb-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:.88rem;margin-bottom:3px;display:flex;align-items:center;gap:7px}
-.qb-title svg{color:var(--accent2);width:17px;height:17px}
-.qb-sub{font-size:.75rem;color:var(--muted);margin-bottom:14px}
-.qb-row{display:flex;gap:9px;align-items:flex-start;flex-wrap:wrap}
-.qb-inp{flex:1;min-width:180px;padding:10px 13px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:.88rem;font-weight:700;letter-spacing:.04em;outline:none;transition:border-color .2s,box-shadow .2s}
-.qb-inp:focus{border-color:rgba(200,255,87,.38);box-shadow:0 0 0 3px rgba(200,255,87,.07)}
-.qb-inp::placeholder{color:var(--muted);font-weight:400;font-family:'DM Sans',sans-serif}
-.btn-qa{padding:10px 20px;background:var(--accent);color:#000;font-family:'Montserrat',sans-serif;font-weight:800;font-size:.82rem;letter-spacing:.04em;border:none;border-radius:10px;cursor:pointer;transition:opacity .2s,transform .15s;display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 3px 14px rgba(200,255,87,.16)}
-.btn-qa:hover{opacity:.86;transform:translateY(-1px)}
-.btn-qa svg{width:14px;height:14px}
-.qb-msg{width:100%;margin-top:5px}
-
-/* MANUAL USER BOX */
-.manual-user-box{
-  background:linear-gradient(135deg,rgba(34,197,94,.07),rgba(200,255,87,.04));
-  border:1px solid rgba(34,197,94,.2);border-radius:16px;
-  padding:18px 22px;margin-bottom:26px;
-}
-.mub-title{font-family:'Montserrat',sans-serif;font-weight:800;font-size:.88rem;margin-bottom:3px;display:flex;align-items:center;gap:7px}
-.mub-title svg{color:var(--green);width:17px;height:17px}
-.mub-sub{font-size:.75rem;color:var(--muted);margin-bottom:14px}
-.mub-grid{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:flex-end;flex-wrap:wrap}
-.mub-field{display:flex;flex-direction:column;gap:4px}
-.mub-label{font-size:.62rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
-.mub-inp{padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;transition:border-color .2s;width:100%}
-.mub-inp:focus{border-color:rgba(34,197,94,.4);box-shadow:0 0 0 3px rgba(34,197,94,.07)}
-.mub-inp::placeholder{color:var(--muted)}
-.btn-add-user{padding:10px 18px;background:var(--green);color:#000;font-family:'Montserrat',sans-serif;font-weight:800;font-size:.81rem;letter-spacing:.04em;border:none;border-radius:10px;cursor:pointer;transition:opacity .2s,transform .15s;display:flex;align-items:center;gap:6px;white-space:nowrap;box-shadow:0 3px 14px rgba(34,197,94,.2)}
-.btn-add-user:hover{opacity:.86;transform:translateY(-1px)}
-.btn-add-user svg{width:14px;height:14px}
-.mub-msg{margin-top:5px}
-
-/* GRID */
-.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px}
-.card.full{grid-column:1/-1}
-.card-title{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.75rem;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;margin-bottom:13px;display:flex;align-items:center;gap:7px}
-.dot{width:7px;height:7px;border-radius:50%}
-.dy{background:var(--yellow)}.dg{background:var(--green)}.dp{background:var(--accent2)}.da{background:var(--accent)}
-
-/* PENDING */
-.pi-list{display:flex;flex-direction:column;gap:8px}
-.pi-item{
-  background:var(--surface2);border:1px solid var(--border);
-  border-radius:12px;padding:12px 14px;
+  border:1px solid rgba(124,92,252,.22);border-radius:11px;
+  padding:12px 15px;margin-bottom:13px;
   display:flex;align-items:center;justify-content:space-between;gap:10px;
-  transition:border-color .2s;
 }
-.pi-item:hover{border-color:rgba(200,255,87,.13)}
-.pi-l{flex:1;min-width:0}
-.pi-em{font-weight:600;font-size:.83rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pi-name{font-size:.68rem;color:var(--muted);margin-top:1px}
-.pi-date{font-size:.64rem;color:var(--muted);margin-top:1px}
-.pi-order{font-family:'Montserrat',sans-serif;font-size:.7rem;font-weight:700;color:var(--accent2);margin-top:3px}
-.pi-method{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:999px;background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.2);color:#a78bfa;margin-top:3px;display:inline-block}
-.pi-acts{display:flex;gap:5px;flex-shrink:0}
-.bapp{padding:6px 12px;border-radius:8px;font-size:.7rem;font-weight:700;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.26);display:flex;align-items:center;gap:4px;transition:background .2s}
-.bapp:hover{background:rgba(34,197,94,.22)}
-.bapp svg{width:10px;height:10px}
-.brej{padding:6px 9px;border-radius:8px;font-size:.7rem;font-weight:700;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;background:rgba(239,68,68,.09);color:#f87171;border:1px solid rgba(239,68,68,.2);display:flex;align-items:center;gap:4px;transition:background .2s}
-.brej:hover{background:rgba(239,68,68,.18)}
-.brej svg{width:10px;height:10px}
+.ob-label{font-size:.61rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.ob-num{font-family:'Montserrat',sans-serif;font-size:.94rem;font-weight:800;color:var(--text);letter-spacing:.04em}
 
-/* APPROVED */
-.apr-list{display:flex;flex-direction:column;gap:7px;max-height:340px;overflow-y:auto}
-.apr-list::-webkit-scrollbar{width:3px}
-.apr-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-.apr-item{display:flex;align-items:center;gap:9px;padding:9px 13px;background:var(--surface2);border-radius:10px}
-.chk{width:18px;height:18px;border-radius:50%;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.24);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.chk svg{width:9px;height:9px;color:#4ade80}
-.apr-em{flex:1;font-size:.79rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.apr-badge{font-size:.6rem;padding:2px 7px;border-radius:999px;font-weight:700;flex-shrink:0}
-.apr-badge.manual{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#4ade80}
-.apr-badge.izipay{background:rgba(227,6,19,.1);border:1px solid rgba(227,6,19,.2);color:#f87171}
-.apr-badge.yape{background:rgba(124,92,252,.1);border:1px solid rgba(124,92,252,.2);color:#a78bfa}
-.apr-badge.plin{background:rgba(0,188,212,.1);border:1px solid rgba(0,188,212,.2);color:#22d3ee}
-.apr-badge.paypal{background:rgba(0,156,222,.1);border:1px solid rgba(0,156,222,.2);color:#60a5fa}
-.apr-dt{font-size:.65rem;color:var(--muted);flex-shrink:0}
-.brev{padding:4px 10px;border-radius:7px;background:transparent;border:1px solid var(--border2);color:var(--muted);font-size:.63rem;cursor:pointer;transition:border-color .2s,color .2s}
-.brev:hover{border-color:var(--red);color:var(--red)}
+.copy-btn{padding:4px 10px;border-radius:7px;background:rgba(200,255,87,.08);border:1px solid rgba(200,255,87,.17);color:var(--accent);font-size:.61rem;font-weight:700;cursor:pointer;transition:background .2s;white-space:nowrap;font-family:'DM Sans',sans-serif;display:inline-flex;align-items:center;gap:3px}
+.copy-btn:hover{background:rgba(200,255,87,.16)}
+.copy-btn.copied{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.25);color:#4ade80}
 
-/* AFFILIATES */
-.aff-item{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:var(--surface2);border-radius:10px;margin-bottom:7px}
-.aff-code{font-family:'Montserrat',sans-serif;font-weight:700;font-size:.84rem;color:var(--accent2)}
-.aff-uses{font-size:.68rem;color:var(--muted)}
-.btn-add-aff{width:100%;padding:9px;background:rgba(124,92,252,.08);border:1px dashed rgba(124,92,252,.28);color:var(--accent2);border-radius:9px;font-size:.76rem;font-weight:600;cursor:pointer;transition:background .2s;font-family:'DM Sans',sans-serif;margin-top:3px;display:flex;align-items:center;justify-content:center;gap:5px}
-.btn-add-aff:hover{background:rgba(124,92,252,.16)}
+/* ── WA BUTTON ── */
+.btn-wa{
+  width:100%;padding:12px;
+  background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.24);
+  color:#4ddb88;border-radius:12px;
+  font-family:'Montserrat',sans-serif;font-weight:700;font-size:.83rem;
+  cursor:pointer;transition:background .2s,transform .15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  text-decoration:none;margin-top:8px;
+}
+.btn-wa:hover{background:rgba(37,211,102,.18);transform:translateY(-1px)}
+.btn-wa svg{width:17px;height:17px;flex-shrink:0}
 
-/* LOG */
-.log-list{display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto}
-.log-list::-webkit-scrollbar{width:3px}
-.log-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-.log-item{display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--surface2);border-radius:9px;font-size:.74rem}
-.ld{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.ld.lg{background:var(--green)}.ld.lr{background:var(--red)}.ld.ly{background:var(--yellow)}
-.lt{flex:1;color:var(--text)}.ltime{font-size:.63rem;color:var(--muted);flex-shrink:0}
+/* ── STATUS TRACKER ── */
+.status-track{
+  margin:14px 0;background:var(--surface2);
+  border:1px solid var(--border2);border-radius:13px;padding:14px 15px;
+}
+.st-bar-title{font-size:.62rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.st-step{display:flex;align-items:flex-start;gap:10px;position:relative;padding-bottom:13px}
+.st-step:last-child{padding-bottom:0}
+.st-step::before{content:'';position:absolute;left:12px;top:26px;bottom:0;width:1px;background:var(--border)}
+.st-step:last-child::before{display:none}
+.st-ic{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.st-ic.done{background:rgba(200,255,87,.13);border:1.5px solid rgba(200,255,87,.35)}
+.st-ic.done svg{color:var(--accent);width:11px;height:11px}
+.st-ic.spin{background:rgba(124,92,252,.13);border:1.5px solid rgba(124,92,252,.35);animation:pulseR 1.8s infinite}
+.st-ic.spin svg{color:#a78bfa;width:11px;height:11px}
+.st-ic.wait{background:var(--surface2);border:1.5px solid var(--border2)}
+.st-ic.wait svg{color:var(--muted);width:11px;height:11px}
+@keyframes pulseR{0%,100%{box-shadow:0 0 0 0 rgba(124,92,252,.4)}50%{box-shadow:0 0 0 6px rgba(124,92,252,0)}}
+.st-lbl{font-size:.79rem;font-weight:600;color:var(--text);padding-top:2px}
+.st-lbl.dim{color:var(--muted)}
+.st-desc{font-size:.7rem;color:var(--muted);margin-top:2px;line-height:1.4}
 
-/* CONFIG */
-.cfg-row{display:flex;gap:9px;align-items:flex-end;margin-bottom:10px}
-.cfg-row .finput{margin-bottom:0;flex:1}
-.btn-save{padding:10px 16px;background:var(--accent);color:#000;font-family:'Montserrat',sans-serif;font-weight:800;font-size:.8rem;border:none;border-radius:10px;cursor:pointer;transition:opacity .2s;white-space:nowrap;display:flex;align-items:center;gap:5px}
-.btn-save:hover{opacity:.86}
-.btn-save svg{width:12px;height:12px}
+/* ── SUCCESS ── */
+.success-screen{text-align:center;padding:10px 0}
+.success-icon{width:68px;height:68px;border-radius:50%;background:rgba(200,255,87,.11);border:2px solid rgba(200,255,87,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 15px;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+.success-icon svg{width:30px;height:30px;color:var(--accent)}
+.success-title{font-family:'Montserrat',sans-serif;font-size:1.1rem;font-weight:900;margin-bottom:7px}
+.success-sub{font-size:.8rem;color:var(--muted);line-height:1.6;max-width:320px;margin:0 auto 18px}
 
-/* EMPTY */
-.empty-st{text-align:center;padding:24px;color:var(--muted);font-size:.77rem}
-.empty-st svg{width:24px;height:24px;opacity:.26;margin-bottom:7px;display:block;margin:0 auto 7px}
+/* ── PENDING SCREEN ── */
+.pending-screen{text-align:center;padding:10px 0}
+.pending-icon{width:68px;height:68px;border-radius:50%;background:rgba(251,191,36,.1);border:2px solid rgba(251,191,36,.28);display:flex;align-items:center;justify-content:center;margin:0 auto 15px;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
+.pending-icon svg{width:28px;height:28px;color:var(--yellow)}
+.pending-title{font-family:'Montserrat',sans-serif;font-size:1rem;font-weight:900;margin-bottom:7px}
+.pending-sub{font-size:.8rem;color:var(--muted);line-height:1.6;max-width:320px;margin:0 auto 14px}
+.pending-order{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:999px;font-family:'Montserrat',sans-serif;font-size:.79rem;font-weight:700;color:var(--yellow);margin-bottom:16px}
 
-/* TOAST */
-.toast{position:fixed;bottom:22px;right:22px;z-index:9999;padding:11px 17px;border-radius:12px;font-size:.8rem;font-weight:600;transform:translateY(16px);opacity:0;transition:all .3s;pointer-events:none;display:flex;align-items:center;gap:7px}
-.toast.ok-t{background:rgba(34,197,94,.13);border:1px solid rgba(34,197,94,.26);color:#4ade80}
-.toast.err-t{background:rgba(239,68,68,.13);border:1px solid rgba(239,68,68,.26);color:#f87171}
-.toast.show{transform:translateY(0);opacity:1}
-.toast svg{width:14px;height:14px;flex-shrink:0}
+/* ── MISC ── */
+.divider-or{display:flex;align-items:center;gap:10px;margin:11px 0;font-size:.66rem;color:var(--muted)}
+.divider-or::before,.divider-or::after{content:'';flex:1;height:1px;background:var(--border)}
+.security-note{display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.12);border-radius:9px;font-size:.71rem;color:var(--muted);margin-top:10px}
+.security-note svg{width:13px;height:13px;color:var(--green);flex-shrink:0}
+.back-link{font-size:.71rem;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-top:9px}
+.back-link:hover{color:var(--accent)}
+.aff-toggle{display:flex;align-items:center;gap:7px;font-size:.73rem;color:var(--muted);cursor:pointer;margin:1px 0 10px;user-select:none}
+.aff-toggle:hover{color:var(--text)}
+#aff-wrap{display:none}
 
-@media(max-width:700px){
-  .stats-row{grid-template-columns:1fr 1fr}
-  .main-grid{grid-template-columns:1fr}
-  .card.full{grid-column:1}
-  .body{padding:14px}
-  .mub-grid{grid-template-columns:1fr 1fr}
-  .qb-row{flex-direction:column}
-  .qb-inp,.btn-qa{width:100%;justify-content:center}
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.mob-open{transform:translateX(0)}
+  .main{margin-left:0;padding-top:56px}
+  .mob-header{display:flex}
+  .topbar{padding:20px 16px 0}
+  .content{padding:22px 16px 48px}
+  .video-grid,.redes-grid{grid-template-columns:1fr}
+  .page-header h1{font-size:1.55rem}
+  .live-badge{display:none}
+  .frow,.pm-grid{grid-template-columns:1fr}
+}
+@media(min-width:769px){
+  .mob-header{display:none}
+  .sb-backdrop{display:none!important}
 }
 </style>
 </head>
 <body>
-<div class="toast" id="toast"></div>
 
-<!-- LOGIN -->
-<div id="login-gate">
- <div class="gate-wrap">
-  <div class="gate-logo">
-   <div class="gate-logo-img"><img src="Joss.png" alt="Joss" onerror="this.parentElement.style.display='none'"/></div>
-   <div class="gate-logo-brand">JOSS <span>DESIGN</span></div>
-   <div class="gate-logo-sub">Panel de Administración</div>
+<!-- MOBILE HEADER -->
+<div class="mob-header" id="mob-header">
+  <div class="mob-brand">
+    <img src="Joss.png" alt="Joss" onerror="this.style.display='none'"/>
+    JOSS <span>DESIGN</span>
   </div>
-  <div class="gate-card">
-   <div class="gate-head">
-    <div class="gate-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-    <div class="gate-title">Acceso Seguro</div>
-    <div class="gate-sub">Solo administradores</div>
-   </div>
-   <div class="gate-body">
-    <label class="flabel">Correo de administrador</label>
-    <input class="finput" id="g-email" type="email" placeholder="admin@jossdesign.com"/>
-    <label class="flabel">Contraseña</label>
-    <input class="finput" id="g-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')gateLogin()"/>
-    <button class="btn-main" onclick="gateLogin()">
-     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
-     Ingresar al panel
+  <div class="mob-right">
+    <button class="mob-buy" onclick="openCheckout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+      Comprar
     </button>
-    <div class="fmsg" id="g-msg"></div>
+    <div class="hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+  </div>
+</div>
+<div class="sb-backdrop" id="sb-backdrop" onclick="closeSidebar()"></div>
+
+<!-- ══ CHECKOUT MODAL ══ -->
+<div class="co-overlay" id="co-overlay" onclick="closeCoOutside(event)">
+ <div class="co-modal">
+  <div class="co-head">
+   <button class="co-close" onclick="closeCheckout()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+   </button>
+   <div class="co-head-inner">
+    <div class="co-head-logo"><img src="Joss.png" alt="Joss" onerror="this.parentElement.style.display='none'"/></div>
+    <div>
+     <div class="co-brand">JOSS <span>DESIGN</span></div>
+     <div class="co-tagline">Checkout seguro</div>
+    </div>
+    <div class="co-secure">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+     SSL · PCI DSS
+    </div>
    </div>
+  </div>
+  <div class="co-tabs">
+   <div class="co-tab active" id="co-tab-buy" onclick="switchCoTab('buy')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+    Comprar curso
+   </div>
+   <div class="co-tab" id="co-tab-login" onclick="switchCoTab('login')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    Ya tengo acceso
+   </div>
+  </div>
+  <div class="co-body">
+
+   <!-- ─ LOGIN ─ -->
+   <div class="co-form" id="cf-login">
+    <label class="flabel">Correo electrónico</label>
+    <input class="finput" id="l-email" type="email" placeholder="tu@correo.com"/>
+    <label class="flabel">Contraseña</label>
+    <input class="finput" id="l-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="btn-main" onclick="doLogin()">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+     Ingresar al curso
+    </button>
+    <div class="fmsg" id="l-msg"></div>
+    <div style="margin-top:12px;text-align:center;font-size:.72rem;color:var(--muted)">
+     ¿Sin cuenta? <span style="color:var(--accent);cursor:pointer;font-weight:700" onclick="switchCoTab('buy')">Comprar curso</span>
+    </div>
+   </div>
+
+   <!-- ─ PASO 1: FACTURACIÓN ─ -->
+   <div class="co-form active" id="cf-billing">
+    <div class="order-summary">
+     <div class="os-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Resumen del pedido
+     </div>
+     <div class="os-row"><span class="os-label">Curso completo Joss Design</span><span class="os-val" id="price-s">S/ —</span></div>
+     <div class="os-row"><span class="os-label">Acceso de por vida</span><span class="os-val" style="color:var(--green)">✓ Incluido</span></div>
+     <div class="os-row"><span class="os-total-label">Total</span><span class="os-total-val" id="price-t">S/ —</span></div>
+    </div>
+    <div style="font-size:.78rem;font-weight:700;color:var(--text);margin-bottom:11px;display:flex;align-items:center;gap:7px">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+     Datos de facturación
+    </div>
+    <div class="frow">
+     <div><label class="flabel">Nombre</label><input class="finput" id="b-fname" type="text" placeholder="Juan"/></div>
+     <div><label class="flabel">Apellido</label><input class="finput" id="b-lname" type="text" placeholder="Pérez"/></div>
+    </div>
+    <label class="flabel">Correo electrónico</label>
+    <input class="finput" id="b-email" type="email" placeholder="tu@correo.com"/>
+    <div class="frow">
+     <div>
+      <label class="flabel">País</label>
+      <select class="finput" id="b-country">
+       <option value="">Seleccionar...</option>
+       <option value="PE" selected>🇵🇪 Perú</option>
+       <option value="CO">🇨🇴 Colombia</option>
+       <option value="MX">🇲🇽 México</option>
+       <option value="AR">🇦🇷 Argentina</option>
+       <option value="CL">🇨🇱 Chile</option>
+       <option value="EC">🇪🇨 Ecuador</option>
+       <option value="US">🇺🇸 Estados Unidos</option>
+       <option value="ES">🇪🇸 España</option>
+       <option value="OTHER">Otro</option>
+      </select>
+     </div>
+     <div><label class="flabel">Teléfono</label><input class="finput" id="b-phone" type="tel" placeholder="+51 999 999"/></div>
+    </div>
+    <label class="flabel">Crea tu contraseña de acceso</label>
+    <input class="finput" id="b-pass" type="password" placeholder="Mínimo 6 caracteres"/>
+    <div class="aff-toggle" onclick="toggleAff()">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+     ¿Tienes código de afiliado?
+    </div>
+    <div id="aff-wrap"><label class="flabel">Código de afiliado</label><input class="finput" id="b-aff" type="text" placeholder="Ej: JOSS10"/></div>
+    <button class="btn-main" onclick="goToPayStep()">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+     Continuar al pago
+    </button>
+    <div class="fmsg" id="billing-msg"></div>
+    <div class="security-note" style="margin-top:12px">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+     Tus datos están protegidos. Pago certificado PCI DSS.
+    </div>
+   </div>
+
+   <!-- ─ PASO 2: MÉTODO DE PAGO ─ -->
+   <div class="co-form" id="cf-payment">
+    <div style="font-size:.78rem;font-weight:700;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:7px">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+     Elige cómo pagar
+    </div>
+    <div class="pm-grid">
+     <div class="pm-pill sel" id="pm-izipay" onclick="selectPM('izipay')">
+      <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><rect x="1" y="4" width="22" height="16" rx="3" fill="#e30613" opacity=".14"/><rect x="1" y="4" width="22" height="16" rx="3" stroke="#e30613" stroke-width="1.5"/><circle cx="8" cy="12" r="3" fill="#e30613"/><circle cx="16" cy="12" r="3" fill="#e30613" opacity=".5"/></svg>
+      Visa / Débito
+     </div>
+     <div class="pm-pill" id="pm-paypal" onclick="selectPM('paypal')">
+      <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><circle cx="12" cy="12" r="10" fill="#003087" opacity=".13"/><path d="M8 17h2l1-3h2.5c2 0 3.5-1 3.5-3s-1.5-3-3.5-3H9L8 17z" stroke="#009cde" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      PayPal
+     </div>
+     <div class="pm-pill" id="pm-yape" onclick="selectPM('yape')">
+      <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><circle cx="12" cy="12" r="10" fill="#7b2ff7" opacity=".13"/><path d="M8 6l4 6 4-6" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 12v6" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/></svg>
+      Yape
+     </div>
+     <div class="pm-pill" id="pm-plin" onclick="selectPM('plin')">
+      <svg viewBox="0 0 24 24" fill="none" width="18" height="18"><circle cx="12" cy="12" r="10" fill="#00bcd4" opacity=".11"/><path d="M7 12h10M12 7v10" stroke="#00bcd4" stroke-width="2.2" stroke-linecap="round"/></svg>
+      Plin
+     </div>
+    </div>
+
+    <!-- IZIPAY FORM -->
+    <div id="pm-izipay-detail">
+     <div class="izipay-brand-bar">
+      <svg viewBox="0 0 24 24" fill="none" width="24" height="24"><rect x="1" y="4" width="22" height="16" rx="3" fill="#e30613" opacity=".18"/><rect x="1" y="4" width="22" height="16" rx="3" stroke="#e30613" stroke-width="1.5"/><circle cx="8" cy="12" r="3" fill="#e30613"/><circle cx="16" cy="12" r="3" fill="#e30613" opacity=".55"/></svg>
+      <div><strong>Pago seguro con Izipay</strong><span>Visa, Mastercard, débito · Certificación PCI DSS</span></div>
+     </div>
+     <div class="izipay-loading" id="izipay-loading"><div class="spinner"></div><p>Preparando formulario seguro...</p></div>
+     <div class="izipay-error-box" id="izipay-error"></div>
+     <div id="izipay-form-wrap" style="display:none">
+      <div class="kr-embedded" id="kr-form">
+       <div class="kr-pan"></div>
+       <div class="kr-expiry"></div>
+       <div class="kr-security-code"></div>
+       <button class="kr-payment-button"></button>
+       <div class="kr-form-error"></div>
+      </div>
+     </div>
+    </div>
+
+    <!-- PAYPAL -->
+    <div id="pm-paypal-detail" style="display:none">
+     <div class="manual-hero">
+      <div class="mh-name pp-c">PayPal</div>
+      <div class="mh-num" style="font-size:.98rem;letter-spacing:0">blackjosue113@gmail.com</div>
+      <div class="mh-sub">Enviar como "pago de bienes/servicios"</div>
+      <button class="copy-btn" style="margin:7px auto 0;display:flex" onclick="copyText('blackjosue113@gmail.com',this)">
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="9" height="9"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copiar
+      </button>
+      <div class="price-badge" id="pp-price">💰 Precio por confirmar</div>
+     </div>
+    </div>
+
+    <!-- YAPE -->
+    <div id="pm-yape-detail" style="display:none">
+     <div class="manual-hero">
+      <div class="mh-name yape-c">yape</div>
+      <div class="mh-num">915 150 077</div>
+      <div class="mh-sub">Josb Design</div>
+      <div class="price-badge" id="yape-price">💰 Precio por confirmar</div>
+     </div>
+     <ul class="pay-steps">
+      <li><span class="snum">1</span>Yapea al <strong style="color:var(--text)">915 150 077</strong> por el monto indicado.</li>
+      <li><span class="snum">2</span>En el concepto escribe tu correo y número de orden.</li>
+      <li><span class="snum">3</span>Toca "Ya yapié" abajo para registrar la solicitud.</li>
+     </ul>
+    </div>
+
+    <!-- PLIN -->
+    <div id="pm-plin-detail" style="display:none">
+     <div class="manual-hero">
+      <div class="mh-name plin-c">plin</div>
+      <div class="mh-num">915 150 077</div>
+      <div class="mh-sub">Josb Design</div>
+      <div class="price-badge" id="plin-price">💰 Precio por confirmar</div>
+     </div>
+     <ul class="pay-steps">
+      <li><span class="snum">1</span>Plínea al <strong style="color:var(--text)">915 150 077</strong> desde tu app bancaria.</li>
+      <li><span class="snum">2</span>En el concepto escribe tu correo y número de orden.</li>
+      <li><span class="snum">3</span>Toca "Ya pagué con Plin" para registrar la solicitud.</li>
+     </ul>
+    </div>
+
+    <!-- ORDER NUMBER (manual) -->
+    <div class="order-box" id="order-box" style="display:none">
+     <div><div class="ob-label">Tu número de orden</div><div class="ob-num" id="order-num">—</div></div>
+     <button class="copy-btn" onclick="copyText(document.getElementById('order-num').textContent,this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="9" height="9"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copiar
+     </button>
+    </div>
+
+    <!-- MANUAL SUBMIT -->
+    <div id="manual-btn-wrap" style="display:none">
+     <button class="btn-main" id="btn-manual-pay" onclick="submitManual()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+      <span id="manual-btn-label">Confirmar y enviar comprobante</span>
+     </button>
+    </div>
+
+    <div class="fmsg" id="pay-msg"></div>
+
+    <!-- WA CTA (after manual submit) -->
+    <div id="wa-cta" style="display:none">
+     <div class="divider-or">envía tu comprobante</div>
+     <a id="wa-link" href="#" target="_blank" class="btn-wa">
+      <svg viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Enviar comprobante por WhatsApp
+     </a>
+     <div class="status-track">
+      <div class="st-bar-title">Estado de tu solicitud</div>
+      <div class="st-step"><div class="st-ic done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="st-lbl">Solicitud enviada</div><div class="st-desc">Registro guardado. Envía tu comprobante por WhatsApp.</div></div></div>
+      <div class="st-step"><div class="st-ic spin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="st-lbl">En revisión</div><div class="st-desc">Verificando comprobante. Menos de 24 horas.</div></div></div>
+      <div class="st-step"><div class="st-ic wait"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div><div><div class="st-lbl dim">Acceso activado</div><div class="st-desc">Te avisamos por WhatsApp cuando esté listo.</div></div></div>
+     </div>
+    </div>
+
+    <div class="security-note" style="margin-top:10px">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+     Pago procesado por Izipay · PCI DSS · SSL 256-bit
+    </div>
+    <span class="back-link" onclick="goBackToBilling()">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+     Cambiar datos de facturación
+    </span>
+   </div>
+
+   <!-- ─ ÉXITO (Izipay automático) ─ -->
+   <div class="co-form" id="cf-success">
+    <div class="success-screen">
+     <div class="success-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+     <div class="success-title">¡Pago completado!</div>
+     <div class="success-sub">Tu acceso al curso ha sido activado automáticamente. ¡Bienvenido!</div>
+     <button class="btn-main" onclick="closeCheckout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+      Ir al curso
+     </button>
+    </div>
+   </div>
+
+   <!-- ─ PENDIENTE (métodos manuales ya enviados) ─ -->
+   <div class="co-form" id="cf-pending">
+    <div class="pending-screen">
+     <div class="pending-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+     </div>
+     <div class="pending-title">Solicitud en revisión</div>
+     <div class="pending-sub">Recibimos tu registro. En cuanto verifiquemos tu comprobante de pago, activaremos tu acceso.</div>
+     <div class="pending-order" id="pending-order-display">Orden: —</div>
+     <div class="status-track" style="text-align:left">
+      <div class="st-bar-title">Estado actual</div>
+      <div class="st-step"><div class="st-ic done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="st-lbl">Solicitud enviada</div><div class="st-desc">Tu registro fue guardado exitosamente.</div></div></div>
+      <div class="st-step"><div class="st-ic spin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="st-lbl">Esperando comprobante</div><div class="st-desc">Envíanos la captura por WhatsApp para agilizar.</div></div></div>
+      <div class="st-step"><div class="st-ic wait"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div><div><div class="st-lbl dim">Acceso activado</div><div class="st-desc">Recibirás un WhatsApp cuando esté listo.</div></div></div>
+     </div>
+     <button class="btn-main" onclick="closeCheckout()" style="margin-top:14px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+      Entendido
+     </button>
+    </div>
+   </div>
+
   </div>
  </div>
 </div>
 
-<!-- ADMIN APP -->
-<div id="admin-app">
- <div class="top-bar">
-  <div class="top-left">
-   <div class="top-logo"><img src="Joss.png" alt="" onerror="this.parentElement.style.display='none'"/></div>
-   <div class="top-brand">JOSS <span>DESIGN</span></div>
-   <span class="adm-badge">Admin</span>
-   <span class="top-time" id="top-time"></span>
+<!-- ══ APP ══ -->
+<div id="app">
+ <aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+   <div class="sb-logo-img"><img src="Joss.png" alt="Joss" onerror="this.parentElement.style.display='none'"/></div>
+   <div class="sb-logo-txt">
+    <div class="brand">JOSS <span>DESIGN</span></div>
+    <div class="tag">Plataforma de Cursos</div>
+   </div>
   </div>
-  <button class="btn-out" onclick="gateLogout()">
-   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-   Salir
-  </button>
- </div>
+  <div class="sb-user" id="sb-user">
+   <div class="su-lbl">Sesión activa</div>
+   <div class="su-em" id="sb-email">—</div>
+   <div class="su-badge">Acceso verificado</div>
+  </div>
+  <div class="sb-actions" id="sb-actions">
+   <button class="sb-buy" onclick="openCheckout()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>
+    Comprar Curso
+   </button>
+   <button class="sb-login" onclick="openLogin()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+    Ya tengo acceso
+   </button>
+  </div>
+  <div class="sb-div"></div>
+  <div class="sb-sec">
+   <div class="sb-sec-lbl">Contenido</div>
+   <div class="nav-item active" onclick="showPanel('videos',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><polygon points="10,8 16,11 10,14" fill="currentColor" stroke="none"/></svg>
+    Videos
+   </div>
+   <div class="nav-item" onclick="showPanel('instalacion',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Instalación
+   </div>
+   <div class="nav-item" onclick="showPanel('redes',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    Redes
+   </div>
+  </div>
+  <div class="sb-foot">
+   <button class="btn-logout" id="btn-logout" onclick="doLogout()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+    Cerrar sesión
+   </button>
+   <div style="margin-top:9px;font-size:.58rem;color:var(--muted);text-align:center">© 2025 Joss Design</div>
+  </div>
+ </aside>
 
- <div class="body">
-  <div class="body-inner">
+ <main class="main">
+  <div class="topbar">
+   <div class="page-header" id="page-header">
+    <h1>Mis <em>Videos</em></h1>
+    <p>Aprende diseño e inteligencia artificial con Joss Design.</p>
+   </div>
+   <div class="live-badge">En curso</div>
+  </div>
+  <div class="content">
 
-   <!-- STATS -->
-   <div class="stats-row" id="stats-row"></div>
-
-   <!-- QUICK APPROVE BY ORDER -->
-   <div class="quick-box">
-    <div class="qb-title">
-     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-     Aprobar por número de orden
+   <!-- VIDEOS -->
+   <div class="panel active" id="panel-videos">
+    <div class="sec-title">Módulos del curso</div>
+    <div class="video-grid">
+     <div class="video-card vc1" id="vc1"><div class="video-thumb"><span class="vnum">01</span><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div><div class="video-info"><div class="vtag">Módulo 01</div><h3>Introducción</h3><div class="vmeta"><span>Joss Design</span><span class="vdot"></span><span>Inicio del curso</span></div></div></div>
+     <div class="video-card vc2" id="vc2"><div class="video-thumb"><span class="vnum">02</span><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div><div class="video-info"><div class="vtag">Módulo 02</div><h3>Manejo de los Prompts en Gemini</h3><div class="vmeta"><span>Joss Design</span><span class="vdot"></span><span>IA &amp; Prompts</span></div></div></div>
+     <div class="video-card vc3" id="vc3"><div class="video-thumb"><span class="vnum">03</span><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div><div class="video-info"><div class="vtag">Módulo 03</div><h3>Cómo Incorporar la IA en tus Diseños</h3><div class="vmeta"><span>Joss Design</span><span class="vdot"></span><span>Diseño + IA</span></div></div></div>
+     <div class="video-card vc4" id="vc4"><div class="video-thumb"><span class="vnum">04</span><span class="cs-badge">Próximamente</span><div class="play-btn" style="opacity:.28;pointer-events:none"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div><div class="video-info"><div class="vtag">Módulo 04</div><h3>Video 4 — Próximamente</h3><div class="vmeta"><span>Joss Design</span><span class="vdot"></span><span>En preparación</span></div></div></div>
     </div>
-    <div class="qb-sub">Escribe el número de orden del comprobante y activa el acceso inmediatamente.</div>
-    <div class="qb-row">
-     <input class="qb-inp" id="qb-order" type="text" placeholder="Ej: JD-M5X2A-K9PQ" onkeydown="if(event.key==='Enter')quickApprove()"/>
-     <button class="btn-qa" onclick="quickApprove()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-      Aprobar acceso
-     </button>
-    </div>
-    <div class="fmsg qb-msg" id="qb-msg"></div>
    </div>
 
-   <!-- MANUAL USER ADD -->
-   <div class="manual-user-box">
-    <div class="mub-title">
-     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-     Agregar usuario manualmente
+   <!-- INSTALACION -->
+   <div class="panel" id="panel-instalacion">
+    <div class="sec-title">Instalación</div>
+    <div class="ph-panel">
+     <div class="ph-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg></div>
+     <h2>Contenido en preparación</h2>
+     <p>Guías de instalación disponibles muy pronto.</p>
+     <div class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Próximamente</div>
     </div>
-    <div class="mub-sub">Para personas que pagaron fuera de la plataforma o a quienes quieras dar acceso directo.</div>
-    <div class="mub-grid">
-     <div class="mub-field">
-      <div class="mub-label">Correo electrónico</div>
-      <input class="mub-inp" id="mu-email" type="email" placeholder="usuario@correo.com"/>
-     </div>
-     <div class="mub-field">
-      <div class="mub-label">Contraseña temporal</div>
-      <input class="mub-inp" id="mu-pass" type="text" placeholder="Mín. 6 caracteres"/>
-     </div>
-     <div class="mub-field">
-      <div class="mub-label">Nombre (opcional)</div>
-      <input class="mub-inp" id="mu-name" type="text" placeholder="Nombre completo"/>
-     </div>
-     <button class="btn-add-user" onclick="addManualUser()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-      Dar acceso
-     </button>
-    </div>
-    <div class="fmsg mub-msg" id="mu-msg"></div>
    </div>
 
-   <!-- MAIN GRID -->
-   <div class="main-grid" id="main-grid"></div>
+   <!-- REDES -->
+   <div class="panel" id="panel-redes">
+    <div class="sec-title">Redes sociales</div>
+    <div class="redes-grid">
+     <a class="red-card tiktok" href="https://www.tiktok.com/@josb.design" target="_blank">
+      <div class="rring"></div><div class="rring2"></div>
+      <div class="red-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.77.01 2.89 2.89 0 012.89-2.9c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-6.13 6.33 6.34 6.34 0 0012.67 0V8.68a8.18 8.18 0 004.78 1.53V6.76a4.85 4.85 0 01-1.01-.07z" fill="#EE1D52"/><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.77.01 2.89 2.89 0 012.89-2.9c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-6.13 6.33 6.34 6.34 0 0012.67 0V8.68a8.18 8.18 0 004.78 1.53V6.76a4.85 4.85 0 01-1.01-.07z" fill="#69C9D0" opacity=".45"/></svg></div>
+      <div class="red-info"><div class="r-plat">TikTok</div><div class="r-handle">@josb.design</div><div class="r-sub">Contenido diario de diseño e IA</div></div>
+      <span class="red-cta">Ver perfil <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+     </a>
+     <a class="red-card whatsapp" href="https://wa.me/51915150077" target="_blank">
+      <div class="rring"></div><div class="rring2"></div>
+      <div class="red-icon"><svg viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
+      <div class="red-info"><div class="r-plat">WhatsApp</div><div class="r-handle">+51 915 150 077</div><div class="r-sub">Consultas y soporte directo</div></div>
+      <span class="red-cta">Escribir <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+     </a>
+    </div>
+   </div>
 
   </div>
- </div>
+ </main>
 </div>
 
 <script>
-// ─── DB (same keys as index.html) ───────────────────────────
-const DB={
-  get:k=>{try{return JSON.parse(localStorage.getItem('jd7_'+k))}catch{return null}},
-  set:(k,v)=>localStorage.setItem('jd7_'+k,JSON.stringify(v))
-};
-const getUsers  =()=>DB.get('u')||{};
-const getPending=()=>DB.get('p')||[];
-const getAffs   =()=>DB.get('a')||{JOSS10:0,DESIGN20:0};
-const getLog    =()=>DB.get('log')||[];
-const saveUsers  =v=>DB.set('u',v);
-const savePending=v=>DB.set('p',v);
-const saveAffs   =v=>DB.set('a',v);
-const saveLog    =v=>DB.set('log',v);
+// ═══════════ CONFIG ═══════════
+const BACKEND_URL='https://josb-design-production.up.railway.app';
+const COURSE_PRICE_CENTS=1; // $0.01 USD in cents = 1 cent
+const COURSE_CURRENCY='USD';
 
+// ═══════════ DB ═══════════
+const DB={get:k=>{try{return JSON.parse(localStorage.getItem('jd7_'+k))}catch{return null}},set:(k,v)=>localStorage.setItem('jd7_'+k,JSON.stringify(v))};
+const getUsers=()=>DB.get('u')||{};
+const getPending=()=>DB.get('p')||[];
+const getAffs=()=>DB.get('a')||{JOSS10:0,DESIGN20:0};
+const getCur=()=>DB.get('c')||null;
+const saveUsers=v=>DB.set('u',v);
+const savePending=v=>DB.set('p',v);
+const saveAffs=v=>DB.set('a',v);
+const saveCur=v=>DB.set('c',v);
 (()=>{const u=getUsers();if(!u['admin@jossdesign.com']){u['admin@jossdesign.com']={pass:'admin1234',role:'admin',since:'-'};saveUsers(u);}})();
 
-function addLog(txt,type='lg'){const l=getLog();l.unshift({txt,type,time:new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})});if(l.length>60)l.length=60;saveLog(l);}
-
-// ─── TOAST ───────────────────────────────────────────────────
-function showToast(txt,err=false){
-  const t=document.getElementById('toast');
-  t.innerHTML=(err
-    ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
-    :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>'
-  )+txt;
-  t.className='toast '+(err?'err-t':'ok-t');
-  void t.offsetWidth;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3200);
+// ═══════════ MOBILE ═══════════
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar'),hb=document.getElementById('hamburger'),bd=document.getElementById('sb-backdrop');
+  const o=sb.classList.toggle('mob-open');hb.classList.toggle('open',o);bd.classList.toggle('on',o);
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('mob-open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.getElementById('sb-backdrop').classList.remove('on');
 }
 
-// ─── LOGIN ───────────────────────────────────────────────────
-function gateLogin(){
-  const e=document.getElementById('g-email').value.trim().toLowerCase();
-  const p=document.getElementById('g-pass').value;
-  const m=document.getElementById('g-msg');m.className='fmsg';
-  if(!e||!p){m.className='fmsg err';m.textContent='Completa los campos.';return;}
-  const u=getUsers();
-  if(!u[e]||u[e].role!=='admin'||u[e].pass!==p){m.className='fmsg err';m.textContent='Credenciales incorrectas.';return;}
-  document.getElementById('login-gate').classList.add('hidden');
-  document.getElementById('admin-app').classList.add('on');
-  renderAll();startClock();
-}
-function gateLogout(){
-  document.getElementById('admin-app').classList.remove('on');
-  document.getElementById('login-gate').classList.remove('hidden');
-}
-function startClock(){
-  const el=document.getElementById('top-time');
-  const tick=()=>el.textContent=new Date().toLocaleString('es',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
-  tick();setInterval(tick,30000);
-}
+// ═══════════ CHECKOUT ═══════════
+let billing={},selPM='izipay',curOrder='',krInit=false;
 
-// ─── QUICK APPROVE ───────────────────────────────────────────
-function quickApprove(){
-  const order=document.getElementById('qb-order').value.trim().toUpperCase();
-  const m=document.getElementById('qb-msg');m.className='fmsg';
-  if(!order){m.className='fmsg err';m.textContent='Escribe el número de orden.';return;}
-  const pending=getPending();
-  const idx=pending.findIndex(p=>p.order&&p.order.toUpperCase()===order);
-  if(idx===-1){m.className='fmsg err';m.textContent='Número de orden no encontrado.';return;}
-  const p=pending[idx];const u=getUsers();
-  u[p.email]={pass:p.pass,role:'approved',since:new Date().toLocaleDateString('es'),method:p.method,affiliate:p.affiliate,order:p.order,name:p.name};
-  saveUsers(u);pending.splice(idx,1);savePending(pending);
-  addLog('Aprobado por orden '+p.order+': '+p.email,'lg');
-  document.getElementById('qb-order').value='';
-  m.className='fmsg ok';m.textContent='✅ Acceso activado para '+p.email;
-  showToast('Acceso activado: '+p.email);renderAll();
-  setTimeout(()=>{m.className='fmsg';},5000);
+function openCheckout(){document.getElementById('co-overlay').classList.add('open');switchCoTab('buy');showCF('cf-billing');refreshPrices();}
+function openLogin(){document.getElementById('co-overlay').classList.add('open');switchCoTab('login');}
+function closeCheckout(){document.getElementById('co-overlay').classList.remove('open');}
+function closeCoOutside(e){if(e.target===document.getElementById('co-overlay'))closeCheckout();}
+function switchCoTab(t){
+  document.getElementById('co-tab-buy').classList.toggle('active',t==='buy');
+  document.getElementById('co-tab-login').classList.toggle('active',t==='login');
+  showCF(t==='buy'?'cf-billing':'cf-login');
+}
+function showCF(id){document.querySelectorAll('.co-form').forEach(f=>f.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function refreshPrices(){
+  const p=DB.get('price')||'$0.01';
+  ['price-s','price-t'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=p;});
+  ['pp-price','yape-price','plin-price'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.innerHTML='💰 Precio: '+p;
+  });
 }
 
-// ─── ADD MANUAL USER ─────────────────────────────────────────
-function addManualUser(){
-  const email=document.getElementById('mu-email').value.trim().toLowerCase();
-  const pass =document.getElementById('mu-pass').value.trim();
-  const name =document.getElementById('mu-name').value.trim();
-  const m=document.getElementById('mu-msg');m.className='fmsg';
-
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-    return showMuMsg('Ingresa un correo válido.','err');
-  if(pass.length<6)
-    return showMuMsg('La contraseña debe tener al menos 6 caracteres.','err');
-
+// ═══════════ BILLING ═══════════
+function goToPayStep(){
+  const fname=document.getElementById('b-fname').value.trim();
+  const lname=document.getElementById('b-lname').value.trim();
+  const email=document.getElementById('b-email').value.trim().toLowerCase();
+  const country=document.getElementById('b-country').value;
+  const pass=document.getElementById('b-pass').value;
+  const aff=document.getElementById('b-aff').value.trim().toUpperCase();
+  setFmsg('billing-msg','','');
+  if(!fname||!lname)return setFmsg('billing-msg','Ingresa tu nombre completo.','err');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return setFmsg('billing-msg','Ingresa un correo válido.','err');
+  if(!country)return setFmsg('billing-msg','Selecciona tu país.','err');
+  if(pass.length<6)return setFmsg('billing-msg','La contraseña debe tener al menos 6 caracteres.','err');
   const users=getUsers();
-  if(users[email]&&users[email].role==='approved')
-    return showMuMsg('Este correo ya tiene acceso activo.','err');
+  if(users[email]){
+    if(users[email].role==='approved')return setFmsg('billing-msg','Este correo ya tiene acceso. Usa "Ya tengo acceso".','inf');
+    if(users[email].role==='pending')return setFmsg('billing-msg','Ya tienes una solicitud en proceso. Usa "Ya tengo acceso" para verificar tu estado.','warn');
+  }
+  if(aff){const affs=getAffs();if(!affs.hasOwnProperty(aff))return setFmsg('billing-msg','Código de afiliado no válido.','err');}
+  billing={fname,lname,email,country,phone:document.getElementById('b-phone').value.trim(),pass,aff};
+  curOrder='JD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).substring(2,6).toUpperCase();
+  document.getElementById('order-num').textContent=curOrder;
+  showCF('cf-payment');
+  selectPM('izipay');
+}
+function goBackToBilling(){showCF('cf-billing');}
+function toggleAff(){const w=document.getElementById('aff-wrap');w.style.display=w.style.display==='none'?'block':'none';}
 
-  users[email]={pass,role:'approved',since:new Date().toLocaleDateString('es'),method:'manual',name:name||email,order:'MANUAL-'+Date.now().toString(36).toUpperCase()};
+// ═══════════ PAYMENT METHOD ═══════════
+function selectPM(m){
+  selPM=m;
+  document.querySelectorAll('.pm-pill').forEach(p=>p.classList.remove('sel'));
+  document.getElementById('pm-'+m).classList.add('sel');
+  ['izipay','paypal','yape','plin'].forEach(pm=>{
+    document.getElementById('pm-'+pm+'-detail').style.display=pm===m?'block':'none';
+  });
+  const isManual=m!=='izipay';
+  document.getElementById('order-box').style.display=isManual?'flex':'none';
+  document.getElementById('manual-btn-wrap').style.display=isManual?'block':'none';
+  document.getElementById('wa-cta').style.display='none';
+  document.getElementById('btn-manual-pay').disabled=false;
+  setFmsg('pay-msg','','');
+  const labels={paypal:'Confirmar — abrir PayPal',yape:'Ya yapié — registrar solicitud',plin:'Ya pagué con Plin'};
+  if(isManual)document.getElementById('manual-btn-label').textContent=labels[m]||'Confirmar';
+  if(m==='izipay')initIzipay();
+}
+
+// ═══════════ IZIPAY ═══════════
+async function initIzipay(){
+  if(krInit)return;
+  document.getElementById('izipay-loading').style.display='flex';
+  document.getElementById('izipay-form-wrap').style.display='none';
+  document.getElementById('izipay-error').classList.remove('show');
+  try{
+    const res=await fetch(BACKEND_URL+'/create-payment',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        amount:COURSE_PRICE_CENTS,
+        currency:COURSE_CURRENCY,
+        orderId:curOrder,
+        customer:{email:billing.email,firstName:billing.fname,lastName:billing.lname}
+      })
+    });
+    if(!res.ok)throw new Error('Backend '+res.status);
+    const data=await res.json();
+    if(!data.formToken)throw new Error('No formToken');
+    KR.setFormConfig({formToken:data.formToken});
+    document.getElementById('izipay-loading').style.display='none';
+    document.getElementById('izipay-form-wrap').style.display='block';
+    krInit=true;
+    KR.onSubmit(pd=>{
+      if(pd.clientAnswer&&pd.clientAnswer.orderStatus==='PAID'){handleIzipaySuccess(pd);}
+      else{setFmsg('pay-msg','El pago no pudo completarse. Verifica los datos de tu tarjeta.','err');}
+      return false;
+    });
+  }catch(err){
+    console.error('Izipay:',err);
+    document.getElementById('izipay-loading').style.display='none';
+    document.getElementById('izipay-error').classList.add('show');
+    document.getElementById('izipay-error').textContent='No se pudo cargar el formulario Izipay. Usa Yape, Plin o PayPal mientras tanto.';
+  }
+}
+
+function handleIzipaySuccess(pd){
+  // Payment confirmed by Izipay — activate immediately
+  const users=getUsers();
+  users[billing.email]={pass:billing.pass,role:'approved',since:new Date().toLocaleDateString('es'),method:'izipay',order:curOrder,name:billing.fname+' '+billing.lname};
   saveUsers(users);
-  // If they had a pending request, remove it
-  const arr=getPending().filter(p=>p.email!==email);savePending(arr);
-
-  addLog('Usuario manual: '+email+(name?' ('+name+')':''),'lg');
-  showToast('Acceso dado a '+email);
-  document.getElementById('mu-email').value='';
-  document.getElementById('mu-pass').value='';
-  document.getElementById('mu-name').value='';
-  showMuMsg('✅ Acceso activado para '+email+'. Ya puede ingresar con la contraseña indicada.','ok');
-  renderAll();
-  setTimeout(()=>{document.getElementById('mu-msg').className='fmsg';},5000);
-}
-function showMuMsg(txt,type){const m=document.getElementById('mu-msg');m.className='fmsg '+type;m.textContent=txt;}
-
-// ─── RENDER ──────────────────────────────────────────────────
-function renderAll(){renderStats();renderGrid();}
-
-function renderStats(){
-  const u=getUsers(),p=getPending(),a=getAffs();
-  const apr=Object.entries(u).filter(([,v])=>v.role==='approved'&&v.pass!=='admin1234').length;
-  document.getElementById('stats-row').innerHTML=`
-    <div class="sc sy"><div class="sc-n">${p.length}</div><div class="sc-l">Pendientes</div></div>
-    <div class="sc sg"><div class="sc-n">${apr}</div><div class="sc-l">Con Acceso</div></div>
-    <div class="sc sp"><div class="sc-n">${Object.keys(a).length}</div><div class="sc-l">Afiliados</div></div>
-    <div class="sc sa"><div class="sc-n">${apr+p.length}</div><div class="sc-l">Total</div></div>
-  `;
+  if(billing.aff){const affs=getAffs();affs[billing.aff]=(affs[billing.aff]||0)+1;saveAffs(affs);}
+  saveCur(billing.email);
+  showCF('cf-success');
+  setTimeout(()=>{closeCheckout();setLoggedIn(billing.email);},2800);
 }
 
-function renderGrid(){
-  const users=getUsers(),pending=getPending(),affs=getAffs(),log=getLog();
-  const approved=Object.entries(users).filter(([,u])=>u.role==='approved');
-  const mL={izipay:'Izipay',card:'Visa',paypal:'PayPal',yape:'Yape',plin:'Plin',manual:'Manual'};
-  const chk='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg>';
-
-  const pendHTML=pending.length===0
-    ?'<div class="empty-st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" display="block"><polyline points="20 6 9 17 4 12"/></svg><div>Sin solicitudes pendientes</div></div>'
-    :pending.map((p,i)=>`
-      <div class="pi-item">
-        <div class="pi-l">
-          <div class="pi-em">${p.email}</div>
-          ${p.name?'<div class="pi-name">'+p.name+'</div>':''}
-          <div class="pi-date">${p.date}</div>
-          <div class="pi-order">${p.order||'—'}</div>
-          <span class="pi-method">${mL[p.method]||p.method}${p.affiliate?' · '+p.affiliate:''}</span>
-        </div>
-        <div class="pi-acts">
-          <button class="bapp" onclick="approvePending(${i})">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><polyline points="20 6 9 17 4 12"/></svg>
-            Aprobar
-          </button>
-          <button class="brej" onclick="rejectPending(${i})">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
-      </div>`).join('');
-
-  const filteredApproved=approved.filter(([e])=>e!=='admin@jossdesign.com');
-  const aprHTML=filteredApproved.length===0
-    ?'<div class="empty-st"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" display="block"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div>Ningún usuario aprobado aún</div></div>'
-    :filteredApproved.map(([email,u])=>{
-      const m=u.method||'—';
-      const badgeClass=m==='manual'?'manual':m==='izipay'?'izipay':m==='yape'?'yape':m==='plin'?'plin':m==='paypal'?'paypal':'manual';
-      return`<div class="apr-item">
-        <div class="chk">${chk}</div>
-        <div class="apr-em">${email}</div>
-        <span class="apr-badge ${badgeClass}">${mL[m]||m}</span>
-        <div class="apr-dt">${u.since||'—'}</div>
-        <button class="brev" onclick="revokeAccess('${email}')">Revocar</button>
-      </div>`;
-    }).join('');
-
-  const affHTML=Object.entries(affs).map(([c,n])=>`
-    <div class="aff-item">
-      <span class="aff-code">${c}</span>
-      <span class="aff-uses">${n} uso${n!==1?'s':''}</span>
-      <button class="brev" onclick="delAff('${c}')">Eliminar</button>
-    </div>`).join('');
-
-  const logHTML=log.length===0
-    ?'<div class="empty-st"><div>Sin actividad reciente</div></div>'
-    :log.slice(0,12).map(l=>`<div class="log-item"><div class="ld ${l.type}"></div><div class="lt">${l.txt}</div><div class="ltime">${l.time}</div></div>`).join('');
-
-  document.getElementById('main-grid').innerHTML=`
-    <div class="card full">
-      <div class="card-title"><span class="dot dy"></span>Solicitudes pendientes (${pending.length})</div>
-      <div class="pi-list">${pendHTML}</div>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot dg"></span>Usuarios con acceso (${filteredApproved.length})</div>
-      <div class="apr-list">${aprHTML}</div>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot dp"></span>Códigos de afiliado</div>
-      ${affHTML}
-      <button class="btn-add-aff" onclick="addAff()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Agregar código
-      </button>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="dot da"></span>Actividad reciente</div>
-      <div class="log-list">${logHTML}</div>
-    </div>
-    <div class="card full">
-      <div class="card-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
-        Configuración
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-        <div>
-          <label class="flabel" style="margin-bottom:5px">Precio del curso (se muestra en el checkout)</label>
-          <div class="cfg-row">
-            <input class="finput" id="price-inp" type="text" placeholder="Ej: $0.01 USD" value="${DB.get('price')||'$0.01'}"/>
-            <button class="btn-save" onclick="savePrice()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
-              Guardar
-            </button>
-          </div>
-          <div class="fmsg" id="price-msg"></div>
-        </div>
-        <div>
-          <label class="flabel" style="margin-bottom:5px">Cambiar contraseña admin</label>
-          <div class="cfg-row">
-            <input class="finput" id="new-pass-inp" type="password" placeholder="Nueva contraseña"/>
-            <button class="btn-save" onclick="changeAdminPass()" style="background:var(--accent2);box-shadow:none">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              Cambiar
-            </button>
-          </div>
-          <div class="fmsg" id="pass-msg"></div>
-        </div>
-      </div>
-    </div>
-  `;
+// ═══════════ MANUAL PAYMENT ═══════════
+function submitManual(){
+  setFmsg('pay-msg','','');
+  // Save as pending
+  savePendingRecord(selPM);
+  const mNames={paypal:'PayPal',yape:'Yape',plin:'Plin'};
+  const waMsg=encodeURIComponent(
+    'Hola Joss Design! 👋\n\nAcabo de realizar el pago del curso.\n\n'+
+    '👤 Nombre: '+billing.fname+' '+billing.lname+'\n'+
+    '📧 Correo: '+billing.email+'\n'+
+    '🔢 Orden: '+curOrder+'\n'+
+    '💳 Método: '+mNames[selPM]+'\n\n'+
+    'Adjunto mi comprobante. ¡Quedo atento!'
+  );
+  if(selPM==='paypal')window.open('https://www.paypal.com/paypalme/jossdesign','_blank');
+  document.getElementById('wa-link').href='https://wa.me/51915150077?text='+waMsg;
+  document.getElementById('wa-cta').style.display='block';
+  document.getElementById('btn-manual-pay').disabled=true;
+  // Show pending state screen after brief delay
+  document.getElementById('pending-order-display').textContent='Orden: '+curOrder;
+  setFmsg('pay-msg','✅ Solicitud guardada. Envía el comprobante por WhatsApp para agilizar la revisión.','ok');
 }
 
-// ─── ACTIONS ─────────────────────────────────────────────────
-function approvePending(i){
-  const p=getPending()[i];const u=getUsers();
-  u[p.email]={pass:p.pass,role:'approved',since:new Date().toLocaleDateString('es'),method:p.method,affiliate:p.affiliate,order:p.order,name:p.name};
-  saveUsers(u);const arr=getPending();arr.splice(i,1);savePending(arr);
-  addLog('Aprobado: '+p.email,'lg');showToast('Acceso activado: '+p.email);renderAll();
+function savePendingRecord(method){
+  const pending=getPending();
+  // Avoid duplicate
+  if(pending.find(p=>p.order===curOrder))return;
+  pending.push({
+    email:billing.email,pass:billing.pass,method,
+    affiliate:billing.aff||null,order:curOrder,
+    name:billing.fname+' '+billing.lname,
+    country:billing.country,phone:billing.phone,
+    date:new Date().toLocaleString('es'),ts:Date.now()
+  });
+  savePending(pending);
+  if(billing.aff){const affs=getAffs();affs[billing.aff]=(affs[billing.aff]||0)+1;saveAffs(affs);}
+  // Mark user as pending
+  const users=getUsers();
+  if(!users[billing.email]){
+    users[billing.email]={pass:billing.pass,role:'pending',since:new Date().toLocaleDateString('es'),method,order:curOrder,name:billing.fname+' '+billing.lname};
+    saveUsers(users);
+  }
 }
-function rejectPending(i){
-  const p=getPending()[i];
-  if(!confirm('¿Rechazar solicitud de '+p.email+'?'))return;
-  const arr=getPending();arr.splice(i,1);savePending(arr);
-  // Remove pending status from users
-  const u=getUsers();if(u[p.email]&&u[p.email].role==='pending'){delete u[p.email];saveUsers(u);}
-  addLog('Rechazado: '+p.email,'lr');showToast('Solicitud rechazada',true);renderAll();
+
+// ═══════════ LOGIN ═══════════
+function doLogin(){
+  const email=document.getElementById('l-email').value.trim().toLowerCase();
+  const pass=document.getElementById('l-pass').value;
+  setFmsg('l-msg','','');
+  if(!email||!pass)return setFmsg('l-msg','Completa todos los campos.','err');
+  const users=getUsers();
+  if(!users[email])return setFmsg('l-msg','Correo no encontrado. ¿Ya enviaste el comprobante?','err');
+  if(users[email].pass!==pass)return setFmsg('l-msg','Contraseña incorrecta.','err');
+  if(users[email].role==='pending'){
+    // Show pending info screen inside modal
+    document.getElementById('pending-order-display').textContent='Orden: '+(users[email].order||'—');
+    showCF('cf-pending');
+    return;
+  }
+  if(users[email].role!=='approved')return setFmsg('l-msg','Acceso denegado.','err');
+  saveCur(email);closeCheckout();closeSidebar();setLoggedIn(email);
 }
-function revokeAccess(email){
-  if(!confirm('¿Revocar acceso de '+email+'?'))return;
-  const u=getUsers();delete u[email];saveUsers(u);
-  addLog('Acceso revocado: '+email,'lr');showToast('Revocado',true);renderAll();
+function doLogout(){saveCur(null);location.reload();}
+function setLoggedIn(email){
+  document.getElementById('app').classList.add('on');
+  document.getElementById('sb-user').classList.add('on');
+  document.getElementById('sb-email').textContent=email;
+  document.getElementById('sb-actions').style.display='none';
+  document.getElementById('btn-logout').classList.add('on');
+  applyUnlock();
 }
-function addAff(){
-  const c=prompt('Nuevo código de afiliado (mayúsculas, sin espacios):');
-  if(!c)return;const cl=c.trim().toUpperCase().replace(/\s+/g,'');if(!cl)return;
-  const a=getAffs();a[cl]=0;saveAffs(a);
-  addLog('Afiliado creado: '+cl,'ly');showToast('Código '+cl+' creado');renderAll();
+
+// ═══════════ HELPERS ═══════════
+function setFmsg(id,txt,type){const e=document.getElementById(id);if(!e)return;e.className='fmsg'+(type?' '+type:'');e.textContent=txt;}
+function copyText(txt,btn){
+  navigator.clipboard.writeText(txt).catch(()=>{const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);});
+  const o=btn.innerHTML;btn.innerHTML='✓ Copiado';btn.classList.add('copied');setTimeout(()=>{btn.innerHTML=o;btn.classList.remove('copied');},2000);
 }
-function delAff(c){
-  if(!confirm('¿Eliminar código '+c+'?'))return;
-  const a=getAffs();delete a[c];saveAffs(a);
-  addLog('Afiliado eliminado: '+c,'ly');showToast('Eliminado',true);renderAll();
+
+// ═══════════ LOCK / UNLOCK ═══════════
+function applyLocks(){
+  document.getElementById('app').classList.add('on');
+  ['vc1','vc2','vc3'].forEach(id=>{
+    const c=document.getElementById(id);if(!c||c.querySelector('.lock-overlay'))return;
+    c.classList.add('locked');
+    const lo=document.createElement('div');lo.className='lock-overlay';
+    lo.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><span>Contenido exclusivo</span><button class="lo-btn" onclick="openCheckout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/></svg>Comprar</button>';
+    c.appendChild(lo);
+  });
 }
-function savePrice(){
-  const v=document.getElementById('price-inp').value.trim();
-  DB.set('price',v);
-  const m=document.getElementById('price-msg');m.className='fmsg ok';m.textContent='✓ Precio guardado: '+v;
-  addLog('Precio: '+v,'ly');showToast('Precio guardado');
-  setTimeout(()=>{m.className='fmsg';},3000);
+function applyUnlock(){
+  document.querySelectorAll('.video-card').forEach(c=>{
+    c.classList.remove('locked');c.classList.add('unlocked');
+    const lo=c.querySelector('.lock-overlay');if(lo)lo.remove();
+  });
 }
-function changeAdminPass(){
-  const v=document.getElementById('new-pass-inp').value.trim();
-  if(v.length<6){const m=document.getElementById('pass-msg');m.className='fmsg err';m.textContent='Mínimo 6 caracteres.';return;}
-  const u=getUsers();u['admin@jossdesign.com'].pass=v;saveUsers(u);
-  const m=document.getElementById('pass-msg');m.className='fmsg ok';m.textContent='✓ Contraseña actualizada.';
-  addLog('Contraseña admin cambiada','ly');showToast('Contraseña actualizada');
-  document.getElementById('new-pass-inp').value='';
-  setTimeout(()=>{m.className='fmsg';},3000);
+
+// ═══════════ NAV ═══════════
+const PH={
+  videos:{t:'Mis <em>Videos</em>',s:'Aprende diseño e inteligencia artificial con Joss Design.'},
+  instalacion:{t:'<em>Instalación</em>',s:'Guías y recursos para configurar tu entorno.'},
+  redes:{t:'Nuestras <em>Redes</em>',s:'Conéctate con Joss Design en todas las plataformas.'}
+};
+function showPanel(name,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  const h=PH[name];
+  document.getElementById('page-header').innerHTML='<h1>'+h.t+'</h1><p>'+h.s+'</p>';
+  closeSidebar();
 }
+
+// ═══════════ INIT ═══════════
+(()=>{
+  const cur=getCur(),users=getUsers();
+  if(cur&&users[cur]){
+    if(users[cur].role==='approved'){setLoggedIn(cur);}
+    else if(users[cur].role==='pending'){applyLocks();}  // locked, show pending on login
+    else{saveCur(null);applyLocks();}
+  }else{saveCur(null);applyLocks();}
+  // Set default price display
+  DB.set('price',DB.get('price')||'$0.01');
+  refreshPrices();
+})();
 </script>
 </body>
 </html>
