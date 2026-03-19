@@ -847,57 +847,24 @@ select.finput option { background: #141421; }
   border-radius: 999px; font-size: .6rem; font-weight: 700; color: var(--ac); white-space: nowrap; flex-shrink: 0;
 }
 
-/* ═══════════════════════════════
-   CARD VISUAL
-═══════════════════════════════ */
-.card-visual { transition: transform .6s ease;
-  background: linear-gradient(135deg,#1a1a3a,#2d1b69 50%,#1a2855);
-  border-radius: 14px; padding: 18px 20px 16px;
-  margin-bottom: 16px; position: relative; overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+/* ─── IZIPAY REDIRECT INFO ─── */
+.izipay-redirect-info {
+  display: flex; align-items: flex-start; gap: 13px;
+  padding: 14px 15px; margin-bottom: 4px;
+  background: var(--s2); border: 1px solid var(--b2); border-radius: 13px;
 }
-.card-visual::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(circle at 20% 50%, rgba(200,255,87,.08) 0%, transparent 55%),
-              radial-gradient(circle at 80% 20%, rgba(124,92,252,.15) 0%, transparent 50%);
+.iri-icon {
+  width: 48px; height: 48px; flex-shrink: 0; border-radius: 12px;
+  background: rgba(227,6,19,.09); border: 1px solid rgba(227,6,19,.2);
+  display: flex; align-items: center; justify-content: center; color: #f87171;
 }
-.cv-chip { position: relative; z-index: 1; margin-bottom: 14px; }
-.cv-network { position: absolute; top: 16px; right: 18px; z-index: 1; }
-.cv-number {
-  font-family: 'Montserrat', sans-serif; font-size: 1.05rem; font-weight: 700;
-  letter-spacing: .18em; color: rgba(255,255,255,.9);
-  margin-bottom: 14px; position: relative; z-index: 1;
+.iri-title { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: .83rem; margin-bottom: 4px; }
+.iri-sub { font-size: .72rem; color: var(--mu); line-height: 1.55; }
+.izipay-redirect-note {
+  display: flex; align-items: center; gap: 6px;
+  font-size: .67rem; color: var(--mu); margin-top: 9px; text-align: center; justify-content: center;
 }
-.cv-bottom { display: flex; gap: 22px; position: relative; z-index: 1; }
-.cv-label { font-size: .55rem; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.45); margin-bottom: 2px; }
-.cv-value { font-family: 'Montserrat', sans-serif; font-size: .82rem; font-weight: 700; color: rgba(255,255,255,.88); letter-spacing: .06em; }
-
-/* ═══════════════════════════════
-   CARD FIELDS
-═══════════════════════════════ */
-.card-fields { margin-bottom: 14px; }
-.cf-group { margin-bottom: 10px; }
-.cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.cf-label {
-  display: block; font-size: .63rem; font-weight: 700;
-  color: var(--mu); letter-spacing: .09em; text-transform: uppercase; margin-bottom: 5px;
-}
-.cf-input-wrap {
-  display: flex; align-items: center; gap: 9px;
-  padding: 0 13px; background: var(--s2); border: 1px solid var(--b2); border-radius: 10px;
-  transition: border-color .2s, box-shadow .2s;
-}
-.cf-input-wrap:focus-within {
-  border-color: rgba(200,255,87,.4); box-shadow: 0 0 0 3px rgba(200,255,87,.07);
-}
-.cf-icon { flex-shrink: 0; color: var(--mu); }
-.cf-input {
-  flex: 1; padding: 11px 0; background: transparent; border: none;
-  color: var(--tx); font-family: 'DM Sans', sans-serif; font-size: .88rem;
-  outline: none; min-width: 0;
-}
-.cf-input::placeholder { color: var(--mu); }
-#cf-pan { font-family: 'Montserrat', sans-serif; font-size: .92rem; letter-spacing: .1em; }
+.izipay-redirect-note svg { flex-shrink: 0; }
 .card-brands {
   display: flex; align-items: center; gap: 7px; margin: 10px 0 12px;
   font-size: .65rem; color: var(--mu);
@@ -1181,7 +1148,7 @@ select.finput option { background: #141421; }
           </div>
         </div>
 
-        <!-- Izipay — custom card form -->
+        <!-- Izipay — redirigir al checkout seguro -->
         <div id="pm-detail-izipay">
           <!-- currency box -->
           <div class="currency-box" id="currency-box">
@@ -1195,88 +1162,36 @@ select.finput option { background: #141421; }
               Auto
             </div>
           </div>
-          <!-- card visual -->
-          <div class="card-visual" id="card-visual">
-            <div class="cv-chip">
-              <svg viewBox="0 0 30 24" fill="none" width="30" height="24">
-                <rect x="1" y="1" width="28" height="22" rx="4" fill="#c8a020" opacity=".7"/>
-                <rect x="8" y="7" width="14" height="10" rx="2" fill="none" stroke="#f0d060" stroke-width="1"/>
-                <line x1="15" y1="7" x2="15" y2="17" stroke="#f0d060" stroke-width="1"/>
-                <line x1="8" y1="12" x2="22" y2="12" stroke="#f0d060" stroke-width="1"/>
-              </svg>
+
+          <!-- info box -->
+          <div class="izipay-redirect-info">
+            <div class="iri-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="28" height="28"><rect x="1" y="4" width="22" height="16" rx="3"/><line x1="1" y1="10" x2="23" y2="10"/><circle cx="5" cy="15" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg>
             </div>
-            <div class="cv-network" id="cv-network">
-              <svg viewBox="0 0 50 30" fill="none" width="50" height="30">
-                <circle cx="18" cy="15" r="12" fill="#eb001b" opacity=".85"/>
-                <circle cx="32" cy="15" r="12" fill="#f79e1b" opacity=".85"/>
-                <path d="M25 5.5a12 12 0 010 19" fill="#ff5f00" opacity=".7"/>
-              </svg>
-            </div>
-            <div class="cv-number" id="cv-number">•••• •••• •••• ••••</div>
-            <div class="cv-bottom">
-              <div>
-                <div class="cv-label">Titular</div>
-                <div class="cv-value" id="cv-holder">NOMBRE APELLIDO</div>
-              </div>
-              <div>
-                <div class="cv-label">Vence</div>
-                <div class="cv-value" id="cv-exp">MM/AA</div>
-              </div>
+            <div>
+              <div class="iri-title">Pago 100% seguro con Izipay</div>
+              <div class="iri-sub">Serás redirigido a la página certificada de Izipay para ingresar los datos de tu tarjeta con seguridad PCI DSS nivel 1.</div>
             </div>
           </div>
-          <!-- card fields -->
-          <div class="card-fields">
-            <div class="cf-group">
-              <label class="cf-label">Número de tarjeta</label>
-              <div class="cf-input-wrap">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16" class="cf-icon"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                <input class="cf-input" id="cf-pan" type="text" inputmode="numeric" placeholder="0000 0000 0000 0000" maxlength="19" autocomplete="cc-number"/>
-              </div>
-            </div>
-            <div class="cf-row">
-              <div class="cf-group">
-                <label class="cf-label">Fecha de vencimiento</label>
-                <div class="cf-input-wrap">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15" class="cf-icon"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                  <input class="cf-input" id="cf-exp" type="text" inputmode="numeric" placeholder="MM/AA" maxlength="5" autocomplete="cc-exp"/>
-                </div>
-              </div>
-              <div class="cf-group">
-                <label class="cf-label">CVV / CVC</label>
-                <div class="cf-input-wrap">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15" class="cf-icon"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                  <input class="cf-input" id="cf-cvv" type="text" inputmode="numeric" placeholder="•••" maxlength="4" autocomplete="cc-csc"/>
-                </div>
-              </div>
-            </div>
-            <div class="cf-group">
-              <label class="cf-label">Nombre del titular</label>
-              <div class="cf-input-wrap">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="15" height="15" class="cf-icon"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <input class="cf-input" id="cf-name" type="text" placeholder="Como aparece en la tarjeta" autocomplete="cc-name" style="text-transform:uppercase"/>
-              </div>
-            </div>
-          </div>
-          <div class="izipay-err-box" id="iz-err"></div>
-          <button class="btn-main" id="btn-pay-card" onclick="submitCardPayment()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            <span id="btn-pay-card-label">Pagar S/ 1.00</span>
-          </button>
-          <div class="card-brands">
+
+          <!-- accepted cards -->
+          <div class="card-brands" style="margin:12px 0 14px">
             <span>Aceptamos</span>
-            <svg viewBox="0 0 60 38" fill="none" height="22" title="Visa"><rect width="60" height="38" rx="4" fill="#1a1f71"/><text x="30" y="26" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="white" letter-spacing="1">VISA</text></svg>
-            <svg viewBox="0 0 60 38" fill="none" height="22" title="Mastercard"><rect width="60" height="38" rx="4" fill="#252525"/><circle cx="23" cy="19" r="11" fill="#eb001b"/><circle cx="37" cy="19" r="11" fill="#f79e1b" opacity=".85"/></svg>
-            <svg viewBox="0 0 60 38" fill="none" height="22" title="Amex"><rect width="60" height="38" rx="4" fill="#2671b9"/><text x="30" y="26" text-anchor="middle" font-family="Arial" font-size="9" font-weight="bold" fill="white">AMEX</text></svg>
+            <svg viewBox="0 0 60 38" fill="none" height="22"><rect width="60" height="38" rx="4" fill="#1a1f71"/><text x="30" y="26" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="white" letter-spacing="1">VISA</text></svg>
+            <svg viewBox="0 0 60 38" fill="none" height="22"><rect width="60" height="38" rx="4" fill="#252525"/><circle cx="23" cy="19" r="11" fill="#eb001b"/><circle cx="37" cy="19" r="11" fill="#f79e1b" opacity=".85"/></svg>
+            <svg viewBox="0 0 60 38" fill="none" height="22"><rect width="60" height="38" rx="4" fill="#2671b9"/><text x="30" y="26" text-anchor="middle" font-family="Arial" font-size="9" font-weight="bold" fill="white">AMEX</text></svg>
           </div>
-          <!-- Hidden KR form (still needed by Izipay SDK) -->
-          <div style="display:none">
-            <div class="kr-embedded" id="kr-hidden">
-              <div class="kr-pan"></div>
-              <div class="kr-expiry"></div>
-              <div class="kr-security-code"></div>
-              <button class="kr-payment-button"></button>
-              <div class="kr-form-error"></div>
-            </div>
+
+          <div class="izipay-err-box" id="iz-err"></div>
+
+          <button class="btn-main" id="btn-pay-card" onclick="redirectToIzipay()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            <span id="btn-pay-card-label">Ir a pagar · S/ 1.00</span>
+          </button>
+
+          <div class="izipay-redirect-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Se abrirá la página segura de Izipay · Regresarás automáticamente al terminar
           </div>
         </div>
 
@@ -1880,113 +1795,150 @@ function updateCurrency(countryCode) {
   });
 }
 
-/* ─── CARD VISUAL UPDATER ─── */
-function initCardInputs() {
-  const pan  = document.getElementById('cf-pan');
-  const exp  = document.getElementById('cf-exp');
-  const cvv  = document.getElementById('cf-cvv');
-  const name = document.getElementById('cf-name');
-  if (!pan) return;
-
-  pan.addEventListener('input', function() {
-    let v = this.value.replace(/\D/g,'').substring(0,16);
-    this.value = v.replace(/(.{4})/g,'$1 ').trim();
-    document.getElementById('cv-number').textContent =
-      (v + '????????????????').substring(0,16).replace(/(.{4})/g,'$1 ').trim()
-      .replace(/\?/g,'•');
-    // detect card type
-    const net = document.getElementById('cv-network');
-    if (/^4/.test(v)) {
-      net.innerHTML = '<svg viewBox="0 0 60 38" fill="none" height="28"><rect width="60" height="38" rx="4" fill="#1a1f71"/><text x="30" y="26" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="white" letter-spacing="1">VISA</text></svg>';
-    } else if (/^5[1-5]/.test(v) || /^2[2-7]/.test(v)) {
-      net.innerHTML = '<svg viewBox="0 0 50 30" fill="none" height="28"><circle cx="18" cy="15" r="12" fill="#eb001b" opacity=".85"/><circle cx="32" cy="15" r="12" fill="#f79e1b" opacity=".85"/></svg>';
-    } else if (/^3[47]/.test(v)) {
-      net.innerHTML = '<svg viewBox="0 0 60 38" fill="none" height="28"><rect width="60" height="38" rx="4" fill="#2671b9"/><text x="30" y="26" text-anchor="middle" font-family="Arial" font-size="9" font-weight="bold" fill="white">AMEX</text></svg>';
-    }
-  });
-
-  exp.addEventListener('input', function() {
-    let v = this.value.replace(/\D/g,'').substring(0,4);
-    if (v.length >= 2) v = v.substring(0,2) + '/' + v.substring(2);
-    this.value = v;
-    const parts = v.split('/');
-    document.getElementById('cv-exp').textContent = v.length >= 4 ? v : (parts[0]||'MM') + '/' + (parts[1]||'AA');
-  });
-
-  cvv.addEventListener('focus', () => document.getElementById('card-visual').style.transform = 'rotateY(180deg)');
-  cvv.addEventListener('blur',  () => document.getElementById('card-visual').style.transform = 'rotateY(0deg)');
-
-  name.addEventListener('input', function() {
-    document.getElementById('cv-holder').textContent = this.value.toUpperCase() || 'NOMBRE APELLIDO';
-  });
-}
-
-/* ─── CARD SUBMIT ─── */
-async function submitCardPayment() {
-  const pan  = document.getElementById('cf-pan').value.replace(/\s/g,'');
-  const exp  = document.getElementById('cf-exp').value;
-  const cvv  = document.getElementById('cf-cvv').value;
-  const name = document.getElementById('cf-name').value.trim();
+/* ─── IZIPAY REDIRECT ─── */
+async function redirectToIzipay() {
   const errEl = document.getElementById('iz-err');
   errEl.classList.remove('show');
 
-  // Validate fields
-  if (pan.length < 15)                        { errEl.textContent = 'Número de tarjeta incompleto.';           errEl.classList.add('show'); return; }
-  if (!/^\d{2}\/\d{2}$/.test(exp))            { errEl.textContent = 'Fecha de vencimiento inválida (MM/AA).'; errEl.classList.add('show'); return; }
-  if (cvv.length < 3)                         { errEl.textContent = 'CVV inválido.';                          errEl.classList.add('show'); return; }
-  if (name.length < 3)                        { errEl.textContent = 'Ingresa el nombre del titular.';         errEl.classList.add('show'); return; }
-
-  const [expMonth, expYear] = exp.split('/');
-
   const btn = document.getElementById('btn-pay-card');
-  const originalLabel = document.getElementById('btn-pay-card-label').textContent;
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:18px;height:18px;border-width:2px;margin-right:8px"></div> Procesando...';
+  btn.innerHTML = '<div class="spinner" style="width:18px;height:18px;border-width:2px;margin-right:8px;display:inline-block"></div> Preparando pago...';
 
   try {
-    // Send card data + order info to backend → backend charges via Izipay REST API
-    const res = await fetch(BACKEND + '/charge-card', {
+    // Ask backend to create a payment URL (formToken) for redirect
+    const res = await fetch(BACKEND + '/create-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        amount   : PRICE_PEN,        // always in PEN cents for Izipay Peru
-        currency : 'PEN',
-        orderId  : currentOrder,
-        customer : {
-          email     : billingData.email,
-          firstName : billingData.fname,
-          lastName  : billingData.lname
-        },
-        card: {
-          pan      : pan,
-          expiry   : expMonth + expYear,  // format: MMYY  e.g. "04/28" → "0428"
-          cvv      : cvv,
-          holder   : name
+        amount  : PRICE_PEN,
+        currency: 'PEN',
+        orderId : currentOrder,
+        customer: {
+          email    : billingData.email,
+          firstName: billingData.fname,
+          lastName : billingData.lname
         }
       })
     });
 
+    if (!res.ok) throw new Error('Error del servidor: ' + res.status);
     const data = await res.json();
+    if (!data.formToken) throw new Error(data.error || 'No se pudo crear el pago');
 
-    if (data.success) {
-      handleIzipaySuccess();
-    } else {
-      throw new Error(data.error || data.details || 'Pago rechazado por el banco.');
-    }
+    // Save pending record BEFORE redirecting so data is not lost
+    savePendingIzipay();
+
+    // Build Izipay hosted checkout URL and redirect
+    const checkoutUrl = 'https://secure.micuentaweb.pe/vads-checkout/?'
+      + 'vads_action_mode=INTERACTIVE'
+      + '&vads_amount=' + PRICE_PEN
+      + '&vads_currency=604'   // 604 = PEN (Peruvian Sol ISO 4217)
+      + '&vads_ctx_mode=PRODUCTION'
+      + '&vads_page_action=PAYMENT'
+      + '&vads_payment_config=SINGLE'
+      + '&vads_site_id=' + '19131378'
+      + '&vads_trans_date=' + new Date().toISOString().replace(/[-T:.Z]/g,'').substring(0,14)
+      + '&vads_trans_id=' + currentOrder.replace(/[^a-zA-Z0-9]/g,'').substring(0,6)
+      + '&vads_version=V2'
+      + '&vads_return_url=' + encodeURIComponent(location.origin + location.pathname + '?pago=ok&order=' + currentOrder)
+      + '&vads_cancel_url=' + encodeURIComponent(location.origin + location.pathname + '?pago=cancel');
+
+    // Use the formToken URL from Izipay (the correct way)
+    // The backend returns the formToken; we use the Izipay standard redirect URL
+    const izipayRedirectUrl = 'https://api.micuentaweb.pe/api-payment/V4/Charge/Redirect?formToken=' + encodeURIComponent(data.formToken);
+
+    // Save data to localStorage before leaving
+    db.set('pending_order', currentOrder);
+    db.set('pending_billing', JSON.stringify(billingData));
+
+    window.location.href = izipayRedirectUrl;
 
   } catch (err) {
-    console.error('Card payment error:', err);
-    const msg = err.message || 'Error al procesar el pago.';
-    errEl.textContent = msg.includes('Backend') || msg.includes('fetch')
-      ? 'No se pudo conectar con el servidor. Usa Yape, Plin o PayPal.'
-      : msg;
+    console.error('Redirect error:', err);
+    errEl.textContent = err.message || 'No se pudo conectar. Usa Yape, Plin o PayPal.';
     errEl.classList.add('show');
     btn.disabled = false;
     btn.innerHTML =
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>' +
-      ' <span id="btn-pay-card-label">' + originalLabel + '</span>';
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>' +
+      ' <span id="btn-pay-card-label">Reintentar</span>';
   }
 }
+
+function savePendingIzipay() {
+  const pending = getPending();
+  if (!pending.find(p => p.order === currentOrder)) {
+    pending.push({
+      email  : billingData.email,
+      pass   : billingData.pass,
+      method : 'izipay',
+      affiliate: billingData.aff || null,
+      order  : currentOrder,
+      name   : billingData.fname + ' ' + billingData.lname,
+      country: billingData.country,
+      phone  : billingData.phone,
+      date   : new Date().toLocaleString('es'),
+      ts     : Date.now()
+    });
+    savePending(pending);
+  }
+  // also mark user as pending
+  const users = getUsers();
+  if (!users[billingData.email]) {
+    users[billingData.email] = {
+      pass  : billingData.pass, role: 'pending',
+      since : new Date().toLocaleDateString('es'),
+      method: 'izipay', order: currentOrder,
+      name  : billingData.fname + ' ' + billingData.lname
+    };
+    saveUsers(users);
+  }
+}
+
+/* ─── HANDLE RETURN FROM IZIPAY ─── */
+function checkIzipayReturn() {
+  const params = new URLSearchParams(location.search);
+  const pago   = params.get('pago');
+  const order  = params.get('order');
+  if (!pago) return;
+
+  // Clean URL
+  history.replaceState({}, '', location.pathname);
+
+  if (pago === 'ok' && order) {
+    // Payment successful — auto-approve
+    const storedBilling = db.get('pending_billing');
+    let bd = storedBilling ? JSON.parse(storedBilling) : null;
+
+    if (bd) {
+      const users = getUsers();
+      users[bd.email] = {
+        pass  : bd.pass, role: 'approved',
+        since : new Date().toLocaleDateString('es'),
+        method: 'izipay', order,
+        name  : bd.fname + ' ' + bd.lname
+      };
+      saveUsers(users);
+      // remove from pending
+      const arr = getPending().filter(p => p.order !== order);
+      savePending(arr);
+      if (bd.aff) {
+        const affs = getAffs();
+        affs[bd.aff] = (affs[bd.aff] || 0) + 1;
+        saveAffs(affs);
+      }
+      saveSession(bd.email);
+      db.set('pending_billing', null);
+      db.set('pending_order', null);
+      addLog('Pago Izipay exitoso: ' + bd.email, 'lg');
+      // Show success — user is already logged in via init
+    }
+  } else if (pago === 'cancel') {
+    // Show a toast
+    toast('Pago cancelado. Puedes intentarlo de nuevo.', false);
+  }
+}
+
+function initCardInputs() { /* no-op: card form removed */ }
 
 function handleIzipaySuccess() {
   const users = getUsers();
@@ -2431,6 +2383,7 @@ function changeAdminPwd() {
     lockCards();
   }
   refreshPrices();
+  checkIzipayReturn(); // detect return from Izipay checkout
 
   // Wire country selector → currency converter
   const countryEl = document.getElementById('b-country');
@@ -2439,9 +2392,6 @@ function changeAdminPwd() {
       updateCurrency(this.value || 'PE');
     });
   }
-
-  // Init card visual + inputs
-  setTimeout(initCardInputs, 100);
 })();
 </script>
 </body>
