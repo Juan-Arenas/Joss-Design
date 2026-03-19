@@ -1103,9 +1103,9 @@ select.finput option { background: #141421; }
       <div class="modal-step active" id="step-billing">
         <div class="order-sum">
           <div class="title">Resumen del pedido</div>
-          <div class="sum-row"><span class="sum-label">Curso completo Joss Design</span><span class="sum-val" id="price-show">US$ 0.01</span></div>
+          <div class="sum-row"><span class="sum-label">Curso completo Joss Design</span><span class="sum-val" id="price-show">S/ 1.00</span></div>
           <div class="sum-row"><span class="sum-label">Acceso de por vida</span><span class="sum-val" style="color:var(--gr)">✓ Incluido</span></div>
-          <div class="sum-row"><span class="sum-total-label">Total</span><span class="sum-total-val" id="price-total">US$ 0.01</span></div>
+          <div class="sum-row"><span class="sum-total-label">Total</span><span class="sum-total-val" id="price-total">S/ 1.00</span></div>
         </div>
         <div style="font-size:.78rem;font-weight:700;margin-bottom:11px;display:flex;align-items:center;gap:7px">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -1187,7 +1187,7 @@ select.finput option { background: #141421; }
           <div class="currency-box" id="currency-box">
             <div class="currency-flag" id="currency-flag">🇵🇪</div>
             <div class="currency-info">
-              <div class="currency-amount" id="currency-amount">US$ 0.01</div>
+              <div class="currency-amount" id="currency-amount">S/ 1.00</div>
               <div class="currency-sub" id="currency-sub">Precio en tu moneda local</div>
             </div>
             <div class="currency-badge">
@@ -1260,7 +1260,7 @@ select.finput option { background: #141421; }
           <div class="izipay-err-box" id="iz-err"></div>
           <button class="btn-main" id="btn-pay-card" onclick="submitCardPayment()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            <span id="btn-pay-card-label">Pagar US$ 0.01</span>
+            <span id="btn-pay-card-label">Pagar S/ 1.00</span>
           </button>
           <div class="card-brands">
             <span>Aceptamos</span>
@@ -1290,7 +1290,7 @@ select.finput option { background: #141421; }
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="9" height="9"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               Copiar
             </button>
-            <div class="price-tag" id="pp-price">💰 US$ 0.01</div>
+            <div class="price-tag" id="pp-price">💰 S/ 1.00</div>
           </div>
         </div>
 
@@ -1300,7 +1300,7 @@ select.finput option { background: #141421; }
             <div class="manual-name yape-grad">yape</div>
             <div class="manual-num">915 150 077</div>
             <div class="manual-sub">Josb Design</div>
-            <div class="price-tag" id="yape-price">💰 US$ 0.01</div>
+            <div class="price-tag" id="yape-price">💰 S/ 1.00</div>
           </div>
           <ul class="pay-steps">
             <li><span class="sn">1</span>Yapea al <strong>915 150 077</strong> por el monto indicado.</li>
@@ -1315,7 +1315,7 @@ select.finput option { background: #141421; }
             <div class="manual-name plin-grad">plin</div>
             <div class="manual-num">915 150 077</div>
             <div class="manual-sub">Josb Design</div>
-            <div class="price-tag" id="plin-price">💰 US$ 0.01</div>
+            <div class="price-tag" id="plin-price">💰 S/ 1.00</div>
           </div>
           <ul class="pay-steps">
             <li><span class="sn">1</span>Plínea al <strong>915 150 077</strong> desde tu app bancaria.</li>
@@ -1649,8 +1649,8 @@ select.finput option { background: #141421; }
 /* ─── CONFIG ─── */
 const BACKEND   = 'https://josb-design-production.up.railway.app';
 const ADMIN_PWD = '1234';       // contraseña para abrir el panel admin
-const PRICE_PEN = 4;           // 4 centavos de sol = ~$0.01 USD
-const PRICE_TXT = 'US$ 0.01'; // texto que se muestra
+const PRICE_PEN = 100;          // centavos de sol (100 = S/ 1.00)
+const PRICE_TXT = 'S/ 1.00';   // texto que se muestra
 
 /* ─── STORAGE ─── */
 const K = 'jd9_';
@@ -1836,15 +1836,15 @@ function selectPM(m) {
 
 /* ─── CURRENCY CONVERSION ─── */
 const CURRENCIES = {
-  PE: { flag:'🇵🇪', code:'PEN', symbol:'S/',  name:'Soles',             rate:0.04,   cents:4    },
-  CO: { flag:'🇨🇴', code:'COP', symbol:'$',   name:'Pesos colombianos', rate:42,     cents:4200  },
-  MX: { flag:'🇲🇽', code:'MXN', symbol:'$',   name:'Pesos mexicanos',   rate:0.17,   cents:17    },
-  AR: { flag:'🇦🇷', code:'ARS', symbol:'$',   name:'Pesos argentinos',  rate:9.5,    cents:950   },
-  CL: { flag:'🇨🇱', code:'CLP', symbol:'$',   name:'Pesos chilenos',    rate:9.5,    cents:950   },
-  EC: { flag:'🇪🇨', code:'USD', symbol:'US$', name:'Dólares',           rate:0.01,   cents:1     },
-  US: { flag:'🇺🇸', code:'USD', symbol:'US$', name:'Dólares',           rate:0.01,   cents:1     },
-  ES: { flag:'🇪🇸', code:'EUR', symbol:'€',   name:'Euros',             rate:0.009,  cents:1     },
-  OTHER:{ flag:'🌍',code:'USD', symbol:'US$', name:'Dólares',           rate:0.01,   cents:1     }
+  PE: { flag:'🇵🇪', code:'PEN', symbol:'S/',  name:'Soles',             rate:1,      cents:100  },
+  CO: { flag:'🇨🇴', code:'COP', symbol:'$',   name:'Pesos colombianos', rate:400,    cents:40000 },
+  MX: { flag:'🇲🇽', code:'MXN', symbol:'$',   name:'Pesos mexicanos',   rate:17.5,   cents:1750  },
+  AR: { flag:'🇦🇷', code:'ARS', symbol:'$',   name:'Pesos argentinos',  rate:1000,   cents:100000},
+  CL: { flag:'🇨🇱', code:'CLP', symbol:'$',   name:'Pesos chilenos',    rate:950,    cents:95000 },
+  EC: { flag:'🇪🇨', code:'USD', symbol:'US$', name:'Dólares',           rate:0.27,   cents:27    },
+  US: { flag:'🇺🇸', code:'USD', symbol:'US$', name:'Dólares',           rate:0.27,   cents:27    },
+  ES: { flag:'🇪🇸', code:'EUR', symbol:'€',   name:'Euros',             rate:0.25,   cents:25    },
+  OTHER:{ flag:'🌍',code:'USD', symbol:'US$', name:'Dólares',           rate:0.27,   cents:27    }
 };
 let currentCurrency = CURRENCIES['PE'];
 
@@ -1852,7 +1852,7 @@ function updateCurrency(countryCode) {
   const c = CURRENCIES[countryCode] || CURRENCIES['PE'];
   currentCurrency = c;
   // Format amount
-  const baseAmount = 1; // $0.01 USD equivalent (rate multiplies this)
+  const baseAmount = 1; // S/ 1.00 equivalent
   const converted = (baseAmount * c.rate);
   let formatted;
   if (c.code === 'CLP' || c.code === 'ARS') {
@@ -1930,56 +1930,61 @@ async function submitCardPayment() {
   const errEl = document.getElementById('iz-err');
   errEl.classList.remove('show');
 
-  if (pan.length < 15)   { errEl.textContent = 'Número de tarjeta incompleto.'; errEl.classList.add('show'); return; }
-  if (!/^\d{2}\/\d{2}$/.test(exp)) { errEl.textContent = 'Fecha de vencimiento inválida (MM/AA).'; errEl.classList.add('show'); return; }
-  if (cvv.length < 3)    { errEl.textContent = 'CVV inválido.'; errEl.classList.add('show'); return; }
-  if (name.length < 3)   { errEl.textContent = 'Ingresa el nombre del titular.'; errEl.classList.add('show'); return; }
+  // Validate fields
+  if (pan.length < 15)                        { errEl.textContent = 'Número de tarjeta incompleto.';           errEl.classList.add('show'); return; }
+  if (!/^\d{2}\/\d{2}$/.test(exp))            { errEl.textContent = 'Fecha de vencimiento inválida (MM/AA).'; errEl.classList.add('show'); return; }
+  if (cvv.length < 3)                         { errEl.textContent = 'CVV inválido.';                          errEl.classList.add('show'); return; }
+  if (name.length < 3)                        { errEl.textContent = 'Ingresa el nombre del titular.';         errEl.classList.add('show'); return; }
+
+  const [expMonth, expYear] = exp.split('/');
 
   const btn = document.getElementById('btn-pay-card');
+  const originalLabel = document.getElementById('btn-pay-card-label').textContent;
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:18px;height:18px;border-width:2px"></div> Procesando...';
+  btn.innerHTML = '<div class="spinner" style="width:18px;height:18px;border-width:2px;margin-right:8px"></div> Procesando...';
 
   try {
-    // Get formToken from backend
-    const res = await fetch(BACKEND + '/create-payment', {
+    // Send card data + order info to backend → backend charges via Izipay REST API
+    const res = await fetch(BACKEND + '/charge-card', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        amount   : currentCurrency.cents,
-        currency : currentCurrency.code === 'COP' ? 'PEN' : 'PEN', // Izipay PE only accepts PEN
+        amount   : PRICE_PEN,        // always in PEN cents for Izipay Peru
+        currency : 'PEN',
         orderId  : currentOrder,
-        customer : { email: billingData.email, firstName: billingData.fname, lastName: billingData.lname }
+        customer : {
+          email     : billingData.email,
+          firstName : billingData.fname,
+          lastName  : billingData.lname
+        },
+        card: {
+          pan      : pan,
+          expiry   : '20' + expYear + expMonth,  // format: YYYYMM
+          cvv      : cvv,
+          holder   : name
+        }
       })
     });
-    if (!res.ok) throw new Error('Backend error ' + res.status);
+
     const data = await res.json();
-    if (!data.formToken) throw new Error('Sin formToken');
 
-    // Set token and trigger KR
-    await KR.setFormConfig({ formToken: data.formToken });
-
-    KR.onSubmit(pd => {
-      if (pd.clientAnswer && pd.clientAnswer.orderStatus === 'PAID') {
-        handleIzipaySuccess();
-      } else {
-        const msg = pd.clientAnswer?.transactions?.[0]?.errorMessage || 'Pago rechazado. Verifica los datos de tu tarjeta.';
-        errEl.textContent = msg;
-        errEl.classList.add('show');
-        btn.disabled = false;
-        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> <span id="btn-pay-card-label">Reintentar pago</span>';
-      }
-      return false;
-    });
-
-    // Trigger KR submit programmatically
-    await KR.submit();
+    if (data.success) {
+      handleIzipaySuccess();
+    } else {
+      throw new Error(data.error || data.details || 'Pago rechazado por el banco.');
+    }
 
   } catch (err) {
     console.error('Card payment error:', err);
-    errEl.textContent = 'Error al procesar el pago. Por favor usa Yape, Plin o PayPal.';
+    const msg = err.message || 'Error al procesar el pago.';
+    errEl.textContent = msg.includes('Backend') || msg.includes('fetch')
+      ? 'No se pudo conectar con el servidor. Usa Yape, Plin o PayPal.'
+      : msg;
     errEl.classList.add('show');
     btn.disabled = false;
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> <span id="btn-pay-card-label">Reintentar</span>';
+    btn.innerHTML =
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>' +
+      ' <span id="btn-pay-card-label">' + originalLabel + '</span>';
   }
 }
 
@@ -2046,7 +2051,7 @@ function submitManual() {
     '💳 Método: ' + (mN[selectedPM] || selectedPM) + '\n\n' +
     'Adjunto mi comprobante. ¡Quedo atento!'
   );
-  if (selectedPM === 'paypal') window.open('https://www.paypal.com/paypalme/blackjosue113@gmail.com', '_blank');
+  if (selectedPM === 'paypal') window.open('https://www.paypal.com/paypalme/jossdesign', '_blank');
   document.getElementById('wa-btn').href = 'https://wa.me/51915150077?text=' + waMsg;
   document.getElementById('wa-section').style.display = 'block';
   document.getElementById('btn-manual').disabled = true;
