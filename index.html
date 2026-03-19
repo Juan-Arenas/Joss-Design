@@ -1959,7 +1959,7 @@ async function submitCardPayment() {
         },
         card: {
           pan      : pan,
-          expiry   : '20' + expYear + expMonth,  // format: YYYYMM
+          expiry   : expMonth + expYear,  // format: MMYY  e.g. "04/28" → "0428"
           cvv      : cvv,
           holder   : name
         }

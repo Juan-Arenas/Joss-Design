@@ -66,7 +66,7 @@ app.post('/create-payment', async (req, res) => {
 
 // ── POST /charge-card ─────────────────────────────────────────
 //  Recibe: { amount, currency, orderId, customer, card }
-//  card  : { pan, expiry (YYYYMM), cvv, holder }
+//  card  : { pan, expiry (MMYY), cvv, holder }
 //  Retorna: { success: true } o { success: false, error: "..." }
 // ─────────────────────────────────────────────────────────────
 app.post('/charge-card', async (req, res) => {
@@ -91,7 +91,7 @@ app.post('/charge-card', async (req, res) => {
       paymentForms: [{
         paymentMethodType: 'CARD',
         pan:    card.pan,
-        expiry: card.expiry,   // YYYYMM p.ej. "202804"
+        expiry: card.expiry,   // MMYY p.ej. "0428"
         cvv:    card.cvv,
         holder: card.holder || `${customer?.firstName || ''} ${customer?.lastName || ''}`.trim()
       }]
