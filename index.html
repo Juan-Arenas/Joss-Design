@@ -4,8 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Joss Design — Curso</title>
-<link rel="icon" type="image/png" href="Fav.png" sizes="64x64"/>
-<link rel="shortcut icon" href="Fav.png"/>
+<link rel="icon" type="image/png" href="Joss.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- Izipay SDK -->
 <script src="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js"
@@ -74,8 +73,8 @@ body {
   gap: 10px;
 }
 .sb-logo-img {
-  width: 52px; height: 52px;
-  border-radius: 12px;
+  width: 36px; height: 36px;
+  border-radius: 10px;
   overflow: hidden;
   flex-shrink: 0;
   background: var(--s2);
@@ -376,7 +375,7 @@ body {
   display: flex; align-items: center; gap: 8px;
   font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: .95rem; color: var(--tx);
 }
-.mob-logo img { width: 38px; height: 38px; border-radius: 10px; cursor: pointer; }
+.mob-logo img { width: 26px; height: 26px; border-radius: 7px; cursor: pointer; }
 .mob-logo span { color: var(--ac); }
 .mob-right { display: flex; align-items: center; gap: 9px; }
 .mob-buy-btn {
@@ -440,7 +439,7 @@ body {
 .modal-head-row {
   display: flex; align-items: center; gap: 10px; position: relative; z-index: 1;
 }
-.modal-logo { width: 46px; height: 46px; border-radius: 11px; overflow: hidden; flex-shrink: 0; }
+.modal-logo { width: 32px; height: 32px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
 .modal-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .modal-brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: .95rem; color: var(--tx); }
 .modal-brand span { color: var(--ac); }
@@ -716,7 +715,7 @@ select.finput option { background: #141421; }
 #admin-panel.show { display: flex; }
 .adm-top { background: var(--s1); border-bottom: 1px solid var(--b1); padding: 0 28px; height: 58px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
 .adm-top-left { display: flex; align-items: center; gap: 11px; }
-.adm-logo { width: 42px; height: 42px; border-radius: 10px; overflow: hidden; background: var(--s2); cursor: pointer; }
+.adm-logo { width: 30px; height: 30px; border-radius: 8px; overflow: hidden; background: var(--s2); cursor: pointer; }
 .adm-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .adm-brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: .95rem; }
 .adm-brand span { color: var(--ac); }
@@ -873,9 +872,64 @@ select.finput option { background: #141421; }
 .card-brands svg { border-radius: 4px; opacity: .7; transition: opacity .2s; }
 .card-brands svg:hover { opacity: 1; }
 
-/* ═══════════════════════════════
-   TOAST
-═══════════════════════════════ */
+/* ─── KR EMBEDDED FORM (Izipay) ─── */
+.kr-embedded {
+  background: transparent !important;
+}
+.kr-form-card {
+  background: var(--s2) !important;
+  border: 1px solid var(--b2) !important;
+  border-radius: 12px !important;
+  padding: 14px !important;
+}
+.kr-field-wrapper,
+.kr-field {
+  background: var(--s2) !important;
+  border: 1px solid var(--b2) !important;
+  border-radius: 10px !important;
+  color: var(--tx) !important;
+}
+.kr-field-wrapper:focus-within {
+  border-color: rgba(200,255,87,.4) !important;
+  box-shadow: 0 0 0 3px rgba(200,255,87,.07) !important;
+}
+.kr-label {
+  color: var(--mu) !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: .63rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .09em !important;
+}
+.kr-payment-button {
+  background: var(--ac) !important;
+  color: #000 !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-weight: 800 !important;
+  font-size: .88rem !important;
+  border-radius: 12px !important;
+  padding: 13px !important;
+  letter-spacing: .04em !important;
+  border: none !important;
+  width: 100% !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 18px rgba(200,255,87,.2) !important;
+  margin-top: 4px !important;
+}
+.kr-payment-button:hover {
+  opacity: .87 !important;
+}
+.kr-icon-wrapper-field svg,
+.kr-icon-field svg {
+  fill: var(--mu) !important;
+}
+.kr-form-error {
+  color: #f87171 !important;
+  font-size: .78rem !important;
+  padding: 6px 0 !important;
+}
+
+
 .toast {
   position: fixed; bottom: 22px; right: 22px; z-index: 9999;
   padding: 11px 17px; border-radius: 12px; font-size: .8rem; font-weight: 600;
@@ -953,7 +1007,7 @@ select.finput option { background: #141421; }
   <div class="adm-top">
     <div class="adm-top-left">
       <div class="adm-logo" onclick="exitAdmin()">
-        <img src="Fav.png" alt=""/>
+        <img src="Joss.png" alt=""/>
       </div>
       <div class="adm-brand">JOSS <span>DESIGN</span></div>
       <span class="adm-badge-red">Admin</span>
@@ -1028,7 +1082,7 @@ select.finput option { background: #141421; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
       <div class="modal-head-row">
-        <div class="modal-logo"><img src="Fav.png" alt="" onerror="this.style.display='none'"/></div>
+        <div class="modal-logo"><img src="Joss.png" alt="" onerror="this.style.display='none'"/></div>
         <div>
           <div class="modal-brand">JOSS <span>DESIGN</span></div>
           <div class="modal-sub">Checkout seguro</div>
@@ -1164,35 +1218,38 @@ select.finput option { background: #141421; }
             </div>
           </div>
 
-          <!-- info box -->
-          <div class="izipay-redirect-info">
-            <div class="iri-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="28" height="28"><rect x="1" y="4" width="22" height="16" rx="3"/><line x1="1" y1="10" x2="23" y2="10"/><circle cx="5" cy="15" r="1" fill="currentColor"/><circle cx="9" cy="15" r="1" fill="currentColor"/></svg>
-            </div>
-            <div>
-              <div class="iri-title">Pago 100% seguro con Izipay</div>
-              <div class="iri-sub">Serás redirigido a la página certificada de Izipay para ingresar los datos de tu tarjeta con seguridad PCI DSS nivel 1.</div>
+          <!-- Loading state -->
+          <div id="iz-loading" style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px">
+            <div class="spinner"></div>
+            <p style="font-size:.78rem;color:var(--mu)">Preparando formulario seguro...</p>
+          </div>
+
+          <!-- KR embedded form — Izipay inyecta aquí -->
+          <div id="iz-form-wrap" style="display:none">
+            <div class="kr-embedded" kr-hide-debug-toolbar>
+              <div class="kr-pan"></div>
+              <div class="kr-expiry"></div>
+              <div class="kr-security-code"></div>
+              <div class="kr-installment-number"></div>
+              <button class="kr-payment-button"></button>
+              <div class="kr-form-error"></div>
             </div>
           </div>
 
-          <!-- accepted cards -->
-          <div class="card-brands" style="margin:12px 0 14px">
-            <span>Aceptamos</span>
-            <svg viewBox="0 0 60 38" fill="none" height="22"><rect width="60" height="38" rx="4" fill="#1a1f71"/><text x="30" y="26" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="white" letter-spacing="1">VISA</text></svg>
-            <svg viewBox="0 0 60 38" fill="none" height="22"><rect width="60" height="38" rx="4" fill="#252525"/><circle cx="23" cy="19" r="11" fill="#eb001b"/><circle cx="37" cy="19" r="11" fill="#f79e1b" opacity=".85"/></svg>
-            <svg viewBox="0 0 60 38" fill="none" height="22"><rect width="60" height="38" rx="4" fill="#2671b9"/><text x="30" y="26" text-anchor="middle" font-family="Arial" font-size="9" font-weight="bold" fill="white">AMEX</text></svg>
-          </div>
-
+          <!-- Error box -->
           <div class="izipay-err-box" id="iz-err"></div>
 
-          <button class="btn-main" id="btn-pay-card" onclick="redirectToIzipay()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            <span id="btn-pay-card-label">Ir a pagar · S/ 1.00</span>
-          </button>
+          <!-- Accepted cards -->
+          <div class="card-brands" style="margin:10px 0 4px">
+            <span>Aceptamos</span>
+            <svg viewBox="0 0 60 38" fill="none" height="20"><rect width="60" height="38" rx="4" fill="#1a1f71"/><text x="30" y="26" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="white" letter-spacing="1">VISA</text></svg>
+            <svg viewBox="0 0 60 38" fill="none" height="20"><rect width="60" height="38" rx="4" fill="#252525"/><circle cx="23" cy="19" r="11" fill="#eb001b"/><circle cx="37" cy="19" r="11" fill="#f79e1b" opacity=".85"/></svg>
+            <svg viewBox="0 0 60 38" fill="none" height="20"><rect width="60" height="38" rx="4" fill="#2671b9"/><text x="30" y="26" text-anchor="middle" font-family="Arial" font-size="9" font-weight="bold" fill="white">AMEX</text></svg>
+          </div>
 
-          <div class="izipay-redirect-note">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            Se abrirá la página segura de Izipay · Regresarás automáticamente al terminar
+          <div style="display:flex;align-items:center;gap:6px;font-size:.66rem;color:var(--mu);margin-top:6px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Pago procesado por Izipay · PCI DSS Nivel 1 · SSL 256-bit
           </div>
         </div>
 
@@ -1347,7 +1404,7 @@ select.finput option { background: #141421; }
 ════════════════════════════════ -->
 <div class="mob-header" id="mob-header">
   <div class="mob-logo">
-    <img src="Fav.png" alt="" onclick="handleLogoTap()" onerror="this.style.display='none'"/>
+    <img src="Joss.png" alt="" onclick="handleLogoTap()" onerror="this.style.display='none'"/>
     JOSS <span>DESIGN</span>
   </div>
   <div class="mob-right">
@@ -1371,7 +1428,7 @@ select.finput option { background: #141421; }
   <aside class="sidebar" id="sidebar">
     <div class="sb-logo">
       <div class="sb-logo-img" id="logo-tap" onclick="handleLogoTap()" title="Joss Design">
-        <img src="Fav.png" alt="Joss" onerror="this.style.display='none'"/>
+        <img src="Joss.png" alt="Joss" onerror="this.style.display='none'"/>
       </div>
       <div class="sb-logo-text">
         <div class="brand">JOSS <span>DESIGN</span></div>
@@ -1747,7 +1804,7 @@ function selectPM(m) {
 
   const labels = { paypal: 'Confirmar — abrir PayPal', yape: 'Ya yapié — enviar comprobante', plin: 'Ya pagué con Plin' };
   if (isManual) document.getElementById('btn-manual-label').textContent = labels[m] || 'Confirmar';
-  if (m === 'izipay') initCardInputs();
+  if (m === 'izipay') initKRForm();
 }
 
 /* ─── CURRENCY CONVERSION ─── */
@@ -1796,17 +1853,36 @@ function updateCurrency(countryCode) {
   });
 }
 
-/* ─── IZIPAY REDIRECT ─── */
-async function redirectToIzipay() {
-  const errEl = document.getElementById('iz-err');
-  errEl.classList.remove('show');
+/* ─── IZIPAY KR EMBEDDED FORM ─── */
+// krReady declared above
 
-  const btn = document.getElementById('btn-pay-card');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner" style="width:18px;height:18px;border-width:2px;margin-right:8px;display:inline-block"></div> Preparando pago...';
+async function initKRForm() {
+  if (krReady) return; // ya inicializado
+  const errEl  = document.getElementById('iz-err');
+  const loading = document.getElementById('iz-loading');
+  const wrap    = document.getElementById('iz-form-wrap');
+  errEl.classList.remove('show');
+  if (loading) loading.style.display = 'flex';
+  if (wrap)    wrap.style.display    = 'none';
 
   try {
-    // Paso 1: crear formToken en el backend
+    // 1. Guardar pendiente en BD
+    await fetch(BACKEND + '/register-pending', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email    : billingData.email,
+        name     : billingData.fname + ' ' + billingData.lname,
+        passHash : billingData.pass,
+        method   : 'izipay',
+        orderId  : currentOrder,
+        affiliate: billingData.aff || null,
+        country  : billingData.country,
+        phone    : billingData.phone
+      })
+    }).catch(e => console.warn('register-pending:', e));
+
+    // 2. Pedir formToken al backend
     const res = await fetch(BACKEND + '/create-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1814,108 +1890,45 @@ async function redirectToIzipay() {
         amount  : PRICE_PEN,
         currency: 'PEN',
         orderId : currentOrder,
-        customer: {
-          email    : billingData.email,
-          firstName: billingData.fname,
-          lastName : billingData.lname
-        }
+        customer: { email: billingData.email, firstName: billingData.fname, lastName: billingData.lname }
       })
     });
-
     if (!res.ok) throw new Error('Error del servidor: ' + res.status);
     const data = await res.json();
-    if (!data.formToken) throw new Error(data.error || 'No se pudo crear el pago');
+    if (!data.formToken) throw new Error(data.error || 'Sin formToken');
 
-    // Paso 2: guardar solicitud pendiente en la BD antes de salir
-    try {
-      await fetch(BACKEND + '/register-pending', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email    : billingData.email,
-          name     : billingData.fname + ' ' + billingData.lname,
-          passHash : billingData.pass,
-          method   : 'izipay',
-          orderId  : currentOrder,
-          affiliate: billingData.aff || null,
-          country  : billingData.country,
-          phone    : billingData.phone
-        })
-      });
-    } catch(e) { console.warn('register-pending failed:', e); }
+    // 3. Configurar KR con el formToken
+    await KR.setFormConfig({ formToken: data.formToken });
 
-    // Guardar datos en localStorage por si volvemos de Izipay
-    localStorage.setItem('jd_pending_billing', JSON.stringify(billingData));
-    localStorage.setItem('jd_pending_order', currentOrder);
+    // 4. Mostrar formulario
+    if (loading) loading.style.display = 'none';
+    if (wrap)    wrap.style.display    = 'block';
+    krReady = true;
 
-    // Paso 3: redirigir al checkout hosted de Izipay
-    // Preferir la URL del backend si viene, sino construir manualmente
-    const returnUrl = location.origin + location.pathname + '?pago=ok&order=' + currentOrder;
-    const cancelUrl = location.origin + location.pathname + '?pago=cancel';
-
-    let izipayUrl;
-    if (data.checkoutUrl) {
-      // URL directa del hosted checkout con el formToken
-      izipayUrl = data.checkoutUrl;
-    } else {
-      // Fallback: construir URL del checkout de Izipay
-      izipayUrl = 'https://secure.micuentaweb.pe/vads-payment/'
-        + '?vads_action_mode=INTERACTIVE'
-        + '&vads_amount=' + PRICE_PEN
-        + '&vads_currency=604'
-        + '&vads_ctx_mode=PRODUCTION'
-        + '&vads_page_action=PAYMENT'
-        + '&vads_payment_config=SINGLE'
-        + '&vads_site_id=19131378'
-        + '&vads_trans_date=' + new Date().toISOString().replace(/[-:.TZ]/g,'').substring(0,14)
-        + '&vads_trans_id=' + Math.floor(Math.random()*900000+100000)
-        + '&vads_version=V2'
-        + '&vads_return_url=' + encodeURIComponent(returnUrl)
-        + '&vads_cancel_url=' + encodeURIComponent(cancelUrl);
-    }
-
-    window.location.href = izipayUrl;
+    // 5. Escuchar resultado del pago
+    KR.onSubmit(paymentData => {
+      const status = paymentData?.clientAnswer?.orderStatus;
+      if (status === 'PAID') {
+        handleIzipaySuccess();
+      } else {
+        const msg = paymentData?.clientAnswer?.transactions?.[0]?.errorMessage
+          || 'Pago rechazado. Verifica los datos de tu tarjeta.';
+        errEl.textContent = msg;
+        errEl.classList.add('show');
+      }
+      return false; // no redirigir
+    });
 
   } catch (err) {
-    console.error('Redirect error:', err);
-    errEl.textContent = err.message || 'No se pudo conectar. Usa Yape, Plin o PayPal.';
+    console.error('KR init error:', err);
+    if (loading) loading.style.display = 'none';
+    errEl.textContent = 'No se pudo cargar el formulario. Usa Yape, Plin o PayPal.';
     errEl.classList.add('show');
-    btn.disabled = false;
-    btn.innerHTML =
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>' +
-      ' <span id="btn-pay-card-label">Reintentar</span>';
   }
 }
 
-function savePendingIzipay() {
-  const pending = getPending();
-  if (!pending.find(p => p.order === currentOrder)) {
-    pending.push({
-      email  : billingData.email,
-      pass   : billingData.pass,
-      method : 'izipay',
-      affiliate: billingData.aff || null,
-      order  : currentOrder,
-      name   : billingData.fname + ' ' + billingData.lname,
-      country: billingData.country,
-      phone  : billingData.phone,
-      date   : new Date().toLocaleString('es'),
-      ts     : Date.now()
-    });
-    savePending(pending);
-  }
-  // also mark user as pending
-  const users = getUsers();
-  if (!users[billingData.email]) {
-    users[billingData.email] = {
-      pass  : billingData.pass, role: 'pending',
-      since : new Date().toLocaleDateString('es'),
-      method: 'izipay', order: currentOrder,
-      name  : billingData.fname + ' ' + billingData.lname
-    };
-    saveUsers(users);
-  }
-}
+function savePendingIzipay() { /* no-op, handled in initKRForm */ }
+function redirectToIzipay()  { initKRForm(); } // compat alias
 
 /* ─── HANDLE RETURN FROM IZIPAY ─── */
 function checkIzipayReturn() {
