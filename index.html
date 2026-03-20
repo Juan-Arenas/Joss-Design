@@ -3078,129 +3078,129 @@ const PROMPT_LIBRARY = [
   {
     id:'q1', cat:'calidad', color:'#c8ff57',
     title:'Mejorar calidad y nitidez de imagen',
-    text:'Upscale and enhance this image to 4K resolution. Increase sharpness, recover fine details in hair and textures, reduce noise and grain, improve dynamic range in shadows and highlights. Preserve original colors and composition. Output: photorealistic, ultra-detailed, professional photography quality.',
+    text:'Mejora esta imagen a resolución 4K. Aumenta la nitidez, recupera los detalles finos del cabello y las texturas, reduce el ruido y el grano, mejora el rango dinámico en sombras y luces. Conserva los colores y la composición originales. Resultado: calidad fotorrealista, ultra detallada y de nivel profesional.',
     tools:['Magnific AI','Topaz Gigapixel','Adobe Firefly']
   },
   {
     id:'q2', cat:'calidad', color:'#c8ff57',
     title:'Eliminar fondo y dejarlo transparente',
-    text:'Remove the background from this image completely. Keep only the main subject with clean, precise edges — pay special attention to hair strands, fine details and semi-transparent areas. Output: subject on transparent background, no artifacts, no color fringing, production-ready for compositing.',
+    text:'Elimina el fondo de esta imagen por completo. Conserva únicamente el sujeto principal con bordes limpios y precisos, prestando especial atención a mechones de cabello, detalles finos y zonas semitransparentes. Resultado: sujeto sobre fondo transparente, sin artefactos ni sangrado de color, listo para composición.',
     tools:['Adobe Firefly','Remove.bg','DALL·E']
   },
   {
     id:'q3', cat:'calidad', color:'#c8ff57',
     title:'Restaurar foto antigua o dañada',
-    text:'Restore this old or damaged photograph. Remove scratches, tears, stains and fading. Reconstruct missing facial features and details using context clues. Improve overall sharpness and tonal balance. Keep the original composition and subject identity intact. Output: clean, restored, natural-looking photograph.',
+    text:'Restaura esta fotografía antigua o dañada. Elimina rayones, roturas, manchas y decoloración. Reconstruye rasgos faciales y detalles faltantes usando el contexto de la imagen. Mejora la nitidez general y el balance tonal. Mantén intacta la composición y la identidad del sujeto. Resultado: fotografía limpia, restaurada y de aspecto natural.',
     tools:['Adobe Firefly','Midjourney','Stable Diffusion']
   },
   {
     id:'q4', cat:'calidad', color:'#c8ff57',
-    title:'Mejorar iluminación de producto',
-    text:'Relight this product photo with professional studio lighting. Add a soft key light from the upper left, a subtle fill light on the right, and a rim light behind the product for depth separation. Clean white or gradient background. No harsh shadows. Output: commercial-grade product photography, ready for e-commerce.',
+    title:'Mejorar iluminación de foto de producto',
+    text:'Vuelve a iluminar esta foto de producto con luz de estudio profesional. Agrega una luz principal suave desde arriba a la izquierda, una luz de relleno sutil a la derecha y una luz de contorno detrás del producto para separarlo del fondo. Fondo blanco o degradado limpio, sin sombras duras. Resultado: fotografía comercial lista para e-commerce.',
     tools:['Adobe Firefly','Midjourney','DALL·E']
   },
 
   // ── EXPANDIR Y TRANSFORMAR ─────────────────────────────
   {
     id:'e1', cat:'expandir', color:'#7c5cfc',
-    title:'Ampliar imagen (outpainting)',
-    text:'Expand this image outward in all directions. Intelligently generate new content that seamlessly matches the existing style, lighting, colors, perspective and atmosphere. Extend the background naturally — if it is a portrait, add environment; if landscape, continue the scene. The extension must be indistinguishable from the original.',
+    title:'Ampliar imagen hacia los bordes (outpainting)',
+    text:'Expande esta imagen hacia afuera en todas las direcciones. Genera nuevo contenido de forma inteligente que encaje perfectamente con el estilo, iluminación, colores, perspectiva y atmósfera existentes. Extiende el fondo de manera natural: si es un retrato, agrega entorno; si es paisaje, continúa la escena. La extensión debe ser indistinguible del original.',
     tools:['Adobe Firefly','DALL·E','Stable Diffusion']
   },
   {
     id:'e2', cat:'expandir', color:'#7c5cfc',
     title:'Cambiar fondo manteniendo el sujeto',
-    text:'Keep the main subject of this image exactly as is and replace the background with: a professional photography studio with soft gradient from light grey to white, subtle bokeh depth of field. Match the original lighting direction on the subject. Seamless, realistic compositing. No halos or edge artifacts.',
+    text:'Conserva exactamente el sujeto principal de esta imagen y reemplaza el fondo por: un estudio fotográfico profesional con degradado suave de gris claro a blanco y bokeh sutil en la profundidad. Respeta la dirección de iluminación original sobre el sujeto. Composición realista y sin costuras, sin halos ni artefactos en los bordes.',
     tools:['Adobe Firefly','DALL·E','Midjourney']
   },
   {
     id:'e3', cat:'expandir', color:'#7c5cfc',
     title:'Convertir foto a pintura digital',
-    text:'Transform this photograph into a professional digital painting. Style: concept art, painterly textures with visible but refined brush strokes, cinematic color grading. Preserve the subject composition and lighting. Add depth through atmospheric perspective. Output: high-resolution digital illustration, portfolio-quality artwork.',
+    text:'Transforma esta fotografía en una pintura digital profesional. Estilo: arte conceptual con texturas pictóricas, pinceladas visibles pero refinadas y gradación de color cinematográfica. Conserva la composición y la iluminación del sujeto. Añade profundidad mediante perspectiva atmosférica. Resultado: ilustración digital en alta resolución, calidad de portafolio.',
     tools:['Midjourney','Stable Diffusion','Adobe Firefly']
   },
   {
     id:'e4', cat:'expandir', color:'#7c5cfc',
     title:'Cambiar estación o clima de una escena',
-    text:'Transform the season and weather in this scene from its current state to: golden autumn with warm orange and red foliage, soft overcast lighting, light fog in the distance. Keep all architectural elements, objects and people unchanged. Only modify environmental and lighting elements to match the new season realistically.',
+    text:'Transforma la estación y el clima de esta escena a: otoño dorado con follaje cálido en naranja y rojo, iluminación suave con cielo nublado y niebla ligera en la distancia. Mantén sin cambios todos los elementos arquitectónicos, objetos y personas. Solo modifica los elementos ambientales y de iluminación para que coincidan con la nueva estación de forma realista.',
     tools:['Adobe Firefly','DALL·E','Midjourney']
   },
 
   // ── PERSONAJES ─────────────────────────────────────────
   {
     id:'p1', cat:'personajes', color:'#00ffcc',
-    title:'Generar personaje animado estilo cartoon',
-    text:'Create a 3D cartoon character: friendly young professional designer, round expressive eyes, stylized proportions with slightly oversized head. Wearing casual creative outfit — hoodie, jeans, sneakers. Neutral standing pose, arms slightly open. Style: Pixar/Disney inspired, clean cel shading, vibrant colors, soft shadows. White background, full body view.',
+    title:'Generar personaje animado estilo cartoon 3D',
+    text:'Crea un personaje cartoon 3D: diseñador joven y simpático, ojos grandes y expresivos, proporciones estilizadas con cabeza ligeramente grande. Viste ropa casual creativa: sudadera con capucha, jeans y zapatillas. Pose neutral de pie con brazos ligeramente abiertos. Estilo inspirado en Pixar y Disney, cel shading limpio, colores vibrantes, sombras suaves. Fondo blanco, cuerpo completo.',
     tools:['Midjourney','DALL·E','Adobe Firefly']
   },
   {
     id:'p2', cat:'personajes', color:'#00ffcc',
-    title:'Persona en diferente pose',
-    text:'Recreate this person in a new pose: confident standing pose, weight shifted slightly to one side, arms crossed loosely, slight natural smile, direct eye contact with camera. Keep the exact same face, skin tone, hair style, clothing and lighting conditions from the original reference. Only change the body posture.',
+    title:'Misma persona en una pose diferente',
+    text:'Recrea esta persona en una nueva pose: postura de pie segura con el peso ligeramente desplazado a un lado, brazos cruzados con naturalidad, sonrisa sutil y contacto visual directo con la cámara. Conserva exactamente el mismo rostro, tono de piel, peinado, ropa y condiciones de iluminación de la referencia original. Solo cambia la postura corporal.',
     tools:['Adobe Firefly','Stable Diffusion','DALL·E']
   },
   {
     id:'p3', cat:'personajes', color:'#00ffcc',
-    title:'Cambiar outfit o ropa del personaje',
-    text:'Change the clothing on this person to: modern streetwear outfit — white oversized graphic tee, wide-leg cargo pants in olive green, chunky white sneakers, small silver chain. Keep the face, hairstyle, skin tone, body proportions and background exactly the same. The new clothing should fit naturally with correct folds and shadows.',
+    title:'Cambiar la ropa o el outfit del personaje',
+    text:'Cambia la ropa de esta persona por: un outfit streetwear moderno compuesto por camiseta blanca oversize con gráfico, pantalón cargo de pierna ancha en verde oliva, zapatillas blancas gruesas y una cadena plateada pequeña. Mantén el rostro, el peinado, el tono de piel, las proporciones y el fondo exactamente iguales. La nueva ropa debe quedar con arrugas y sombras naturales.',
     tools:['Adobe Firefly','DALL·E','Midjourney']
   },
   {
     id:'p4', cat:'personajes', color:'#00ffcc',
-    title:'Personaje en múltiples expresiones faciales',
-    text:'Generate 6 facial expression variations of the same character in a clean grid layout: neutral, happy/smiling, surprised, concentrated/focused, laughing, and thoughtful. Keep identical face structure, skin tone, hair and style across all expressions. White background, consistent lighting and framing for each. Style: semi-realistic illustration.',
+    title:'Personaje con múltiples expresiones faciales',
+    text:'Genera 6 variaciones de expresión facial del mismo personaje en una cuadrícula ordenada: neutral, feliz o sonriendo, sorprendido, concentrado o enfocado, riendo y pensativo. Mantén estructura facial idéntica, tono de piel, cabello y estilo en todas las expresiones. Fondo blanco, iluminación y encuadre consistentes en cada variación. Estilo: ilustración semi-realista.',
     tools:['Midjourney','DALL·E','Stable Diffusion']
   },
   {
     id:'p5', cat:'personajes', color:'#00ffcc',
     title:'Avatar profesional para redes sociales',
-    text:'Create a professional avatar portrait for social media. Subject: person with friendly but confident expression, looking slightly toward camera. Style: clean semi-realistic illustration, soft studio lighting, shallow depth of field background in brand color. Square format, centered composition, from shoulders up. Polished, approachable, modern.',
+    text:'Crea un retrato de avatar profesional para redes sociales. Sujeto: persona con expresión amigable pero segura, mirando levemente hacia la cámara. Estilo: ilustración semi-realista limpia, iluminación suave de estudio, fondo desenfocado en color de marca. Formato cuadrado, composición centrada, encuadre desde los hombros hacia arriba. Pulido, accesible y moderno.',
     tools:['Midjourney','Adobe Firefly','DALL·E']
   },
 
   // ── COMPOSICIÓN ────────────────────────────────────────
   {
     id:'c1', cat:'composicion', color:'#fbbf24',
-    title:'Escena con producto en contexto real',
-    text:'Place this product naturally in a real-life lifestyle scene: modern minimalist kitchen counter, morning light coming through window, coffee cup and small plant nearby as props. The product should look naturally placed, not composited. Match perspective, lighting and shadows to the scene. Style: editorial lifestyle photography, warm tones.',
+    title:'Producto en escena de vida real',
+    text:'Coloca este producto de forma natural en una escena lifestyle de vida real: encimera de cocina minimalista moderna, luz de la mañana entrando por una ventana, una taza de café y una planta pequeña como elementos de apoyo. El producto debe verse colocado naturalmente, no como una composición digital. Ajusta perspectiva, iluminación y sombras a la escena. Estilo: fotografía editorial lifestyle en tonos cálidos.',
     tools:['Adobe Firefly','DALL·E','Midjourney']
   },
   {
     id:'c2', cat:'composicion', color:'#fbbf24',
-    title:'Foto de grupo con fondo personalizado',
-    text:'Take this group of people and place them in a new environment: modern rooftop terrace at sunset, city skyline in background, soft golden hour lighting. Maintain natural proportions and interactions between people. The new background lighting should match and complement the existing lighting on the subjects. Seamless, cinematic result.',
+    title:'Grupo de personas con fondo personalizado',
+    text:'Toma este grupo de personas y ubícalo en un nuevo entorno: terraza moderna en azotea al atardecer, horizonte urbano al fondo, iluminación suave de hora dorada. Mantén las proporciones naturales e interacciones entre las personas. La iluminación del nuevo fondo debe coincidir y complementar la iluminación existente sobre los sujetos. Resultado cinematográfico y sin costuras.',
     tools:['Adobe Firefly','Stable Diffusion','DALL·E']
   },
   {
     id:'c3', cat:'composicion', color:'#fbbf24',
-    title:'Efecto de doble exposición',
-    text:'Create a double exposure composition blending a portrait silhouette with a landscape scene. The face/body outline contains a dense forest or mountain scene inside it. Background: clean white or very light grey. Color treatment: monochromatic with a single accent color — deep teal or dusty rose. Style: fine art photography, editorial.',
+    title:'Efecto de doble exposición artística',
+    text:'Crea una composición de doble exposición que fusione la silueta de un retrato con una escena de paisaje. El contorno del rostro o cuerpo contiene un bosque denso o escena montañosa en su interior. Fondo: blanco limpio o gris muy claro. Tratamiento de color: monocromático con un solo color de acento, teal profundo o rosa polvoso. Estilo: fotografía artística de autor, editorial.',
     tools:['Midjourney','Stable Diffusion','Adobe Firefly']
   },
 
-  // ── TEXTURAS Y EFECTOS ─────────────────────────────────
+  // ── EFECTOS ────────────────────────────────────────────
   {
     id:'t1', cat:'efectos', color:'#ef4444',
-    title:'Añadir efecto de luz neón a imagen',
-    text:'Add neon lighting effects to this image. Overlay glowing neon light traces — magenta, cyan and electric blue — that follow the edges and contours of the main subject. Add light bloom and lens flare. The environment should feel like a night urban scene with reflective wet ground. Keep subject recognizable. Cyberpunk aesthetic.',
+    title:'Agregar efecto de iluminación neón',
+    text:'Agrega efectos de luz neón a esta imagen. Superpone trazos de luz neón brillante en magenta, cian y azul eléctrico que sigan los bordes y contornos del sujeto principal. Añade bloom de luz y destello de lente. El entorno debe evocar una escena urbana nocturna con suelo mojado y reflejos. El sujeto debe seguir siendo reconocible. Estética cyberpunk.',
     tools:['Adobe Firefly','Stable Diffusion','Midjourney']
   },
   {
     id:'t2', cat:'efectos', color:'#ef4444',
     title:'Convertir imagen a estilo anime',
-    text:'Convert this image to anime illustration style. Clean cel-shaded coloring, defined outlines, simplified but expressive facial features, stylized hair with shine highlights. Lighting: anime-style with hard light and shadow separation. Background: simplified or painterly. Maintain the subject identity and composition from the original. High quality anime production style.',
+    text:'Convierte esta imagen a estilo de ilustración anime. Coloreado cel shading limpio, contornos definidos, rasgos faciales simplificados pero expresivos, cabello estilizado con brillos. Iluminación al estilo anime con separación clara entre luz y sombra. Fondo simplificado o pictórico. Mantén la identidad del sujeto y la composición del original. Calidad de producción anime de alto nivel.',
     tools:['Midjourney','Stable Diffusion','Adobe Firefly']
   },
   {
     id:'t3', cat:'efectos', color:'#ef4444',
-    title:'Textura realista sobre superficie',
-    text:'Apply a realistic material texture to this object: brushed stainless steel with subtle directional grain, slight reflections showing environment, micro-scratches for realism. The texture must follow the object geometry correctly — wrapping around curves and edges naturally. Match the original lighting direction. Output: photorealistic material rendering.',
+    title:'Aplicar textura realista a una superficie',
+    text:'Aplica una textura de material realista a este objeto: acero inoxidable cepillado con grano direccional sutil, reflejos ligeros del entorno y micro-rayones para mayor realismo. La textura debe seguir correctamente la geometría del objeto, envolviendo curvas y bordes de forma natural. Respeta la dirección de iluminación original. Resultado: renderizado de material fotorrealista.',
     tools:['Adobe Firefly','Midjourney','Stable Diffusion']
   },
   {
     id:'t4', cat:'efectos', color:'#ef4444',
     title:'Efecto glitch y distorsión digital',
-    text:'Apply a controlled digital glitch effect to this image. Horizontal scan line displacement, RGB channel splitting with colored fringing, small pixelated artifact blocks scattered across the image, VHS tracking error lines. The glitch should feel intentional and artistic, not destructive. Keep the subject recognizable. Style: digital art, cyberpunk.',
+    text:'Aplica un efecto de glitch digital controlado a esta imagen. Desplazamiento horizontal de líneas de escaneo, separación de canales RGB con sangrado de color, pequeños bloques de artefactos pixelados dispersos por la imagen y líneas de error de rastreo estilo VHS. El glitch debe sentirse intencional y artístico, no destructivo. El sujeto debe seguir siendo reconocible. Estilo: arte digital, cyberpunk.',
     tools:['Stable Diffusion','Midjourney','Adobe Firefly']
   },
 ];
