@@ -3013,13 +3013,16 @@ Todo prompt que generes debe seguir obligatoriamente esta anatomía de 4 partes,
 
 Responde SOLO con el prompt generado, redactado en prosa fluida y profesional en español. No uses numeración ni títulos de sección visibles — el prompt debe leerse como un texto corrido y natural. Máximo 200 palabras.`;
 
+let _promptRunning = false;
 async function generatePrompt() {
+  if (_promptRunning) return; // evitar llamadas múltiples
   const input = document.getElementById('prompt-input').value.trim();
   if (!input) { toast('Escribe qué necesitas primero', false); return; }
   const btn     = document.getElementById('prompt-btn');
   const loading = document.getElementById('prompt-loading');
   const result  = document.getElementById('prompt-result');
   const resText = document.getElementById('prompt-result-text');
+  _promptRunning = true;
   btn.disabled = true;
   loading.classList.add('show');
   result.classList.remove('show');
@@ -3043,14 +3046,17 @@ async function generatePrompt() {
     console.error('Gemini:', e);
     toast('Error al generar. Intenta de nuevo.', false);
   } finally {
+    _promptRunning = false;
     btn.disabled = false;
     loading.classList.remove('show');
   }
 }
 
 function useChip(el) {
-  document.getElementById('prompt-input').value = el.textContent;
-  document.getElementById('prompt-input').focus();
+  const inp = document.getElementById('prompt-input');
+  inp.value = el.textContent;
+  inp.focus();
+  // NO llamar generatePrompt aquí — el usuario decide cuándo enviar
 }
 
 function copyPromptResult() {
