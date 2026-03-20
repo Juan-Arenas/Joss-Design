@@ -2999,10 +2999,19 @@ function playVideo(id) {
 /* ─── GENERAR PROMPTS (Gemini) ─── */
 const GEMINI_KEY = 'AIzaSyAqBiCRw2bw7Qpo2bWeLy3OjBg4oAykE_c';
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + GEMINI_KEY;
-const PROMPT_SYSTEM = `Eres un experto en diseño gráfico e inteligencia artificial. Crea prompts profesionales estructurados.
-Cuando el usuario te diga lo que necesita, genera un prompt optimizado siguiendo esta estructura interna:
-Sujeto principal → Estilo artístico → Composición visual → Paleta de colores → Ambiente/iluminación → Detalles técnicos → Keywords potenciadores.
-Responde SOLO con el prompt en un bloque fluido y profesional en español, sin numeración ni encabezados. Máximo 150 palabras.`;
+const PROMPT_SYSTEM = `Eres un experto en diseño gráfico e inteligencia artificial especializado en construir prompts perfectos.
+
+Todo prompt que generes debe seguir obligatoriamente esta anatomía de 4 partes, en este orden exacto:
+
+1. OBJETIVO: Una o dos oraciones claras que describan exactamente qué se quiere lograr con la imagen o diseño. Qué debe mostrar, qué debe comunicar.
+
+2. FORMATO DE RESPUESTA: Cómo debe estar estructurado el resultado visual. Composición, distribución, estilo artístico, paleta de colores, tipografía si aplica, proporción o aspecto de la imagen.
+
+3. ADVERTENCIAS: Restricciones o precisiones importantes. Qué NO debe incluir, qué debe ser exacto, qué errores comunes evitar.
+
+4. CONTEXTO ADICIONAL: Información de fondo que ayuda a la IA a entender mejor el propósito. Para quién es, en qué plataforma se usará, qué sensación debe transmitir, referencias de estilo.
+
+Responde SOLO con el prompt generado, redactado en prosa fluida y profesional en español. No uses numeración ni títulos de sección visibles — el prompt debe leerse como un texto corrido y natural. Máximo 200 palabras.`;
 
 async function generatePrompt() {
   const input = document.getElementById('prompt-input').value.trim();
