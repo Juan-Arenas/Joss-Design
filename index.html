@@ -1857,17 +1857,21 @@ function updateCurrency(countryCode) {
 // krReady declared above
 
 async function initKRForm() {
-  if (krReady) return;
+  if (krReady) return; // ya inicializado
   const errEl  = document.getElementById('iz-err');
   const loading = document.getElementById('iz-loading');
-  const wrap   = document.getElementById('iz-form-wrap');
+  const wrap    = document.getElementById('iz-form-wrap');
   errEl.classList.remove('show');
   if (loading) loading.style.display = 'flex';
   if (wrap)    wrap.style.display    = 'none';
 
+  // Guardar datos del comprador AHORA — antes de cualquier async
+  localStorage.setItem('jd_billing', JSON.stringify(billingData));
+  localStorage.setItem('jd_order',   currentOrder);
+
   try {
-    // 1. Registrar pendiente en BD (no bloquea)
-    fetch(BACKEND + '/register-pending', {
+    // 1. Guardar pendiente en BD
+    await fetch(BACKEND + '/register-pending', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1882,11 +1886,7 @@ async function initKRForm() {
       })
     }).catch(e => console.warn('register-pending:', e));
 
-    // Guardar datos para recuperar cuando vuelva de Izipay
-    localStorage.setItem('jd_billing', JSON.stringify(billingData));
-    localStorage.setItem('jd_order',   currentOrder);
-
-    // 2. Obtener formToken
+    // 2. Pedir formToken al backend
     const res = await fetch(BACKEND + '/create-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1905,9 +1905,12 @@ async function initKRForm() {
     const data = await res.json();
     if (!data.formToken) throw new Error(data.error || 'Sin formToken');
 
-    // 3. PRIMERO registrar onSubmit — ANTES de setFormConfig
+    // Usar el orderId limpio que devuelve el backend
+    if (data.cleanOrder) currentOrder = data.cleanOrder;
+
+    // 3. Registrar onSubmit ANTES de setFormConfig (CRÍTICO)
     KR.onSubmit(result => {
-      console.log('KR onSubmit result:', JSON.stringify(result?.clientAnswer?.orderStatus));
+      console.log('KR onSubmit:', result?.clientAnswer?.orderStatus);
       const status = result?.clientAnswer?.orderStatus;
       if (status === 'PAID') {
         handleIzipaySuccess();
@@ -1918,17 +1921,20 @@ async function initKRForm() {
         errEl.textContent = msg;
         errEl.classList.add('show');
       }
-      return false; // evita redirección
+      return false;
     });
 
-    // También capturar errores del SDK
     KR.onError(err => {
       console.error('KR error:', err);
-      errEl.textContent = err?.errorMessage || 'Error en el formulario de pago.';
+      if (err?.errorCode === 'CLIENT_300') {
+        errEl.textContent = 'Error en el formulario. Por favor recarga la página e intenta de nuevo.';
+      } else {
+        errEl.textContent = err?.errorMessage || 'Error en el pago.';
+      }
       errEl.classList.add('show');
     });
 
-    // 4. Configurar con el formToken
+    // 4. Configurar KR con el token (DESPUÉS de onSubmit)
     await KR.setFormConfig({ formToken: data.formToken });
 
     // 5. Mostrar formulario
@@ -1939,7 +1945,7 @@ async function initKRForm() {
   } catch (err) {
     console.error('KR init error:', err);
     if (loading) loading.style.display = 'none';
-    errEl.textContent = 'Error: ' + err.message + '. Usa Yape, Plin o PayPal.';
+    errEl.textContent = 'Error: ' + err.message;
     errEl.classList.add('show');
   }
 }
@@ -1948,79 +1954,53 @@ function savePendingIzipay() { /* manejado en initKRForm */ }
 function redirectToIzipay()  { initKRForm(); }
 function initCardInputs()    { /* no-op */ }
 
-/* ─── CUANDO IZIPAY REDIRIGE DE VUELTA CON ?kr=ok ─── */
+/* ─── HANDLE RETURN FROM IZIPAY ─── */
 async function checkIzipayReturn() {
   const params = new URLSearchParams(location.search);
   const kr = params.get('kr');
   if (!kr) return;
   history.replaceState({}, '', location.pathname);
-
   if (kr === 'ok') {
-    // Recuperar datos guardados antes de salir
     const bdRaw = localStorage.getItem('jd_billing');
     const order = localStorage.getItem('jd_order');
-    if (!bdRaw || !order) return;
+    if (!bdRaw) return;
     const bd = JSON.parse(bdRaw);
-
-    // Activar en backend
     try {
       await fetch(BACKEND + '/activate-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email    : bd.email,
-          name     : bd.fname + ' ' + bd.lname,
-          passHash : bd.pass,
-          method   : 'izipay',
-          orderId  : order,
-          affiliate: bd.aff || null
+          email: bd.email, name: bd.fname+' '+bd.lname,
+          passHash: bd.pass, method: 'izipay',
+          orderId: order, affiliate: bd.aff||null
         })
       });
-    } catch(e) { console.warn('activate-user:', e); }
-
-    // Activar localmente
+    } catch(e) {}
     const users = getUsers();
-    users[bd.email] = {
-      pass  : bd.pass, role: 'approved',
-      since : new Date().toLocaleDateString('es'),
-      method: 'izipay', order,
-      name  : bd.fname + ' ' + bd.lname
-    };
+    users[bd.email] = { pass: bd.pass, role: 'approved', since: new Date().toLocaleDateString('es'), method: 'izipay', order, name: bd.fname+' '+bd.lname };
     saveUsers(users);
     saveSession(bd.email);
     localStorage.removeItem('jd_billing');
     localStorage.removeItem('jd_order');
-    addLog('Pago Izipay exitoso: ' + bd.email, 'lg');
     setLoggedIn(bd.email);
-    toast('¡Pago exitoso! Bienvenido al curso.', true);
+    toast('¡Pago exitoso! Bienvenido al curso. 🎉', true);
   }
 }
 
 async function handleIzipaySuccess() {
-  // Activar en backend
   try {
     await fetch(BACKEND + '/activate-user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email    : billingData.email,
-        name     : billingData.fname + ' ' + billingData.lname,
-        passHash : billingData.pass,
-        method   : 'izipay',
-        orderId  : currentOrder,
-        affiliate: billingData.aff || null
+        email: billingData.email, name: billingData.fname+' '+billingData.lname,
+        passHash: billingData.pass, method: 'izipay',
+        orderId: currentOrder, affiliate: billingData.aff||null
       })
     });
-  } catch(e) { console.warn('activate-user:', e); }
-
-  // Activar localmente
+  } catch(e) { console.warn(e); }
   const users = getUsers();
-  users[billingData.email] = {
-    pass  : billingData.pass, role: 'approved',
-    since : new Date().toLocaleDateString('es'),
-    method: 'izipay', order: currentOrder,
-    name  : billingData.fname + ' ' + billingData.lname
-  };
+  users[billingData.email] = { pass: billingData.pass, role: 'approved', since: new Date().toLocaleDateString('es'), method: 'izipay', order: currentOrder, name: billingData.fname+' '+billingData.lname };
   saveUsers(users);
   saveSession(billingData.email);
   localStorage.removeItem('jd_billing');
@@ -2029,7 +2009,6 @@ async function handleIzipaySuccess() {
   showStep('step-success');
   setTimeout(() => { closeModal(); setLoggedIn(billingData.email); }, 2500);
 }
-
 
 /* ─── MANUAL PAYMENT ─── */
 function submitManual() {

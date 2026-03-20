@@ -302,34 +302,46 @@ app.put('/admin/config', adminOnly, async (req, res) => {
 
 // ── Izipay create-payment ────────────────────────────────────
 app.post('/create-payment', async (req, res) => {
-  const { amount, currency='PEN', orderId, customer, returnUrl, cancelUrl } = req.body;
+  const { amount, currency='PEN', orderId, customer } = req.body;
   if (!amount || amount <= 0) return res.status(400).json({ error: 'Monto inválido' });
+
+  // orderId: Izipay solo acepta letras y números, máx 32 chars
+  const cleanOrderId = (orderId || ('JD' + Date.now()))
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .substring(0, 32);
+
   try {
     const payload = {
-      amount, currency, orderId,
+      amount      : parseInt(amount, 10),  // DEBE ser integer
+      currency    : currency,              // "PEN"
+      orderId     : cleanOrderId,
       customer: {
-        email     : customer?.email     || '',
-        firstName : customer?.firstName || '',
-        lastName  : customer?.lastName  || ''
+        email     : customer?.email     || 'cliente@jossdesign.com',
+        firstName : customer?.firstName || 'Cliente',
+        lastName  : customer?.lastName  || 'Joss'
       }
     };
-    // Si vienen URLs de retorno, incluirlas para el hosted checkout
-    if (returnUrl) payload.vads_return_url = returnUrl;
-    if (cancelUrl) payload.vads_cancel_url = cancelUrl;
 
+    console.log('Izipay payload:', JSON.stringify(payload));
     const data = await izipayPost('/api-payment/V4/Charge/CreatePayment', payload);
+    console.log('Izipay response:', JSON.stringify(data));
 
     if (data.status === 'SUCCESS' && data.answer?.formToken) {
       return res.json({
-        formToken : data.answer.formToken,
-        // URL directa del hosted checkout de Izipay
-        checkoutUrl: `https://secure.micuentaweb.pe/vads-payment/?kr-form-token=${encodeURIComponent(data.answer.formToken)}`
+        formToken  : data.answer.formToken,
+        cleanOrder : cleanOrderId
       });
     }
-    console.error('Izipay error:', JSON.stringify(data));
-    return res.status(500).json({ error: data.answer?.errorMessage || 'Error Izipay: ' + data.status });
+
+    // Loguear error completo para debug
+    const errMsg = data.answer?.errorMessage
+      || data.answer?.detailedErrorMessage
+      || JSON.stringify(data);
+    console.error('Izipay CreatePayment error:', errMsg);
+    return res.status(500).json({ error: errMsg });
+
   } catch (e) {
-    console.error('create-payment exception:', e);
+    console.error('create-payment exception:', e.message);
     return res.status(500).json({ error: e.message });
   }
 });
