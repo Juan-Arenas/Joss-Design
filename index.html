@@ -1419,7 +1419,111 @@ select.finput option { background: #141421; }
   white-space: nowrap; flex-shrink: 0;
 }
 
-/* ══ GENERAR PROMPTS ══ */
+
+/* ══ BIBLIOTECA DE PROMPTS ══ */
+.plib-filters {
+  display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 22px;
+}
+.plib-filter {
+  padding: 7px 16px; border-radius: 999px;
+  background: var(--s2); border: 1.5px solid var(--b1);
+  font-size: .75rem; font-weight: 700; color: var(--mu);
+  cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif;
+}
+.plib-filter:hover { border-color: rgba(200,255,87,.3); color: var(--tx); }
+.plib-filter.active {
+  background: rgba(200,255,87,.1); border-color: var(--ac);
+  color: var(--ac);
+}
+
+.plib-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.plib-card {
+  background: var(--s2); border: 1px solid var(--b1);
+  border-radius: 16px; padding: 18px; display: flex;
+  flex-direction: column; gap: 12px;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+  position: relative; overflow: hidden;
+}
+.plib-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cat-color, var(--ac)), transparent);
+  opacity: 0; transition: opacity .3s;
+}
+.plib-card:hover {
+  border-color: rgba(255,255,255,.15);
+  box-shadow: 0 8px 28px rgba(0,0,0,.3);
+  transform: translateY(-2px);
+}
+.plib-card:hover::before { opacity: 1; }
+
+.plib-card-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 10px;
+}
+.plib-cat-badge {
+  font-size: .56rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .1em; padding: 3px 9px; border-radius: 999px;
+  border: 1px solid; white-space: nowrap;
+}
+.plib-title {
+  font-family: 'Montserrat', sans-serif; font-weight: 800;
+  font-size: .88rem; color: var(--tx); line-height: 1.3;
+  flex: 1;
+}
+.plib-text {
+  font-size: .78rem; color: var(--mu); line-height: 1.65;
+  max-height: 5.8em; overflow: hidden;
+}
+.plib-card-footer {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-top: auto; padding-top: 4px;
+}
+.plib-tools {
+  display: flex; gap: 5px; flex-wrap: wrap;
+}
+.plib-tool-tag {
+  font-size: .58rem; font-weight: 700; padding: 2px 8px;
+  border-radius: 999px; background: rgba(255,255,255,.04);
+  border: 1px solid var(--b1); color: var(--mu);
+}
+.plib-copy-btn {
+  display: flex; align-items: center; gap: 5px;
+  padding: 7px 14px; border-radius: 9px;
+  background: rgba(200,255,87,.08); border: 1px solid rgba(200,255,87,.2);
+  color: var(--ac); font-size: .7rem; font-weight: 700;
+  cursor: pointer; transition: background .2s; white-space: nowrap;
+  font-family: 'DM Sans', sans-serif;
+}
+.plib-copy-btn:hover { background: rgba(200,255,87,.16); }
+.plib-copy-btn svg { width: 12px; height: 12px; }
+.plib-copy-btn.copied {
+  background: rgba(34,197,94,.1); border-color: rgba(34,197,94,.25); color: #4ade80;
+}
+
+/* Expanded view */
+.plib-text-full {
+  font-size: .78rem; color: var(--mu); line-height: 1.65;
+  white-space: pre-wrap;
+}
+.plib-expand-btn {
+  font-size: .68rem; color: var(--ac2); cursor: pointer;
+  font-weight: 700; background: none; border: none;
+  padding: 0; font-family: 'DM Sans', sans-serif;
+  transition: opacity .2s;
+}
+.plib-expand-btn:hover { opacity: .75; }
+
+@media (max-width: 768px) {
+  .plib-grid { grid-template-columns: 1fr; }
+}
+
+/* ══ GENERAR PROMPTS (legacy) ══ */
 .prompt-hero {
   background: linear-gradient(135deg, #0c0c1e, #111128);
   border: 1px solid rgba(124,92,252,.25); border-radius: 18px;
@@ -2283,55 +2387,26 @@ select.finput option { background: #141421; }
         </div>
       </div>
 
-      <!-- GENERAR PROMPTS -->
+            <!-- BIBLIOTECA DE PROMPTS -->
       <div class="panel" id="panel-prompts">
 
         <div class="prompt-hero">
-          <div class="prompt-hero-title">Generador de <span>Prompts</span> Profesionales</div>
-          <div class="prompt-hero-sub">Describe lo que necesitas y obtendrás un prompt optimizado y estructurado listo para usar en tus diseños con IA.</div>
+          <div class="prompt-hero-title">Biblioteca de <span>Prompts</span></div>
+          <div class="prompt-hero-sub">Prompts escritos y probados por Joss Design, listos para copiar y usar en Midjourney, DALL·E, Stable Diffusion o Gemini.</div>
         </div>
 
-        <div class="prompt-examples">
-          <div class="prompt-examples-label">Ejemplos rápidos</div>
-          <div class="prompt-chips">
-            <div class="prompt-chip" onclick="useChip(this)">Mejorar calidad de imagen</div>
-            <div class="prompt-chip" onclick="useChip(this)">Crear logo minimalista</div>
-            <div class="prompt-chip" onclick="useChip(this)">Diseño de portada para red social</div>
-            <div class="prompt-chip" onclick="useChip(this)">Paleta de colores para marca</div>
-            <div class="prompt-chip" onclick="useChip(this)">Tipografía para app moderna</div>
-            <div class="prompt-chip" onclick="useChip(this)">Fondo abstracto con degradado</div>
-          </div>
+        <!-- Filtros por categoría -->
+        <div class="plib-filters" id="plib-filters">
+          <button class="plib-filter active" onclick="filterPrompts('all', this)">Todos</button>
+          <button class="plib-filter" onclick="filterPrompts('calidad', this)">Calidad</button>
+          <button class="plib-filter" onclick="filterPrompts('expandir', this)">Expandir</button>
+          <button class="plib-filter" onclick="filterPrompts('personajes', this)">Personajes</button>
+          <button class="plib-filter" onclick="filterPrompts('composicion', this)">Composición</button>
+          <button class="plib-filter" onclick="filterPrompts('efectos', this)">Efectos</button>
         </div>
 
-        <div class="prompt-input-wrap">
-          <div class="prompt-textarea-wrap">
-            <textarea class="prompt-textarea" id="prompt-input"
-              placeholder="Ej: Necesito un prompt para crear un logo moderno para una barbería..."
-              rows="2"
-              onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); generatePrompt(); }"></textarea>
-          </div>
-          <button class="prompt-send-btn" id="prompt-btn" onclick="generatePrompt()">
-            <svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22 11 13 2 9l20-7z"/></svg>
-          </button>
-        </div>
-
-        <div class="prompt-loading" id="prompt-loading">
-          <div class="prompt-loading-dots">
-            <span></span><span></span><span></span>
-          </div>
-          <span style="font-size:.8rem;color:var(--mu)">Generando prompt profesional...</span>
-        </div>
-
-        <div class="prompt-result" id="prompt-result">
-          <div class="prompt-result-header">
-            <div class="prompt-result-label">Prompt generado</div>
-            <button class="prompt-copy-btn" onclick="copyPromptResult()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-              Copiar
-            </button>
-          </div>
-          <div class="prompt-result-body" id="prompt-result-text"></div>
-        </div>
+        <!-- Grid de prompts -->
+        <div class="plib-grid" id="plib-grid"></div>
 
       </div>
 
@@ -2461,7 +2536,7 @@ function closeSidebar() {
 const panelTitles = {
   videos     : { h: 'Mis <em>Videos</em>',           p: 'Aprende diseño e inteligencia artificial con Joss Design.' },
   instalacion: { h: 'Recursos &amp; <em>Material</em>', p: 'Archivos, guías y todo lo que necesitas para el curso.' },
-  prompts    : { h: 'Generar <em>Prompts</em>',       p: 'Crea prompts profesionales optimizados para diseño con IA.' },
+  prompts    : { h: 'Biblioteca de <em>Prompts</em>',  p: 'Prompts probados y listos para usar en Midjourney, DALL·E, Firefly y más.' },
   redes      : { h: 'Nuestras <em>Redes</em>',        p: 'Conéctate con Joss Design en todas las plataformas.' }
 };
 function showPanel(name, el) {
@@ -2473,6 +2548,7 @@ function showPanel(name, el) {
   document.getElementById('page-h1').innerHTML = t.h;
   document.getElementById('page-p').textContent = t.p;
   closeSidebar();
+  if (name === 'prompts') initPromptLibrary();
 }
 
 /* ─── MODAL ─── */
@@ -2996,72 +3072,204 @@ function playVideo(id) {
   }
 }
 
-/* ─── GENERAR PROMPTS (Gemini) ─── */
-const GEMINI_KEY = 'AIzaSyAqBiCRw2bw7Qpo2bWeLy3OjBg4oAykE_c';
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_KEY;
-const PROMPT_SYSTEM = `Eres un experto en diseño gráfico e inteligencia artificial especializado en construir prompts perfectos.
+/* ─── BIBLIOTECA DE PROMPTS ─── */
+const PROMPT_LIBRARY = [
+  // ── CALIDAD Y RETOQUE ──────────────────────────────────
+  {
+    id:'q1', cat:'calidad', color:'#c8ff57',
+    title:'Mejorar calidad y nitidez de imagen',
+    text:'Upscale and enhance this image to 4K resolution. Increase sharpness, recover fine details in hair and textures, reduce noise and grain, improve dynamic range in shadows and highlights. Preserve original colors and composition. Output: photorealistic, ultra-detailed, professional photography quality.',
+    tools:['Magnific AI','Topaz Gigapixel','Adobe Firefly']
+  },
+  {
+    id:'q2', cat:'calidad', color:'#c8ff57',
+    title:'Eliminar fondo y dejarlo transparente',
+    text:'Remove the background from this image completely. Keep only the main subject with clean, precise edges — pay special attention to hair strands, fine details and semi-transparent areas. Output: subject on transparent background, no artifacts, no color fringing, production-ready for compositing.',
+    tools:['Adobe Firefly','Remove.bg','DALL·E']
+  },
+  {
+    id:'q3', cat:'calidad', color:'#c8ff57',
+    title:'Restaurar foto antigua o dañada',
+    text:'Restore this old or damaged photograph. Remove scratches, tears, stains and fading. Reconstruct missing facial features and details using context clues. Improve overall sharpness and tonal balance. Keep the original composition and subject identity intact. Output: clean, restored, natural-looking photograph.',
+    tools:['Adobe Firefly','Midjourney','Stable Diffusion']
+  },
+  {
+    id:'q4', cat:'calidad', color:'#c8ff57',
+    title:'Mejorar iluminación de producto',
+    text:'Relight this product photo with professional studio lighting. Add a soft key light from the upper left, a subtle fill light on the right, and a rim light behind the product for depth separation. Clean white or gradient background. No harsh shadows. Output: commercial-grade product photography, ready for e-commerce.',
+    tools:['Adobe Firefly','Midjourney','DALL·E']
+  },
 
-Todo prompt que generes debe seguir obligatoriamente esta anatomía de 4 partes, en este orden exacto:
+  // ── EXPANDIR Y TRANSFORMAR ─────────────────────────────
+  {
+    id:'e1', cat:'expandir', color:'#7c5cfc',
+    title:'Ampliar imagen (outpainting)',
+    text:'Expand this image outward in all directions. Intelligently generate new content that seamlessly matches the existing style, lighting, colors, perspective and atmosphere. Extend the background naturally — if it is a portrait, add environment; if landscape, continue the scene. The extension must be indistinguishable from the original.',
+    tools:['Adobe Firefly','DALL·E','Stable Diffusion']
+  },
+  {
+    id:'e2', cat:'expandir', color:'#7c5cfc',
+    title:'Cambiar fondo manteniendo el sujeto',
+    text:'Keep the main subject of this image exactly as is and replace the background with: a professional photography studio with soft gradient from light grey to white, subtle bokeh depth of field. Match the original lighting direction on the subject. Seamless, realistic compositing. No halos or edge artifacts.',
+    tools:['Adobe Firefly','DALL·E','Midjourney']
+  },
+  {
+    id:'e3', cat:'expandir', color:'#7c5cfc',
+    title:'Convertir foto a pintura digital',
+    text:'Transform this photograph into a professional digital painting. Style: concept art, painterly textures with visible but refined brush strokes, cinematic color grading. Preserve the subject composition and lighting. Add depth through atmospheric perspective. Output: high-resolution digital illustration, portfolio-quality artwork.',
+    tools:['Midjourney','Stable Diffusion','Adobe Firefly']
+  },
+  {
+    id:'e4', cat:'expandir', color:'#7c5cfc',
+    title:'Cambiar estación o clima de una escena',
+    text:'Transform the season and weather in this scene from its current state to: golden autumn with warm orange and red foliage, soft overcast lighting, light fog in the distance. Keep all architectural elements, objects and people unchanged. Only modify environmental and lighting elements to match the new season realistically.',
+    tools:['Adobe Firefly','DALL·E','Midjourney']
+  },
 
-1. OBJETIVO: Una o dos oraciones claras que describan exactamente qué se quiere lograr con la imagen o diseño. Qué debe mostrar, qué debe comunicar.
+  // ── PERSONAJES ─────────────────────────────────────────
+  {
+    id:'p1', cat:'personajes', color:'#00ffcc',
+    title:'Generar personaje animado estilo cartoon',
+    text:'Create a 3D cartoon character: friendly young professional designer, round expressive eyes, stylized proportions with slightly oversized head. Wearing casual creative outfit — hoodie, jeans, sneakers. Neutral standing pose, arms slightly open. Style: Pixar/Disney inspired, clean cel shading, vibrant colors, soft shadows. White background, full body view.',
+    tools:['Midjourney','DALL·E','Adobe Firefly']
+  },
+  {
+    id:'p2', cat:'personajes', color:'#00ffcc',
+    title:'Persona en diferente pose',
+    text:'Recreate this person in a new pose: confident standing pose, weight shifted slightly to one side, arms crossed loosely, slight natural smile, direct eye contact with camera. Keep the exact same face, skin tone, hair style, clothing and lighting conditions from the original reference. Only change the body posture.',
+    tools:['Adobe Firefly','Stable Diffusion','DALL·E']
+  },
+  {
+    id:'p3', cat:'personajes', color:'#00ffcc',
+    title:'Cambiar outfit o ropa del personaje',
+    text:'Change the clothing on this person to: modern streetwear outfit — white oversized graphic tee, wide-leg cargo pants in olive green, chunky white sneakers, small silver chain. Keep the face, hairstyle, skin tone, body proportions and background exactly the same. The new clothing should fit naturally with correct folds and shadows.',
+    tools:['Adobe Firefly','DALL·E','Midjourney']
+  },
+  {
+    id:'p4', cat:'personajes', color:'#00ffcc',
+    title:'Personaje en múltiples expresiones faciales',
+    text:'Generate 6 facial expression variations of the same character in a clean grid layout: neutral, happy/smiling, surprised, concentrated/focused, laughing, and thoughtful. Keep identical face structure, skin tone, hair and style across all expressions. White background, consistent lighting and framing for each. Style: semi-realistic illustration.',
+    tools:['Midjourney','DALL·E','Stable Diffusion']
+  },
+  {
+    id:'p5', cat:'personajes', color:'#00ffcc',
+    title:'Avatar profesional para redes sociales',
+    text:'Create a professional avatar portrait for social media. Subject: person with friendly but confident expression, looking slightly toward camera. Style: clean semi-realistic illustration, soft studio lighting, shallow depth of field background in brand color. Square format, centered composition, from shoulders up. Polished, approachable, modern.',
+    tools:['Midjourney','Adobe Firefly','DALL·E']
+  },
 
-2. FORMATO DE RESPUESTA: Cómo debe estar estructurado el resultado visual. Composición, distribución, estilo artístico, paleta de colores, tipografía si aplica, proporción o aspecto de la imagen.
+  // ── COMPOSICIÓN ────────────────────────────────────────
+  {
+    id:'c1', cat:'composicion', color:'#fbbf24',
+    title:'Escena con producto en contexto real',
+    text:'Place this product naturally in a real-life lifestyle scene: modern minimalist kitchen counter, morning light coming through window, coffee cup and small plant nearby as props. The product should look naturally placed, not composited. Match perspective, lighting and shadows to the scene. Style: editorial lifestyle photography, warm tones.',
+    tools:['Adobe Firefly','DALL·E','Midjourney']
+  },
+  {
+    id:'c2', cat:'composicion', color:'#fbbf24',
+    title:'Foto de grupo con fondo personalizado',
+    text:'Take this group of people and place them in a new environment: modern rooftop terrace at sunset, city skyline in background, soft golden hour lighting. Maintain natural proportions and interactions between people. The new background lighting should match and complement the existing lighting on the subjects. Seamless, cinematic result.',
+    tools:['Adobe Firefly','Stable Diffusion','DALL·E']
+  },
+  {
+    id:'c3', cat:'composicion', color:'#fbbf24',
+    title:'Efecto de doble exposición',
+    text:'Create a double exposure composition blending a portrait silhouette with a landscape scene. The face/body outline contains a dense forest or mountain scene inside it. Background: clean white or very light grey. Color treatment: monochromatic with a single accent color — deep teal or dusty rose. Style: fine art photography, editorial.',
+    tools:['Midjourney','Stable Diffusion','Adobe Firefly']
+  },
 
-3. ADVERTENCIAS: Restricciones o precisiones importantes. Qué NO debe incluir, qué debe ser exacto, qué errores comunes evitar.
+  // ── TEXTURAS Y EFECTOS ─────────────────────────────────
+  {
+    id:'t1', cat:'efectos', color:'#ef4444',
+    title:'Añadir efecto de luz neón a imagen',
+    text:'Add neon lighting effects to this image. Overlay glowing neon light traces — magenta, cyan and electric blue — that follow the edges and contours of the main subject. Add light bloom and lens flare. The environment should feel like a night urban scene with reflective wet ground. Keep subject recognizable. Cyberpunk aesthetic.',
+    tools:['Adobe Firefly','Stable Diffusion','Midjourney']
+  },
+  {
+    id:'t2', cat:'efectos', color:'#ef4444',
+    title:'Convertir imagen a estilo anime',
+    text:'Convert this image to anime illustration style. Clean cel-shaded coloring, defined outlines, simplified but expressive facial features, stylized hair with shine highlights. Lighting: anime-style with hard light and shadow separation. Background: simplified or painterly. Maintain the subject identity and composition from the original. High quality anime production style.',
+    tools:['Midjourney','Stable Diffusion','Adobe Firefly']
+  },
+  {
+    id:'t3', cat:'efectos', color:'#ef4444',
+    title:'Textura realista sobre superficie',
+    text:'Apply a realistic material texture to this object: brushed stainless steel with subtle directional grain, slight reflections showing environment, micro-scratches for realism. The texture must follow the object geometry correctly — wrapping around curves and edges naturally. Match the original lighting direction. Output: photorealistic material rendering.',
+    tools:['Adobe Firefly','Midjourney','Stable Diffusion']
+  },
+  {
+    id:'t4', cat:'efectos', color:'#ef4444',
+    title:'Efecto glitch y distorsión digital',
+    text:'Apply a controlled digital glitch effect to this image. Horizontal scan line displacement, RGB channel splitting with colored fringing, small pixelated artifact blocks scattered across the image, VHS tracking error lines. The glitch should feel intentional and artistic, not destructive. Keep the subject recognizable. Style: digital art, cyberpunk.',
+    tools:['Stable Diffusion','Midjourney','Adobe Firefly']
+  },
+];
 
-4. CONTEXTO ADICIONAL: Información de fondo que ayuda a la IA a entender mejor el propósito. Para quién es, en qué plataforma se usará, qué sensación debe transmitir, referencias de estilo.
+const CAT_LABELS = {
+  all:'Todos', calidad:'Calidad', expandir:'Expandir',
+  personajes:'Personajes', composicion:'Composición',
+  efectos:'Efectos'
+};
 
-Responde SOLO con el prompt generado, redactado en prosa fluida y profesional en español. No uses numeración ni títulos de sección visibles — el prompt debe leerse como un texto corrido y natural. Máximo 200 palabras.`;
-
-let _promptRunning = false;
-async function generatePrompt() {
-  if (_promptRunning) return; // evitar llamadas múltiples
-  const input = document.getElementById('prompt-input').value.trim();
-  if (!input) { toast('Escribe qué necesitas primero', false); return; }
-  const btn     = document.getElementById('prompt-btn');
-  const loading = document.getElementById('prompt-loading');
-  const result  = document.getElementById('prompt-result');
-  const resText = document.getElementById('prompt-result-text');
-  _promptRunning = true;
-  btn.disabled = true;
-  loading.classList.add('show');
-  result.classList.remove('show');
-  try {
-    const res = await fetch(GEMINI_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: PROMPT_SYSTEM + '\n\nNecesito un prompt para: ' + input }] }],
-        generationConfig: { temperature: 0.8, maxOutputTokens: 600 }
-      })
-    });
-    if (!res.ok) throw new Error('Error ' + res.status);
-    const data = await res.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('Sin respuesta');
-    resText.textContent = text;
-    result.classList.add('show');
-    toast('¡Prompt generado! ✨', true);
-  } catch(e) {
-    console.error('Gemini:', e);
-    toast('Error al generar. Intenta de nuevo.', false);
-  } finally {
-    _promptRunning = false;
-    btn.disabled = false;
-    loading.classList.remove('show');
+function renderPromptLibrary(cat) {
+  var grid = document.getElementById('plib-grid');
+  if (!grid) return;
+  var items = cat === 'all' ? PROMPT_LIBRARY : PROMPT_LIBRARY.filter(function(p){ return p.cat === cat; });
+  var html = '';
+  for (var i = 0; i < items.length; i++) {
+    var p = items[i];
+    var toolTags = '';
+    for (var j = 0; j < p.tools.length; j++) {
+      toolTags += '<span class="plib-tool-tag">' + p.tools[j] + '</span>';
+    }
+    var copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+    var checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+    html +=
+      '<div class="plib-card" style="--cat-color:' + p.color + '">' +
+        '<div class="plib-card-top">' +
+          '<div class="plib-title">' + p.title + '</div>' +
+          '<div class="plib-cat-badge" style="color:' + p.color + ';border-color:' + p.color + '33;background:' + p.color + '11">' + CAT_LABELS[p.cat] + '</div>' +
+        '</div>' +
+        '<div class="plib-text" id="plib-text-' + p.id + '">' + p.text + '</div>' +
+        '<button class="plib-expand-btn" id="plib-exp-' + p.id + '" data-id="' + p.id + '" onclick="expandPrompt(this.dataset.id)">Ver completo ↓</button>' +
+        '<div class="plib-card-footer">' +
+          '<div class="plib-tools">' + toolTags + '</div>' +
+          '<button class="plib-copy-btn" data-id="' + p.id + '" onclick="copyPrompt(this.dataset.id, this)">' + copyIcon + ' Copiar</button>' +
+        '</div>' +
+      '</div>';
   }
+  grid.innerHTML = html;
 }
 
-function useChip(el) {
-  const inp = document.getElementById('prompt-input');
-  inp.value = el.textContent;
-  inp.focus();
-  // NO llamar generatePrompt aquí — el usuario decide cuándo enviar
+function filterPrompts(cat, btn) {
+  document.querySelectorAll('.plib-filter').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderPromptLibrary(cat);
 }
 
-function copyPromptResult() {
-  const text = document.getElementById('prompt-result-text').textContent;
-  copyTxt(text, document.querySelector('.prompt-copy-btn'));
+function expandPrompt(id) {
+  var el  = document.getElementById('plib-text-' + id);
+  var btn = document.getElementById('plib-exp-' + id);
+  var expanded = el.classList.toggle('plib-text-full');
+  el.classList.toggle('plib-text', !expanded);
+  btn.textContent = expanded ? 'Ver menos ↑' : 'Ver completo ↓';
+}
+
+function copyPrompt(id, btn) {
+  var p = PROMPT_LIBRARY.find(function(x){ return x.id === id; });
+  if (!p) return;
+  navigator.clipboard.writeText(p.text).then(function() {
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copiado';
+    setTimeout(function() {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copiar';
+    }, 2200);
+  });
+}
+
+function initPromptLibrary() {
+  if (document.getElementById('plib-grid')) renderPromptLibrary('all');
 }
 
 /* ─── HELPERS ─── */
