@@ -1933,27 +1933,45 @@ async function initKRForm() {
 
     // 6. Registrar onSubmit
     KR.onSubmit(paymentData => {
-      console.log('KR result:', JSON.stringify({
-        status: paymentData?.clientAnswer?.orderStatus,
-        error : paymentData?.clientAnswer?.transactions?.[0]?.errorMessage
-      }));
+      // LOG COMPLETO para diagnóstico
+      console.log('=== KR FULL RESULT ===', JSON.stringify(paymentData, null, 2));
+      const tx  = paymentData?.clientAnswer?.transactions?.[0];
+      console.log('orderStatus:', paymentData?.clientAnswer?.orderStatus);
+      console.log('tx.status:', tx?.status);
+      console.log('tx.detailedStatus:', tx?.detailedStatus);
+      console.log('tx.errorCode:', tx?.errorCode);
+      console.log('tx.errorMessage:', tx?.errorMessage);
+      console.log('tx.detailedErrorCode:', tx?.detailedErrorCode);
+      console.log('tx.detailedErrorMessage:', tx?.detailedErrorMessage);
+
       const status = paymentData?.clientAnswer?.orderStatus;
       if (status === 'PAID') {
         handleIzipaySuccess(paymentData);
       } else {
-        const msg = paymentData?.clientAnswer?.transactions?.[0]?.errorMessage
-          || paymentData?.clientAnswer?.errorMessage
-          || 'Pago rechazado. Verifica los datos de tu tarjeta e intenta de nuevo.';
-        errEl.textContent = '⚠️ ' + msg;
+        // Mostrar todos los detalles del rechazo en pantalla
+        const errorCode    = tx?.errorCode || '';
+        const errorMsg     = tx?.errorMessage || paymentData?.clientAnswer?.errorMessage || 'Pago rechazado';
+        const detailedMsg  = tx?.detailedErrorMessage || '';
+        const detailedCode = tx?.detailedErrorCode || '';
+
+        const displayMsg = [
+          errorMsg,
+          detailedMsg ? '(' + detailedMsg + ')' : '',
+          errorCode   ? '[Código: ' + errorCode + (detailedCode ? '/' + detailedCode : '') + ']' : ''
+        ].filter(Boolean).join(' ');
+
+        errEl.textContent = '⚠️ ' + displayMsg;
         errEl.classList.add('show');
+        console.error('PAGO RECHAZADO DETALLE:', displayMsg);
       }
-      return false; // no redirigir
+      return false;
     });
 
     KR.onError(err => {
-      console.error('KR error:', JSON.stringify(err));
+      console.error('=== KR ERROR COMPLETO ===', JSON.stringify(err, null, 2));
       const msg = err?.errorMessage || err?.clientAnswer?.errorMessage || 'Error en el formulario de pago.';
-      errEl.textContent = '⚠️ ' + msg;
+      const code = err?.errorCode || '';
+      errEl.textContent = '⚠️ ' + msg + (code ? ' [' + code + ']' : '');
       errEl.classList.add('show');
     });
 
