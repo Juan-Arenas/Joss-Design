@@ -1562,47 +1562,43 @@ select.finput option { background: #141421; }
 'use strict';
 
 /* ─── CONFIG ─── */
-const BACKEND      = 'https://josb-design-production.up.railway.app';
-const ADMIN_PWD    = '1234';        // contraseña para abrir el panel admin (en pantalla)
-const ADMIN_SECRET = 'jossdesign2025'; // debe coincidir con ADMIN_SECRET en Railway
-const PRICE_PEN    = 100;           // centavos PEN para Izipay
-const PRICE_TXT    = 'S/ 1.00';
+const BACKEND   = 'https://josb-design-production.up.railway.app';
+const ADMIN_PWD = '1234';       // contraseña para abrir el panel admin
+const PRICE_PEN = 100;          // centavos de sol (100 = S/ 1.00)
+const PRICE_TXT = 'S/ 1.00';   // texto que se muestra
 
-/* ─── SESSION (solo localStorage — es del dispositivo del usuario) ─── */
-const SESSION_KEY = 'jd_session';
-const getSession  = () => { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { return null; } };
-const saveSession = v => { try { localStorage.setItem(SESSION_KEY, JSON.stringify(v)); } catch {} };
-const clearSession = () => { try { localStorage.removeItem(SESSION_KEY); } catch {} };
+/* ─── STORAGE ─── */
+const K = 'jd9_';
+const db = {
+  get : k => { try { return JSON.parse(localStorage.getItem(K+k)); } catch(e) { return null; } },
+  set : (k,v) => { try { localStorage.setItem(K+k, JSON.stringify(v)); } catch(e) {} }
+};
+const getUsers   = () => db.get('u') || {};
+const getPending = () => db.get('p') || [];
+const getAffs    = () => db.get('a') || { JOSS10: 0, DESIGN20: 0 };
+const getLog     = () => db.get('l') || [];
+const getSession = () => db.get('s') || null;
+const saveUsers   = v => db.set('u', v);
+const savePending = v => db.set('p', v);
+const saveAffs    = v => db.set('a', v);
+const saveLog     = v => db.set('l', v);
+const saveSession = v => db.set('s', v);
 
-/* ─── API HELPERS ─── */
-async function apiGet(path, admin = false) {
-  const headers = admin ? { 'x-admin-secret': ADMIN_SECRET } : {};
-  const res = await fetch(BACKEND + path, { headers });
-  return res.json();
+/* ensure admin user exists */
+(function() {
+  const u = getUsers();
+  if (!u['admin']) {
+    u['admin'] = { pass: 'admin1234', role: 'admin' };
+    saveUsers(u);
+  }
+})();
+
+function addLog(txt, type) {
+  const l = getLog();
+  l.unshift({ txt, type: type||'lg', time: new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'}) });
+  if (l.length > 60) l.length = 60;
+  saveLog(l);
 }
-async function apiPost(path, body, admin = false) {
-  const headers = { 'Content-Type': 'application/json' };
-  if (admin) headers['x-admin-secret'] = ADMIN_SECRET;
-  const res = await fetch(BACKEND + path, { method: 'POST', headers, body: JSON.stringify(body) });
-  return res.json();
-}
-async function apiPut(path, body, admin = false) {
-  const headers = { 'Content-Type': 'application/json' };
-  if (admin) headers['x-admin-secret'] = ADMIN_SECRET;
-  const res = await fetch(BACKEND + path, { method: 'PUT', headers, body: JSON.stringify(body) });
-  return res.json();
-}
-
-/* ─── SIMPLE HASH (para no enviar contraseña en texto plano) ─── */
-async function hashPass(pass) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pass));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-/* ─── AFILIADOS (en localStorage — no crítico) ─── */
-const getAffs  = () => { try { return JSON.parse(localStorage.getItem('jd_affs')) || { JOSS10:0, DESIGN20:0 }; } catch { return { JOSS10:0, DESIGN20:0 }; } };
-const saveAffs = v => { try { localStorage.setItem('jd_affs', JSON.stringify(v)); } catch {} };
-
 
 /* ─── TOAST ─── */
 function toast(txt, ok) {
@@ -1676,7 +1672,7 @@ function showStep(id) {
   document.getElementById(id).classList.add('active');
 }
 function refreshPrices() {
-  const p = PRICE_TXT;
+  const p = db.get('price') || PRICE_TXT;
   ['price-show','price-total','pp-price','yape-price','plin-price'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -1707,6 +1703,7 @@ async function goToPayment() {
   const msgEl   = document.getElementById('billing-msg');
   msgEl.className = 'fmsg';
 
+  // Validaciones locales
   if (!fname || !lname)  return setMsg('billing-msg', 'Ingresa tu nombre completo.', 'err');
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setMsg('billing-msg', 'Ingresa un correo válido.', 'err');
   if (!country)          return setMsg('billing-msg', 'Selecciona tu país.', 'err');
@@ -1715,13 +1712,40 @@ async function goToPayment() {
     const affs = getAffs();
     if (!affs.hasOwnProperty(aff)) return setMsg('billing-msg', 'Código de afiliado no válido.', 'err');
   }
-  // Check if email already registered (quick backend check)
+
+  // Verificar en backend si el correo ya existe
+  const btnContinue = document.querySelector('#step-billing .btn-main');
+  if (btnContinue) { btnContinue.disabled = true; btnContinue.textContent = 'Verificando...'; }
+
   try {
-    const h = await hashPass(pass);
-    const check = await apiPost('/login', { email, passHash: '___check___only___' });
-    if (check.status === 'approved') return setMsg('billing-msg', 'Este correo ya tiene acceso. Usa la pestaña "Ya tengo acceso".', 'inf');
-    if (check.status === 'pending')  return setMsg('billing-msg', 'Ya tienes una solicitud pendiente. Usa "Ya tengo acceso" para ver el estado.', 'warn');
-  } catch(e) { /* continue if check fails */ }
+    const res = await fetch(BACKEND + '/check-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+
+    if (data.status === 'approved') {
+      setMsg('billing-msg',
+        '✅ Este correo ya tiene acceso al curso. Usa la pestaña "Ya tengo acceso" para ingresar.',
+        'inf');
+      return;
+    }
+    if (data.status === 'pending') {
+      setMsg('billing-msg',
+        '⏳ Ya enviaste una solicitud con este correo. Espera a que sea revisada — te avisaremos por WhatsApp. Usa "Ya tengo acceso" para ver el estado.',
+        'warn');
+      return;
+    }
+  } catch (e) {
+    // Si el backend falla, continuar (no bloquear por error de red)
+    console.warn('Email check failed, continuing:', e.message);
+  } finally {
+    if (btnContinue) {
+      btnContinue.disabled = false;
+      btnContinue.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Continuar al pago';
+    }
+  }
 
   billingData = { fname, lname, email, country, phone: document.getElementById('b-phone').value.trim(), pass, aff };
   currentOrder = 'JD-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2,6).toUpperCase();
@@ -1830,14 +1854,32 @@ async function redirectToIzipay() {
     const data = await res.json();
     if (!data.formToken) throw new Error(data.error || 'No se pudo crear el pago');
 
-    // Save pending record BEFORE redirecting — now goes to DB
-    await savePendingIzipay();
+    // Save pending record BEFORE redirecting so data is not lost
+    savePendingIzipay();
 
-    // Save billing to localStorage so we can activate after return
-    localStorage.setItem('jd_pending_billing', JSON.stringify(billingData));
-    localStorage.setItem('jd_pending_order', currentOrder);
+    // Build Izipay hosted checkout URL and redirect
+    const checkoutUrl = 'https://secure.micuentaweb.pe/vads-checkout/?'
+      + 'vads_action_mode=INTERACTIVE'
+      + '&vads_amount=' + PRICE_PEN
+      + '&vads_currency=604'   // 604 = PEN (Peruvian Sol ISO 4217)
+      + '&vads_ctx_mode=PRODUCTION'
+      + '&vads_page_action=PAYMENT'
+      + '&vads_payment_config=SINGLE'
+      + '&vads_site_id=' + '19131378'
+      + '&vads_trans_date=' + new Date().toISOString().replace(/[-T:.Z]/g,'').substring(0,14)
+      + '&vads_trans_id=' + currentOrder.replace(/[^a-zA-Z0-9]/g,'').substring(0,6)
+      + '&vads_version=V2'
+      + '&vads_return_url=' + encodeURIComponent(location.origin + location.pathname + '?pago=ok&order=' + currentOrder)
+      + '&vads_cancel_url=' + encodeURIComponent(location.origin + location.pathname + '?pago=cancel');
 
+    // Use the formToken URL from Izipay (the correct way)
+    // The backend returns the formToken; we use the Izipay standard redirect URL
     const izipayRedirectUrl = 'https://secure.micuentaweb.pe/t/szf9tmo5' 
+
+    // Save data to localStorage before leaving
+    db.set('pending_order', currentOrder);
+    db.set('pending_billing', JSON.stringify(billingData));
+
     window.location.href = izipayRedirectUrl;
 
   } catch (err) {
@@ -1851,82 +1893,134 @@ async function redirectToIzipay() {
   }
 }
 
-async function savePendingIzipay() {
-  const h = await hashPass(billingData.pass);
-  await apiPost('/register-pending', {
-    email    : billingData.email,
-    name     : billingData.fname + ' ' + billingData.lname,
-    passHash : h,
-    method   : 'izipay',
-    orderId  : currentOrder,
-    affiliate: billingData.aff || null,
-    country  : billingData.country,
-    phone    : billingData.phone
-  });
+function savePendingIzipay() {
+  const pending = getPending();
+  if (!pending.find(p => p.order === currentOrder)) {
+    pending.push({
+      email  : billingData.email,
+      pass   : billingData.pass,
+      method : 'izipay',
+      affiliate: billingData.aff || null,
+      order  : currentOrder,
+      name   : billingData.fname + ' ' + billingData.lname,
+      country: billingData.country,
+      phone  : billingData.phone,
+      date   : new Date().toLocaleString('es'),
+      ts     : Date.now()
+    });
+    savePending(pending);
+  }
+  // also mark user as pending
+  const users = getUsers();
+  if (!users[billingData.email]) {
+    users[billingData.email] = {
+      pass  : billingData.pass, role: 'pending',
+      since : new Date().toLocaleDateString('es'),
+      method: 'izipay', order: currentOrder,
+      name  : billingData.fname + ' ' + billingData.lname
+    };
+    saveUsers(users);
+  }
 }
 
 /* ─── HANDLE RETURN FROM IZIPAY ─── */
-async function checkIzipayReturn() {
+function checkIzipayReturn() {
   const params = new URLSearchParams(location.search);
   const pago   = params.get('pago');
   const order  = params.get('order');
   if (!pago) return;
 
+  // Clean URL
   history.replaceState({}, '', location.pathname);
 
   if (pago === 'ok' && order) {
-    const stored = localStorage.getItem('jd_pending_billing');
-    const bd = stored ? JSON.parse(stored) : null;
+    // Payment successful — auto-approve
+    const storedBilling = db.get('pending_billing');
+    let bd = storedBilling ? JSON.parse(storedBilling) : null;
+
     if (bd) {
-      const h = await hashPass(bd.pass);
-      await apiPost('/activate-user', {
-        email    : bd.email,
-        name     : bd.fname + ' ' + bd.lname,
-        passHash : h,
-        method   : 'izipay',
-        orderId  : order,
-        affiliate: bd.aff || null
-      });
-      localStorage.removeItem('jd_pending_billing');
-      localStorage.removeItem('jd_pending_order');
-      saveSession({ email: bd.email, pass: bd.pass });
+      const users = getUsers();
+      users[bd.email] = {
+        pass  : bd.pass, role: 'approved',
+        since : new Date().toLocaleDateString('es'),
+        method: 'izipay', order,
+        name  : bd.fname + ' ' + bd.lname
+      };
+      saveUsers(users);
+      // remove from pending
+      const arr = getPending().filter(p => p.order !== order);
+      savePending(arr);
+      if (bd.aff) {
+        const affs = getAffs();
+        affs[bd.aff] = (affs[bd.aff] || 0) + 1;
+        saveAffs(affs);
+      }
+      saveSession(bd.email);
+      db.set('pending_billing', null);
+      db.set('pending_order', null);
+      addLog('Pago Izipay exitoso: ' + bd.email, 'lg');
+      // Show success — user is already logged in via init
     }
   } else if (pago === 'cancel') {
+    // Show a toast
     toast('Pago cancelado. Puedes intentarlo de nuevo.', false);
   }
 }
 
-function initCardInputs() { /* no-op */ }
+function initCardInputs() { /* no-op: card form removed */ }
 
-async function handleIzipaySuccess() {
-  const h = await hashPass(billingData.pass);
-  await apiPost('/activate-user', {
-    email    : billingData.email,
-    name     : billingData.fname + ' ' + billingData.lname,
-    passHash : h,
-    method   : 'izipay',
-    orderId  : currentOrder,
-    affiliate: billingData.aff || null
-  });
-  saveSession({ email: billingData.email, pass: billingData.pass });
+function handleIzipaySuccess() {
+  const users = getUsers();
+  users[billingData.email] = {
+    pass: billingData.pass, role: 'approved',
+    since: new Date().toLocaleDateString('es'),
+    method: 'izipay', order: currentOrder,
+    name: billingData.fname + ' ' + billingData.lname
+  };
+  saveUsers(users);
+  if (billingData.aff) {
+    const affs = getAffs();
+    affs[billingData.aff] = (affs[billingData.aff] || 0) + 1;
+    saveAffs(affs);
+  }
+  saveSession(billingData.email);
+  addLog('Pago Izipay: ' + billingData.email, 'lg');
   showStep('step-success');
   setTimeout(() => { closeModal(); setLoggedIn(billingData.email); }, 2500);
 }
 
 /* ─── MANUAL PAYMENT ─── */
-async function submitManual() {
+function submitManual() {
   setMsg('pay-msg', '', '');
-  const h = await hashPass(billingData.pass);
-  await apiPost('/register-pending', {
-    email    : billingData.email,
-    name     : billingData.fname + ' ' + billingData.lname,
-    passHash : h,
-    method   : selectedPM,
-    orderId  : currentOrder,
-    affiliate: billingData.aff || null,
-    country  : billingData.country,
-    phone    : billingData.phone
-  });
+
+  // Save pending
+  const pending = getPending();
+  if (!pending.find(p => p.order === currentOrder)) {
+    pending.push({
+      email: billingData.email, pass: billingData.pass,
+      method: selectedPM, affiliate: billingData.aff || null,
+      order: currentOrder, name: billingData.fname + ' ' + billingData.lname,
+      country: billingData.country, phone: billingData.phone,
+      date: new Date().toLocaleString('es'), ts: Date.now()
+    });
+    savePending(pending);
+  }
+  if (billingData.aff) {
+    const affs = getAffs();
+    affs[billingData.aff] = (affs[billingData.aff] || 0) + 1;
+    saveAffs(affs);
+  }
+  // Mark as pending user
+  const users = getUsers();
+  if (!users[billingData.email]) {
+    users[billingData.email] = {
+      pass: billingData.pass, role: 'pending',
+      since: new Date().toLocaleDateString('es'),
+      method: selectedPM, order: currentOrder,
+      name: billingData.fname + ' ' + billingData.lname
+    };
+    saveUsers(users);
+  }
 
   const mN = { paypal: 'PayPal', yape: 'Yape', plin: 'Plin' };
   const waMsg = encodeURIComponent(
@@ -1946,37 +2040,27 @@ async function submitManual() {
 }
 
 /* ─── LOGIN ─── */
-async function doLogin() {
+function doLogin() {
   const email = document.getElementById('l-email').value.trim().toLowerCase();
   const pass  = document.getElementById('l-pass').value;
   setMsg('l-msg', '', '');
   if (!email || !pass) return setMsg('l-msg', 'Completa todos los campos.', 'err');
-
-  const btn = document.querySelector('#step-login .btn-main');
-  if (btn) { btn.disabled = true; btn.textContent = 'Verificando...'; }
-
-  try {
-    const h = await hashPass(pass);
-    const r = await apiPost('/login', { email, passHash: h });
-
-    if (r.status === 'approved') {
-      saveSession({ email, pass });
-      closeModal(); closeSidebar(); setLoggedIn(email);
-    } else if (r.status === 'pending') {
-      document.getElementById('pending-order-badge').textContent = 'Orden: ' + (r.order || '—');
-      showStep('step-pending');
-    } else if (r.status === 'wrong_password') {
-      setMsg('l-msg', 'Contraseña incorrecta.', 'err');
-    } else {
-      setMsg('l-msg', 'Correo no encontrado. ¿Ya enviaste el comprobante?', 'err');
-    }
-  } catch (e) {
-    setMsg('l-msg', 'Error de conexión. Intenta de nuevo.', 'err');
+  const users = getUsers();
+  if (!users[email]) return setMsg('l-msg', 'Correo no encontrado. ¿Ya enviaste el comprobante?', 'err');
+  if (users[email].pass !== pass) return setMsg('l-msg', 'Contraseña incorrecta.', 'err');
+  if (users[email].role === 'pending') {
+    document.getElementById('pending-order-badge').textContent = 'Orden: ' + (users[email].order || '—');
+    showStep('step-pending');
+    return;
   }
-  if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg> Ingresar al curso'; }
+  if (users[email].role !== 'approved') return setMsg('l-msg', 'Acceso denegado.', 'err');
+  saveSession(email);
+  closeModal();
+  closeSidebar();
+  setLoggedIn(email);
 }
 function doLogout() {
-  clearSession();
+  saveSession(null);
   location.reload();
 }
 function setLoggedIn(email) {
@@ -2052,7 +2136,7 @@ function closeAdminPass() {
 }
 function checkAdminPass() {
   const val = document.getElementById('adm-pass-input').value;
-  const savedPwd = localStorage.getItem('jd_admin_pwd') || ADMIN_PWD;
+  const savedPwd = db.get('admin_pwd') || ADMIN_PWD;
   if (val === savedPwd) {
     closeAdminPass();
     openAdminPanel();
@@ -2078,172 +2162,156 @@ function exitAdmin() {
 }
 
 function renderAdmin() {
-  document.getElementById('adm-stats').innerHTML = `
-    <div class="stat s-ye"><div class="stat-n">...</div><div class="stat-l">Pendientes</div></div>
-    <div class="stat s-gr"><div class="stat-n">...</div><div class="stat-l">Con Acceso</div></div>
-    <div class="stat s-pu"><div class="stat-n">-</div><div class="stat-l">Afiliados</div></div>
-    <div class="stat s-ac"><div class="stat-n">-</div><div class="stat-l">Total</div></div>`;
-  document.getElementById('adm-grid').innerHTML = `<div style="text-align:center;padding:32px;color:var(--mu)"><div class="spinner" style="margin:0 auto 12px"></div>Cargando datos...</div>`;
-  loadAdminData();
-}
-
-async function loadAdminData() {
+  const users   = getUsers();
+  const pending = getPending();
+  const affs    = getAffs();
+  const log     = getLog();
+  const approved = Object.entries(users).filter(([,u]) => u.role === 'approved');
   const mL = { izipay:'Izipay', paypal:'PayPal', yape:'Yape', plin:'Plin', manual:'Manual' };
-  const chk = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg>';
-  const affs = getAffs();
+  const chkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg>';
 
-  try {
-    const [pending, users, log, cfg] = await Promise.all([
-      apiGet('/admin/pending', true),
-      apiGet('/admin/users',   true),
-      apiGet('/admin/log',     true),
-      apiGet('/config')
-    ]);
+  // Stats
+  document.getElementById('adm-stats').innerHTML = `
+    <div class="stat s-ye"><div class="stat-n">${pending.length}</div><div class="stat-l">Pendientes</div></div>
+    <div class="stat s-gr"><div class="stat-n">${approved.length}</div><div class="stat-l">Con Acceso</div></div>
+    <div class="stat s-pu"><div class="stat-n">${Object.keys(affs).length}</div><div class="stat-l">Afiliados</div></div>
+    <div class="stat s-ac"><div class="stat-n">${approved.length + pending.length}</div><div class="stat-l">Total</div></div>
+  `;
 
-    // Stats
-    document.getElementById('adm-stats').innerHTML = `
-      <div class="stat s-ye"><div class="stat-n">${pending.length}</div><div class="stat-l">Pendientes</div></div>
-      <div class="stat s-gr"><div class="stat-n">${users.length}</div><div class="stat-l">Con Acceso</div></div>
-      <div class="stat s-pu"><div class="stat-n">${Object.keys(affs).length}</div><div class="stat-l">Afiliados</div></div>
-      <div class="stat s-ac"><div class="stat-n">${users.length + pending.length}</div><div class="stat-l">Total</div></div>`;
-
-    // Pending HTML
-    const pendHTML = pending.length === 0
-      ? '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" display="block"><polyline points="20 6 9 17 4 12"/></svg><div>Sin solicitudes pendientes</div></div>'
-      : pending.map(p => `
-        <div class="pi-item">
-          <div class="pi-left">
-            <div class="pi-email">${p.email}</div>
-            ${p.name ? '<div class="pi-name">' + p.name + '</div>' : ''}
-            <div class="pi-date">${p.date || ''}</div>
-            <div class="pi-order">${p.order_id || '—'}</div>
-            <span class="pi-method">${mL[p.method]||p.method}${p.affiliate?' · '+p.affiliate:''}</span>
-          </div>
-          <div class="pi-acts">
-            <button class="b-app" onclick="approvePending('${p.order_id}')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><polyline points="20 6 9 17 4 12"/></svg>
-              Aprobar
-            </button>
-            <button class="b-rej" onclick="rejectPending('${p.order_id}','${p.email}')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          </div>
-        </div>`).join('');
-
-    // Users HTML
-    const aprHTML = users.length === 0
-      ? '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" display="block"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div>Ningún usuario aprobado aún</div></div>'
-      : users.map(u => {
-          const m = u.method || 'manual';
-          return `<div class="apr-item">
-            <div class="apr-check">${chk}</div>
-            <div class="apr-email">${u.email}</div>
-            <span class="apr-badge ${m}">${mL[m]||m}</span>
-            <div class="apr-date">${u.approved_at||'—'}</div>
-            <button class="b-rev" onclick="revokeUser('${u.email}')">Revocar</button>
-          </div>`;
-        }).join('');
-
-    // Affiliates
-    const affHTML = Object.entries(affs).map(([code, uses]) => `
-      <div class="aff-item">
-        <span class="aff-code">${code}</span>
-        <span class="aff-uses">${uses} uso${uses!==1?'s':''}</span>
-        <button class="b-rev" onclick="deleteAff('${code}')">Eliminar</button>
+  // Pending
+  const pendHTML = pending.length === 0
+    ? '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" display="block"><polyline points="20 6 9 17 4 12"/></svg><div>Sin solicitudes pendientes</div></div>'
+    : pending.map((p, i) => `
+      <div class="pi-item">
+        <div class="pi-left">
+          <div class="pi-email">${p.email}</div>
+          ${p.name ? '<div class="pi-name">' + p.name + '</div>' : ''}
+          <div class="pi-date">${p.date}</div>
+          <div class="pi-order">${p.order || '—'}</div>
+          <span class="pi-method">${mL[p.method] || p.method}${p.affiliate ? ' · ' + p.affiliate : ''}</span>
+        </div>
+        <div class="pi-acts">
+          <button class="b-app" onclick="approvePending(${i})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><polyline points="20 6 9 17 4 12"/></svg>
+            Aprobar
+          </button>
+          <button class="b-rej" onclick="rejectPending(${i})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
       </div>`).join('');
 
-    // Log
-    const logHTML = !log.length
-      ? '<div class="empty-state"><div>Sin actividad reciente</div></div>'
-      : log.map(l => `
-        <div class="log-item">
-          <div class="log-dot ${l.type}"></div>
-          <div class="log-txt">${l.action}</div>
-          <div class="log-time">${l.time}</div>
-        </div>`).join('');
+  // Approved
+  const aprHTML = approved.length === 0
+    ? '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" display="block"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div>Ningún usuario aprobado aún</div></div>'
+    : approved.map(([email, u]) => {
+        const m = u.method || 'manual';
+        return `<div class="apr-item">
+          <div class="apr-check">${chkSvg}</div>
+          <div class="apr-email">${email}</div>
+          <span class="apr-badge ${m}">${mL[m] || m}</span>
+          <div class="apr-date">${u.since || '—'}</div>
+          <button class="b-rev" onclick="revokeUser('${email}')">Revocar</button>
+        </div>`;
+      }).join('');
 
-    const priceVal = cfg?.price_txt || PRICE_TXT;
+  // Affiliates
+  const affHTML = Object.entries(affs).map(([code, uses]) => `
+    <div class="aff-item">
+      <span class="aff-code">${code}</span>
+      <span class="aff-uses">${uses} uso${uses !== 1 ? 's' : ''}</span>
+      <button class="b-rev" onclick="deleteAff('${code}')">Eliminar</button>
+    </div>`).join('');
 
-    document.getElementById('adm-grid').innerHTML = `
-      <div class="adm-card full">
-        <div class="adm-card-title"><span class="dot d-ye"></span>Solicitudes pendientes (${pending.length})
-          <button onclick="loadAdminData()" style="margin-left:auto;padding:3px 9px;border-radius:7px;background:rgba(200,255,87,.08);border:1px solid rgba(200,255,87,.18);color:var(--ac);font-size:.63rem;cursor:pointer">↻ Actualizar</button>
-        </div>
-        <div class="pi-list">${pendHTML}</div>
+  // Log
+  const logHTML = log.length === 0
+    ? '<div class="empty-state"><div>Sin actividad reciente</div></div>'
+    : log.slice(0, 12).map(l => `
+      <div class="log-item">
+        <div class="log-dot ${l.type}"></div>
+        <div class="log-txt">${l.txt}</div>
+        <div class="log-time">${l.time}</div>
+      </div>`).join('');
+
+  document.getElementById('adm-grid').innerHTML = `
+    <div class="adm-card full">
+      <div class="adm-card-title"><span class="dot d-ye"></span>Solicitudes pendientes (${pending.length})</div>
+      <div class="pi-list">${pendHTML}</div>
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title"><span class="dot d-gr"></span>Usuarios con acceso (${approved.length})</div>
+      <div class="apr-list">${aprHTML}</div>
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title"><span class="dot d-pu"></span>Afiliados</div>
+      ${affHTML}
+      <button class="btn-add-aff" onclick="addAff()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar código
+      </button>
+    </div>
+    <div class="adm-card">
+      <div class="adm-card-title"><span class="dot d-ac"></span>Actividad reciente</div>
+      <div class="log-list">${logHTML}</div>
+    </div>
+    <div class="adm-card full">
+      <div class="adm-card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+        Configuración
       </div>
-      <div class="adm-card">
-        <div class="adm-card-title"><span class="dot d-gr"></span>Usuarios con acceso (${users.length})</div>
-        <div class="apr-list">${aprHTML}</div>
-      </div>
-      <div class="adm-card">
-        <div class="adm-card-title"><span class="dot d-pu"></span>Afiliados</div>
-        ${affHTML}
-        <button class="btn-add-aff" onclick="addAff()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Agregar código
-        </button>
-      </div>
-      <div class="adm-card">
-        <div class="adm-card-title"><span class="dot d-ac"></span>Actividad reciente</div>
-        <div class="log-list">${logHTML}</div>
-      </div>
-      <div class="adm-card full">
-        <div class="adm-card-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
-          Configuración
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-          <div>
-            <label class="cfg-label">Precio del curso (texto visible)</label>
-            <div class="cfg-row">
-              <input class="adm-inp" id="price-inp" type="text" placeholder="Ej: S/ 49" value="${priceVal}"/>
-              <button class="btn-save" onclick="savePrice()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
-                Guardar
-              </button>
-            </div>
-            <div class="adm-msg" id="price-msg"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <label class="cfg-label">Precio del curso (texto visible)</label>
+          <div class="cfg-row">
+            <input class="adm-inp" id="price-inp" type="text" placeholder="Ej: S/ 49" value="${db.get('price') || PRICE_TXT}"/>
+            <button class="btn-save" onclick="savePrice()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+              Guardar
+            </button>
           </div>
-          <div>
-            <label class="cfg-label">Cambiar contraseña del panel admin</label>
-            <div class="cfg-row">
-              <input class="adm-inp" id="new-pwd-inp" type="password" placeholder="Nueva contraseña"/>
-              <button class="btn-save" style="background:var(--ac2)" onclick="changeAdminPwd()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                Cambiar
-              </button>
-            </div>
-            <div class="adm-msg" id="pwd-msg"></div>
-          </div>
+          <div class="adm-msg" id="price-msg"></div>
         </div>
-      </div>`;
-
-  } catch(e) {
-    document.getElementById('adm-grid').innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div style="color:#f87171">Error cargando datos: ${e.message}</div></div>`;
-  }
+        <div>
+          <label class="cfg-label">Cambiar contraseña del panel admin</label>
+          <div class="cfg-row">
+            <input class="adm-inp" id="new-pwd-inp" type="password" placeholder="Nueva contraseña"/>
+            <button class="btn-save" style="background:var(--ac2)" onclick="changeAdminPwd()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              Cambiar
+            </button>
+          </div>
+          <div class="adm-msg" id="pwd-msg"></div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 /* ─── ADMIN ACTIONS ─── */
-async function quickApprove() {
+function quickApprove() {
   const order = document.getElementById('qb-inp').value.trim().toUpperCase();
   const m = document.getElementById('qb-msg');
   m.className = 'adm-msg';
   if (!order) { m.className = 'adm-msg err'; m.textContent = 'Escribe el número de orden.'; return; }
-  try {
-    const r = await apiPost('/admin/approve', { orderId: order }, true);
-    if (r.success) {
-      document.getElementById('qb-inp').value = '';
-      m.className = 'adm-msg ok'; m.textContent = '✅ Acceso activado para ' + r.email;
-      toast('Acceso activado: ' + r.email, true);
-      loadAdminData();
-      setTimeout(() => { m.className = 'adm-msg'; }, 5000);
-    } else {
-      m.className = 'adm-msg err'; m.textContent = r.error || 'Orden no encontrada.';
-    }
-  } catch(e) { m.className = 'adm-msg err'; m.textContent = 'Error: ' + e.message; }
+  const pending = getPending();
+  const idx = pending.findIndex(p => p.order && p.order.toUpperCase() === order);
+  if (idx === -1) { m.className = 'adm-msg err'; m.textContent = 'Número de orden no encontrado.'; return; }
+  const p = pending[idx];
+  const u = getUsers();
+  u[p.email] = { pass: p.pass, role: 'approved', since: new Date().toLocaleDateString('es'), method: p.method, affiliate: p.affiliate, order: p.order, name: p.name };
+  saveUsers(u);
+  pending.splice(idx, 1);
+  savePending(pending);
+  addLog('Aprobado (orden): ' + p.email, 'lg');
+  document.getElementById('qb-inp').value = '';
+  m.className = 'adm-msg ok';
+  m.textContent = '✅ Acceso activado para ' + p.email;
+  toast('Acceso activado: ' + p.email, true);
+  renderAdmin();
+  setTimeout(() => { m.className = 'adm-msg'; }, 5000);
 }
 
-async function addManualUser() {
+function addManualUser() {
   const email = document.getElementById('mu-email').value.trim().toLowerCase();
   const pass  = document.getElementById('mu-pass').value.trim();
   const name  = document.getElementById('mu-name').value.trim();
@@ -2251,113 +2319,108 @@ async function addManualUser() {
   m.className = 'adm-msg';
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { m.className = 'adm-msg err'; m.textContent = 'Correo inválido.'; return; }
   if (pass.length < 6) { m.className = 'adm-msg err'; m.textContent = 'Contraseña mínimo 6 caracteres.'; return; }
-  try {
-    const h = await hashPass(pass);
-    const r = await apiPost('/admin/add-user', { email, passHash: h, name }, true);
-    if (r.success) {
-      ['mu-email','mu-pass','mu-name'].forEach(id => document.getElementById(id).value = '');
-      m.className = 'adm-msg ok'; m.textContent = '✅ Acceso activado para ' + email;
-      toast('Acceso dado a ' + email, true);
-      loadAdminData();
-      setTimeout(() => { m.className = 'adm-msg'; }, 5000);
-    } else { m.className = 'adm-msg err'; m.textContent = r.error || 'Error.'; }
-  } catch(e) { m.className = 'adm-msg err'; m.textContent = 'Error: ' + e.message; }
+  const users = getUsers();
+  if (users[email] && users[email].role === 'approved') { m.className = 'adm-msg err'; m.textContent = 'Este correo ya tiene acceso activo.'; return; }
+  users[email] = { pass, role: 'approved', since: new Date().toLocaleDateString('es'), method: 'manual', name: name || email, order: 'MANUAL-' + Date.now().toString(36).toUpperCase() };
+  saveUsers(users);
+  const arr = getPending().filter(p => p.email !== email);
+  savePending(arr);
+  addLog('Usuario manual: ' + email, 'lg');
+  toast('Acceso dado a ' + email, true);
+  document.getElementById('mu-email').value = '';
+  document.getElementById('mu-pass').value  = '';
+  document.getElementById('mu-name').value  = '';
+  m.className = 'adm-msg ok';
+  m.textContent = '✅ Acceso activado para ' + email;
+  renderAdmin();
+  setTimeout(() => { m.className = 'adm-msg'; }, 5000);
 }
 
-async function approvePending(orderId) {
-  try {
-    const r = await apiPost('/admin/approve', { orderId }, true);
-    if (r.success) { toast('Acceso activado: ' + r.email, true); loadAdminData(); }
-    else toast(r.error || 'Error', false);
-  } catch(e) { toast('Error: ' + e.message, false); }
+function approvePending(i) {
+  const p = getPending()[i];
+  const u = getUsers();
+  u[p.email] = { pass: p.pass, role: 'approved', since: new Date().toLocaleDateString('es'), method: p.method, affiliate: p.affiliate, order: p.order, name: p.name };
+  saveUsers(u);
+  const arr = getPending(); arr.splice(i, 1); savePending(arr);
+  addLog('Aprobado: ' + p.email, 'lg');
+  toast('Acceso activado: ' + p.email, true);
+  renderAdmin();
 }
-
-async function rejectPending(orderId, email) {
-  if (!confirm('¿Rechazar solicitud de ' + email + '?')) return;
-  try {
-    await apiPost('/admin/reject', { orderId }, true);
-    toast('Rechazado', false); loadAdminData();
-  } catch(e) { toast('Error', false); }
+function rejectPending(i) {
+  const p = getPending()[i];
+  if (!confirm('¿Rechazar solicitud de ' + p.email + '?')) return;
+  const arr = getPending(); arr.splice(i, 1); savePending(arr);
+  const u = getUsers();
+  if (u[p.email] && u[p.email].role === 'pending') { delete u[p.email]; saveUsers(u); }
+  addLog('Rechazado: ' + p.email, 'lr');
+  toast('Solicitud rechazada', false);
+  renderAdmin();
 }
-
-async function revokeUser(email) {
+function revokeUser(email) {
   if (!confirm('¿Revocar acceso de ' + email + '?')) return;
-  try {
-    await apiPost('/admin/revoke', { email }, true);
-    toast('Acceso revocado', false); loadAdminData();
-  } catch(e) { toast('Error', false); }
+  const u = getUsers(); delete u[email]; saveUsers(u);
+  addLog('Revocado: ' + email, 'lr');
+  toast('Acceso revocado', false);
+  renderAdmin();
 }
-
 function addAff() {
   const code = prompt('Nuevo código de afiliado (mayúsculas, sin espacios):');
   if (!code) return;
-  const clean = code.trim().toUpperCase().replace(/\s+/g,'');
+  const clean = code.trim().toUpperCase().replace(/\s+/g, '');
   if (!clean) return;
   const a = getAffs(); a[clean] = 0; saveAffs(a);
-  toast('Código ' + clean + ' creado', true); loadAdminData();
+  addLog('Afiliado creado: ' + clean, 'ly');
+  toast('Código ' + clean + ' creado', true);
+  renderAdmin();
 }
-
 function deleteAff(code) {
   if (!confirm('¿Eliminar código ' + code + '?')) return;
   const a = getAffs(); delete a[code]; saveAffs(a);
-  toast('Eliminado', false); loadAdminData();
+  addLog('Afiliado eliminado: ' + code, 'ly');
+  toast('Eliminado', false);
+  renderAdmin();
 }
-
-async function savePrice() {
+function savePrice() {
   const v = document.getElementById('price-inp').value.trim();
+  db.set('price', v);
   const m = document.getElementById('price-msg');
-  try {
-    await apiPut('/admin/config', { key: 'price_txt', value: v }, true);
-    m.className = 'adm-msg ok'; m.textContent = '✓ Precio guardado: ' + v;
-    toast('Precio guardado', true);
-    setTimeout(() => { m.className = 'adm-msg'; }, 3000);
-  } catch(e) { m.className = 'adm-msg err'; m.textContent = 'Error: ' + e.message; }
+  m.className = 'adm-msg ok'; m.textContent = '✓ Precio guardado: ' + v;
+  addLog('Precio: ' + v, 'ly');
+  toast('Precio guardado', true);
+  setTimeout(() => { m.className = 'adm-msg'; }, 3000);
 }
-
 function changeAdminPwd() {
   const v = document.getElementById('new-pwd-inp').value.trim();
   if (v.length < 4) { const m = document.getElementById('pwd-msg'); m.className = 'adm-msg err'; m.textContent = 'Mínimo 4 caracteres.'; return; }
-  localStorage.setItem('jd_admin_pwd', v);
+  db.set('admin_pwd', v);
   const m = document.getElementById('pwd-msg');
   m.className = 'adm-msg ok'; m.textContent = '✓ Contraseña actualizada.';
   document.getElementById('new-pwd-inp').value = '';
+  addLog('Contraseña admin cambiada', 'ly');
   toast('Contraseña actualizada', true);
   setTimeout(() => { m.className = 'adm-msg'; }, 3000);
 }
 
 /* ─── INIT ─── */
-(async function init() {
-  // Load price from backend
-  try {
-    const cfg = await apiGet('/config');
-    if (cfg?.price_txt) {
-      ['price-show','price-total'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=cfg.price_txt; });
-      ['pp-price','yape-price','plin-price'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent='💰 '+cfg.price_txt; });
-      document.getElementById('btn-pay-card-label').textContent = 'Ir a pagar · ' + cfg.price_txt;
-      document.getElementById('currency-amount').textContent = cfg.price_txt;
-    }
-  } catch(e) { refreshPrices(); }
-
-  // Check session
+(function init() {
   const session = getSession();
-  if (session?.email) {
-    try {
-      const h = await hashPass(session.pass);
-      const r = await apiPost('/login', { email: session.email, passHash: h });
-      if (r.status === 'approved') {
-        setLoggedIn(session.email);
-      } else {
-        clearSession(); lockCards();
-      }
-    } catch(e) { lockCards(); }
+   const users   = getUsers();
+  if (session && users[session] && users[session].role === 'approved') {
+    setLoggedIn(session);
   } else {
-    clearSession(); lockCards();
+    saveSession(null);
+    lockCards();
   }
+  refreshPrices();
+  checkIzipayReturn(); // detect return from Izipay checkout
 
-  checkIzipayReturn();
-
+  // Wire country selector → currency converter
   const countryEl = document.getElementById('b-country');
-  if (countryEl) countryEl.addEventListener('change', function() { updateCurrency(this.value || 'PE'); });
+  if (countryEl) {
+    countryEl.addEventListener('change', function() {
+      updateCurrency(this.value || 'PE');
+    });
+  }
 })();
 </script>
 </body>

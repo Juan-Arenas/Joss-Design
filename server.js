@@ -101,6 +101,29 @@ async function log(action, type = 'lg') {
 
 app.get('/', (req, res) => res.json({ status: 'ok', service: 'Joss Design Backend v2' }));
 
+// ── POST /check-email ────────────────────────────────────────
+//  Verifica si un correo ya tiene solicitud pendiente o acceso aprobado
+//  Usado para bloquear registros duplicados
+app.post('/check-email', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ status: 'error', error: 'Email requerido' });
+  try {
+    const approved = await pool.query(
+      `SELECT 1 FROM approved_users WHERE email = $1`, [email]
+    );
+    if (approved.rows.length > 0) return res.json({ status: 'approved' });
+
+    const pending = await pool.query(
+      `SELECT 1 FROM pending_orders WHERE email = $1 AND status = 'pending'`, [email]
+    );
+    if (pending.rows.length > 0) return res.json({ status: 'pending' });
+
+    res.json({ status: 'available' });
+  } catch (e) {
+    res.status(500).json({ status: 'error', error: e.message });
+  }
+});
+
 // Guardar solicitud pendiente (Yape/Plin/PayPal/Izipay antes de redirigir)
 app.post('/register-pending', async (req, res) => {
   const { email, name, passHash, method, orderId, affiliate, country, phone } = req.body;
