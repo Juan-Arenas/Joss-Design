@@ -1031,8 +1031,17 @@ select.finput option { background: #141421; }
 }
 
 /* ═══════════════════════════════
+/* ═══════════════════════════════
    KR EMBEDDED — NEÓN PROFESIONAL
 ═══════════════════════════════ */
+
+@keyframes kr-neon-border {
+  0%   { border-color: #c8ff57; box-shadow: 0 0 8px #c8ff57, 0 0 22px rgba(200,255,87,.25); }
+  33%  { border-color: #7c5cfc; box-shadow: 0 0 8px #7c5cfc, 0 0 22px rgba(124,92,252,.25); }
+  66%  { border-color: #00ffcc; box-shadow: 0 0 8px #00ffcc, 0 0 22px rgba(0,255,204,.25); }
+  100% { border-color: #c8ff57; box-shadow: 0 0 8px #c8ff57, 0 0 22px rgba(200,255,87,.25); }
+}
+
 .kr-embedded {
   background: transparent !important;
   width: 100% !important;
@@ -1040,107 +1049,106 @@ select.finput option { background: #141421; }
   margin: 0 !important;
 }
 
-/* Cada campo: neón wrapper */
+/* Cada campo */
 .kr-field-wrapper {
   position: relative !important;
-  background: var(--s2) !important;
-  border: 1.5px solid var(--b2) !important;
-  border-radius: 13px !important;
-  padding: 8px 14px 6px !important;
-  margin-bottom: 12px !important;
+  background: #0d0d1a !important;
+  border: 1.5px solid rgba(255,255,255,.09) !important;
+  border-radius: 12px !important;
+  padding: 22px 14px 8px !important;
+  margin-bottom: 10px !important;
   min-height: 54px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  transition: border-color .25s, box-shadow .25s !important;
+  max-height: 58px !important;
+  transition: border-color .3s, box-shadow .3s !important;
   overflow: hidden !important;
-}
-/* Línea neón en la parte inferior al enfocar */
-.kr-field-wrapper::after {
-  content: '' !important;
-  position: absolute !important;
-  bottom: 0 !important; left: 10% !important;
-  width: 80% !important; height: 2px !important;
-  background: linear-gradient(90deg, transparent, #c8ff57, #7c5cfc, #00ffcc, transparent) !important;
-  border-radius: 999px !important;
-  opacity: 0 !important;
-  transform: scaleX(0) !important;
-  transition: opacity .3s, transform .4s !important;
-}
-.kr-field-wrapper:focus-within {
-  border-color: rgba(200,255,87,.4) !important;
-  box-shadow:
-    0 0 0 2px rgba(200,255,87,.08),
-    0 0 18px rgba(200,255,87,.1),
-    0 0 40px rgba(124,92,252,.06) !important;
-}
-.kr-field-wrapper:focus-within::after {
-  opacity: 1 !important;
-  transform: scaleX(1) !important;
-  animation: neon-border-spin 2s linear infinite !important;
-  background-size: 200% 200% !important;
+  cursor: text !important;
+  display: block !important;
 }
 
-/* Label flotante */
+/* Neón girando al enfocar */
+.kr-field-wrapper:focus-within {
+  animation: kr-neon-border 2.5s ease-in-out infinite !important;
+}
+
+/* Label arriba pequeño */
 .kr-label {
+  position: absolute !important;
+  top: 8px !important;
+  left: 14px !important;
   font-family: 'DM Sans', sans-serif !important;
-  font-size: .58rem !important;
+  font-size: .56rem !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
   letter-spacing: .1em !important;
-  color: var(--mu) !important;
-  margin-bottom: 4px !important;
-  display: block !important;
+  color: rgba(96,96,120,.75) !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
   transition: color .2s !important;
-  position: static !important;
+  white-space: nowrap !important;
 }
-.kr-field-wrapper:focus-within .kr-label {
-  color: var(--ac) !important;
-}
+.kr-field-wrapper:focus-within .kr-label { color: #c8ff57 !important; }
 
-/* Input */
-.kr-field, .kr-field input, .kr-input {
+/* Input / iframe */
+.kr-field {
   background: transparent !important;
-  color: var(--tx) !important;
-  font-family: 'DM Sans', sans-serif !important;
-  font-size: .93rem !important;
-  font-weight: 500 !important;
   border: none !important;
   outline: none !important;
   width: 100% !important;
-  padding: 0 !important;
-  caret-color: var(--ac) !important;
-  letter-spacing: .02em !important;
+  color: #ededf5 !important;
+  font-size: .92rem !important;
+  font-family: 'DM Sans', sans-serif !important;
+  caret-color: #c8ff57 !important;
+  display: block !important;
+  height: 24px !important;
+}
+.kr-field input,
+.kr-field iframe {
+  background: transparent !important;
+  color: #ededf5 !important;
+  caret-color: #c8ff57 !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  max-height: 24px !important;
+  border: none !important;
+  outline: none !important;
+  width: 100% !important;
+  font-size: .92rem !important;
+  font-family: 'DM Sans', sans-serif !important;
 }
 
 /* Iconos */
-.kr-icon-wrapper-field, .kr-icon-field {
-  opacity: .5 !important;
+.kr-icon-wrapper-field,
+.kr-icon-field {
+  position: absolute !important;
+  right: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  opacity: .35 !important;
   transition: opacity .2s !important;
 }
 .kr-field-wrapper:focus-within .kr-icon-wrapper-field,
-.kr-field-wrapper:focus-within .kr-icon-field { opacity: .9 !important; }
-.kr-icon-wrapper-field svg, .kr-icon-field svg {
-  fill: var(--ac) !important;
-  width: 15px !important; height: 15px !important;
+.kr-field-wrapper:focus-within .kr-icon-field { opacity: 1 !important; }
+.kr-icon-wrapper-field svg,
+.kr-icon-field svg {
+  fill: #c8ff57 !important;
+  width: 15px !important;
+  height: 15px !important;
+  display: block !important;
 }
 
-/* Expiry + CVV lado a lado */
-.kr-expiry, .kr-security-code {
+/* Expiry + CVV en fila */
+.kr-expiry,
+.kr-security-code {
   display: inline-block !important;
   width: 49% !important;
 }
 .kr-expiry { margin-right: 2% !important; }
 
-/* Error en campo */
+/* Campo en error */
 .kr-field-wrapper.kr-field-wrapper-in-error {
-  border-color: rgba(239,68,68,.55) !important;
-  box-shadow: 0 0 0 2px rgba(239,68,68,.08), 0 0 16px rgba(239,68,68,.08) !important;
-}
-.kr-field-wrapper.kr-field-wrapper-in-error::after {
-  background: linear-gradient(90deg, transparent, #ef4444, transparent) !important;
-  opacity: 1 !important;
-  transform: scaleX(1) !important;
+  border-color: rgba(239,68,68,.7) !important;
+  box-shadow: 0 0 10px rgba(239,68,68,.25) !important;
+  animation: none !important;
 }
 
 /* Error texto */
@@ -1155,7 +1163,7 @@ select.finput option { background: #141421; }
 /* Botón PAGAR */
 .kr-payment-button {
   position: relative !important;
-  background: var(--ac) !important;
+  background: #c8ff57 !important;
   color: #000 !important;
   font-family: 'Montserrat', sans-serif !important;
   font-weight: 900 !important;
@@ -1166,8 +1174,8 @@ select.finput option { background: #141421; }
   border: none !important;
   width: 100% !important;
   cursor: pointer !important;
-  box-shadow: 0 4px 20px rgba(200,255,87,.3), 0 0 40px rgba(200,255,87,.1) !important;
-  margin-top: 10px !important;
+  box-shadow: 0 4px 20px rgba(200,255,87,.35), 0 0 40px rgba(200,255,87,.12) !important;
+  margin-top: 12px !important;
   text-transform: uppercase !important;
   transition: opacity .2s, transform .15s, box-shadow .2s !important;
   display: block !important;
@@ -1178,23 +1186,20 @@ select.finput option { background: #141421; }
   position: absolute !important;
   top: -50% !important; left: -60% !important;
   width: 40% !important; height: 200% !important;
-  background: rgba(255,255,255,.18) !important;
+  background: rgba(255,255,255,.22) !important;
   transform: skewX(-20deg) !important;
   transition: left .5s !important;
 }
 .kr-payment-button:hover {
   opacity: .9 !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 8px 30px rgba(200,255,87,.4), 0 0 60px rgba(200,255,87,.15) !important;
+  box-shadow: 0 8px 30px rgba(200,255,87,.45), 0 0 60px rgba(200,255,87,.18) !important;
 }
 .kr-payment-button:hover::before { left: 130% !important; }
 .kr-payment-button:active { transform: translateY(0) !important; }
 
-/* Placeholder */
-.kr-field ::placeholder { color: rgba(96,96,120,.4) !important; }
-
 /* currency-amount still used by updateCurrency */
-.currency-amount { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 900; color: var(--ac); }
+.currency-amount { font-family: 'Montserrat', sans-serif; font-size: 1.5rem; font-weight: 900; color: #c8ff57; }
 
 
 .toast {
