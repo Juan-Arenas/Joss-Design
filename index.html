@@ -1575,7 +1575,7 @@ const db = {
 };
 const getUsers   = () => db.get('u') || {};
 const getPending = () => db.get('p') || [];
-const getAffs    = () => db.get('a') || { JOSS10: 0, DESIGN20: 0 };
+const getAffs    = () => db.get('a') || {};
 const getLog     = () => db.get('l') || [];
 const getSession = () => db.get('s') || null;
 const saveUsers   = v => db.set('u', v);
@@ -1693,7 +1693,7 @@ let billingData = {};
 let currentOrder = '';
 let krReady = false;
 
-async function goToPayment() {
+function goToPayment() {
   const fname   = document.getElementById('b-fname').value.trim();
   const lname   = document.getElementById('b-lname').value.trim();
   const email   = document.getElementById('b-email').value.trim().toLowerCase();
@@ -1703,48 +1703,19 @@ async function goToPayment() {
   const msgEl   = document.getElementById('billing-msg');
   msgEl.className = 'fmsg';
 
-  // Validaciones locales
   if (!fname || !lname)  return setMsg('billing-msg', 'Ingresa tu nombre completo.', 'err');
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setMsg('billing-msg', 'Ingresa un correo válido.', 'err');
   if (!country)          return setMsg('billing-msg', 'Selecciona tu país.', 'err');
   if (pass.length < 6)   return setMsg('billing-msg', 'La contraseña debe tener al menos 6 caracteres.', 'err');
+
+  const users = getUsers();
+  if (users[email]) {
+    if (users[email].role === 'approved') return setMsg('billing-msg', 'Este correo ya tiene acceso. Usa la pestaña "Ya tengo acceso".', 'inf');
+    if (users[email].role === 'pending')  return setMsg('billing-msg', 'Ya tienes una solicitud pendiente. Usa "Ya tengo acceso" para ver el estado.', 'warn');
+  }
   if (aff) {
     const affs = getAffs();
     if (!affs.hasOwnProperty(aff)) return setMsg('billing-msg', 'Código de afiliado no válido.', 'err');
-  }
-
-  // Verificar en backend si el correo ya existe
-  const btnContinue = document.querySelector('#step-billing .btn-main');
-  if (btnContinue) { btnContinue.disabled = true; btnContinue.textContent = 'Verificando...'; }
-
-  try {
-    const res = await fetch(BACKEND + '/check-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-    const data = await res.json();
-
-    if (data.status === 'approved') {
-      setMsg('billing-msg',
-        '✅ Este correo ya tiene acceso al curso. Usa la pestaña "Ya tengo acceso" para ingresar.',
-        'inf');
-      return;
-    }
-    if (data.status === 'pending') {
-      setMsg('billing-msg',
-        '⏳ Ya enviaste una solicitud con este correo. Espera a que sea revisada — te avisaremos por WhatsApp. Usa "Ya tengo acceso" para ver el estado.',
-        'warn');
-      return;
-    }
-  } catch (e) {
-    // Si el backend falla, continuar (no bloquear por error de red)
-    console.warn('Email check failed, continuing:', e.message);
-  } finally {
-    if (btnContinue) {
-      btnContinue.disabled = false;
-      btnContinue.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Continuar al pago';
-    }
   }
 
   billingData = { fname, lname, email, country, phone: document.getElementById('b-phone').value.trim(), pass, aff };
@@ -1874,7 +1845,7 @@ async function redirectToIzipay() {
 
     // Use the formToken URL from Izipay (the correct way)
     // The backend returns the formToken; we use the Izipay standard redirect URL
-    const izipayRedirectUrl = 'https://secure.micuentaweb.pe/t/szf9tmo5' 
+    const izipayRedirectUrl = 'https://secure.micuentaweb.pe/t/szf9tmo5'
 
     // Save data to localStorage before leaving
     db.set('pending_order', currentOrder);
@@ -2348,19 +2319,20 @@ function approvePending(i) {
 }
 function rejectPending(i) {
   const p = getPending()[i];
-  if (!confirm('¿Rechazar solicitud de ' + p.email + '?')) return;
+  if (!confirm('¿Rechazar solicitud de ' + p.email + '?\n\nEl correo quedará libre para que pueda intentarlo de nuevo.')) return;
+  // Eliminar de pendientes
   const arr = getPending(); arr.splice(i, 1); savePending(arr);
-  const u = getUsers();
-  if (u[p.email] && u[p.email].role === 'pending') { delete u[p.email]; saveUsers(u); }
-  addLog('Rechazado: ' + p.email, 'lr');
-  toast('Solicitud rechazada', false);
+  // Eliminar completamente del registro de usuarios (queda libre)
+  const u = getUsers(); delete u[p.email]; saveUsers(u);
+  addLog('Rechazado: ' + p.email + ' (correo liberado)', 'lr');
+  toast('Rechazado — correo liberado', false);
   renderAdmin();
 }
 function revokeUser(email) {
-  if (!confirm('¿Revocar acceso de ' + email + '?')) return;
+  if (!confirm('¿Revocar acceso de ' + email + '?\n\nEl correo quedará libre para volver a intentarlo.')) return;
   const u = getUsers(); delete u[email]; saveUsers(u);
-  addLog('Revocado: ' + email, 'lr');
-  toast('Acceso revocado', false);
+  addLog('Revocado: ' + email + ' (correo liberado)', 'lr');
+  toast('Acceso revocado — correo liberado', false);
   renderAdmin();
 }
 function addAff() {
