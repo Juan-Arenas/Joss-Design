@@ -1837,7 +1837,7 @@ async function redirectToIzipay() {
     localStorage.setItem('jd_pending_billing', JSON.stringify(billingData));
     localStorage.setItem('jd_pending_order', currentOrder);
 
-    const izipayRedirectUrl = 'https://secure.micuentaweb.pe/t/szf9tmo5' + encodeURIComponent(data.formToken);
+    const izipayRedirectUrl = 'https://secure.micuentaweb.pe/t/szf9tmo5' 
     window.location.href = izipayRedirectUrl;
 
   } catch (err) {
