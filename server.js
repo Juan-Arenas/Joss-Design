@@ -300,22 +300,69 @@ app.put('/admin/config', adminOnly, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// ── Izipay ───────────────────────────────────────────────────
+// ── Izipay create-payment ────────────────────────────────────
 app.post('/create-payment', async (req, res) => {
-  const { amount, currency='PEN', orderId, customer } = req.body;
+  const { amount, currency='PEN', orderId, customer, returnUrl, cancelUrl } = req.body;
   if (!amount || amount <= 0) return res.status(400).json({ error: 'Monto inválido' });
   try {
-    const data = await izipayPost('/api-payment/V4/Charge/CreatePayment', {
+    const payload = {
       amount, currency, orderId,
-      customer: { email: customer?.email||'', firstName: customer?.firstName||'', lastName: customer?.lastName||'' }
-    });
-    if (data.status==='SUCCESS' && data.answer?.formToken) return res.json({ formToken: data.answer.formToken });
-    return res.status(500).json({ error: data.answer?.errorMessage || 'Error Izipay' });
-  } catch (e) { return res.status(500).json({ error: e.message }); }
+      customer: {
+        email     : customer?.email     || '',
+        firstName : customer?.firstName || '',
+        lastName  : customer?.lastName  || ''
+      }
+    };
+    // Si vienen URLs de retorno, incluirlas para el hosted checkout
+    if (returnUrl) payload.vads_return_url = returnUrl;
+    if (cancelUrl) payload.vads_cancel_url = cancelUrl;
+
+    const data = await izipayPost('/api-payment/V4/Charge/CreatePayment', payload);
+
+    if (data.status === 'SUCCESS' && data.answer?.formToken) {
+      return res.json({
+        formToken : data.answer.formToken,
+        // URL directa del hosted checkout de Izipay
+        checkoutUrl: `https://secure.micuentaweb.pe/vads-payment/?kr-form-token=${encodeURIComponent(data.answer.formToken)}`
+      });
+    }
+    console.error('Izipay error:', JSON.stringify(data));
+    return res.status(500).json({ error: data.answer?.errorMessage || 'Error Izipay: ' + data.status });
+  } catch (e) {
+    console.error('create-payment exception:', e);
+    return res.status(500).json({ error: e.message });
+  }
 });
 
-app.post('/ipn', (req, res) => {
-  console.log('IPN:', JSON.stringify(req.body));
+// ── IPN — Izipay notifica el pago aquí ──────────────────────
+// Configurar en Back Office → Configuración → Reglas de notificaciones
+// URL: https://josb-design-production.up.railway.app/ipn
+app.post('/ipn', async (req, res) => {
+  console.log('IPN recibido:', JSON.stringify(req.body));
+  const orderStatus = req.body?.vads_trans_status || req.body?.orderStatus;
+  const orderId     = req.body?.vads_order_id     || req.body?.orderId;
+  // Si el pago fue aprobado, activar automáticamente
+  if ((orderStatus === 'AUTHORISED' || orderStatus === 'CAPTURED') && orderId) {
+    try {
+      const r = await pool.query(
+        `SELECT * FROM pending_orders WHERE order_id = $1`, [orderId]
+      );
+      if (r.rows.length > 0) {
+        const p = r.rows[0];
+        await pool.query(
+          `INSERT INTO approved_users(email,name,pass_hash,method,order_id,affiliate)
+           VALUES($1,$2,$3,'izipay',$4,$5)
+           ON CONFLICT(email) DO UPDATE SET
+             pass_hash=EXCLUDED.pass_hash, method=EXCLUDED.method,
+             order_id=EXCLUDED.order_id, approved_at=NOW()`,
+          [p.email, p.name, p.pass_hash, p.order_id, p.affiliate]
+        );
+        await pool.query(`DELETE FROM pending_orders WHERE order_id=$1`, [orderId]);
+        await log(`Pago IPN aprobado: ${p.email} (${orderId})`, 'lg');
+        console.log('✅ Acceso activado automáticamente:', p.email);
+      }
+    } catch(e) { console.error('IPN DB error:', e); }
+  }
   res.sendStatus(200);
 });
 
