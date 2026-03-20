@@ -8,9 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <!-- Izipay SDK -->
 <script src="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/kr-payment-form.min.js"
-  kr-public-key="19131378:publickey_FCreyHUK1syQokKpjc9lFXmSsWR1tdP1qOMnaekvTBLeS"
+  kr-public-key="19131378:testpublickey_UJiGu4Sv2o17wVBOkpAYrCS3opWzDgerAtWJWXKm40UGJ"
   kr-language="es-PE"
-  kr-post-url-success="about:blank"></script>
+  kr-post-url-success="https://josb-design-production.up.railway.app/ipn"></script>
 <link rel="stylesheet" href="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/classic-reset.min.css"/>
 <link rel="stylesheet" href="https://static.micuentaweb.pe/static/js/krypton-client/V4.0/stable/classic.min.css"/>
 <style>
@@ -1802,6 +1802,17 @@ function selectPM(m) {
   document.getElementById('btn-manual').disabled              = false;
   setMsg('pay-msg', '', '');
 
+  // Reset Izipay form state when switching away and back
+  if (m !== 'izipay') {
+    krReady = false;
+    const loading = document.getElementById('iz-loading');
+    const wrap    = document.getElementById('iz-form-wrap');
+    const errEl   = document.getElementById('iz-err');
+    if (loading) loading.style.display = 'flex';
+    if (wrap)    wrap.style.display    = 'none';
+    if (errEl)   { errEl.classList.remove('show'); errEl.textContent = ''; }
+  }
+
   const labels = { paypal: 'Confirmar — abrir PayPal', yape: 'Ya yapié — enviar comprobante', plin: 'Ya pagué con Plin' };
   if (isManual) document.getElementById('btn-manual-label').textContent = labels[m] || 'Confirmar';
   if (m === 'izipay') initKRForm();
@@ -1862,6 +1873,7 @@ async function initKRForm() {
   const loading = document.getElementById('iz-loading');
   const wrap    = document.getElementById('iz-form-wrap');
   errEl.classList.remove('show');
+  errEl.textContent = '';
   if (loading) loading.style.display = 'flex';
   if (wrap)    wrap.style.display    = 'none';
 
@@ -1893,19 +1905,17 @@ async function initKRForm() {
         customer: { email: billingData.email, firstName: billingData.fname, lastName: billingData.lname }
       })
     });
-    if (!res.ok) throw new Error('Error del servidor: ' + res.status);
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      throw new Error(errBody.error || 'Error del servidor: ' + res.status);
+    }
     const data = await res.json();
-    if (!data.formToken) throw new Error(data.error || 'Sin formToken');
+    if (!data.formToken) throw new Error(data.error || 'Sin formToken de Izipay');
 
-    // 3. Poner el formToken en el atributo kr-form-token del div
-    //    (método oficial según documentación de Izipay)
-    const krDiv = document.getElementById('kr-form-div');
-    krDiv.setAttribute('kr-form-token', data.formToken);
-
-    // También llamar setFormConfig para que el SDK lo aplique inmediatamente
+    // 3. Configurar el SDK con el formToken
     await KR.setFormConfig({ formToken: data.formToken });
 
-    // 4. Registrar onSubmit — analizar resultado del pago (imagen 7 de docs)
+    // 4. Registrar onSubmit — analizar resultado del pago
     KR.onSubmit(paymentData => {
       console.log('KR result:', JSON.stringify({
         status: paymentData?.clientAnswer?.orderStatus,
@@ -1917,8 +1927,8 @@ async function initKRForm() {
       } else {
         const msg = paymentData?.clientAnswer?.transactions?.[0]?.errorMessage
           || paymentData?.clientAnswer?.errorMessage
-          || 'Pago rechazado. Verifica los datos de tu tarjeta.';
-        errEl.textContent = msg;
+          || 'Pago rechazado. Verifica los datos de tu tarjeta e intenta de nuevo.';
+        errEl.textContent = '⚠️ ' + msg;
         errEl.classList.add('show');
       }
       return false; // no redirigir, manejamos nosotros
@@ -1926,7 +1936,8 @@ async function initKRForm() {
 
     KR.onError(err => {
       console.error('KR error:', JSON.stringify(err));
-      errEl.textContent = err?.errorMessage || 'Error en el formulario de pago.';
+      const msg = err?.errorMessage || err?.clientAnswer?.errorMessage || 'Error en el formulario de pago.';
+      errEl.textContent = '⚠️ ' + msg;
       errEl.classList.add('show');
     });
 
@@ -1938,7 +1949,8 @@ async function initKRForm() {
   } catch (err) {
     console.error('KR init error:', err);
     if (loading) loading.style.display = 'none';
-    errEl.textContent = 'No se pudo cargar el formulario. Usa Yape, Plin o PayPal.';
+    krReady = false; // permitir reintento
+    errEl.textContent = '❌ ' + (err.message || 'No se pudo cargar el formulario de pago.');
     errEl.classList.add('show');
   }
 }
@@ -2070,24 +2082,63 @@ function submitManual() {
 }
 
 /* ─── LOGIN ─── */
-function doLogin() {
+async function doLogin() {
   const email = document.getElementById('l-email').value.trim().toLowerCase();
   const pass  = document.getElementById('l-pass').value;
   setMsg('l-msg', '', '');
   if (!email || !pass) return setMsg('l-msg', 'Completa todos los campos.', 'err');
+
+  // Verificar primero en localStorage (sesión rápida)
   const users = getUsers();
-  if (!users[email]) return setMsg('l-msg', 'Correo no encontrado. ¿Ya enviaste el comprobante?', 'err');
-  if (users[email].pass !== pass) return setMsg('l-msg', 'Contraseña incorrecta.', 'err');
-  if (users[email].role === 'pending') {
-    document.getElementById('pending-order-badge').textContent = 'Orden: ' + (users[email].order || '—');
-    showStep('step-pending');
-    return;
+  if (users[email]) {
+    if (users[email].pass !== pass) return setMsg('l-msg', 'Contraseña incorrecta.', 'err');
+    if (users[email].role === 'pending') {
+      document.getElementById('pending-order-badge').textContent = 'Orden: ' + (users[email].order || '—');
+      showStep('step-pending');
+      return;
+    }
+    if (users[email].role === 'approved') {
+      saveSession(email);
+      closeModal();
+      closeSidebar();
+      setLoggedIn(email);
+      return;
+    }
   }
-  if (users[email].role !== 'approved') return setMsg('l-msg', 'Acceso denegado.', 'err');
-  saveSession(email);
-  closeModal();
-  closeSidebar();
-  setLoggedIn(email);
+
+  // Si no está en localStorage, consultar el backend (otro navegador / dispositivo)
+  setMsg('l-msg', 'Verificando...', 'inf');
+  try {
+    const res = await fetch(BACKEND + '/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, passHash: pass })
+    });
+    const data = await res.json();
+    if (data.status === 'approved') {
+      // Guardar en localStorage para futuras sesiones rápidas
+      const u = getUsers();
+      u[email] = { pass, role: 'approved', since: data.user?.approved_at || '', method: data.user?.method || 'izipay', order: data.user?.order_id || '', name: data.user?.name || email };
+      saveUsers(u);
+      saveSession(email);
+      setMsg('l-msg', '', '');
+      closeModal();
+      closeSidebar();
+      setLoggedIn(email);
+    } else if (data.status === 'pending') {
+      document.getElementById('pending-order-badge').textContent = 'Orden: ' + (data.order || '—');
+      setMsg('l-msg', '', '');
+      showStep('step-pending');
+    } else if (data.status === 'wrong_password') {
+      setMsg('l-msg', 'Contraseña incorrecta.', 'err');
+    } else if (data.status === 'not_found') {
+      setMsg('l-msg', 'Correo no encontrado. ¿Ya enviaste el comprobante?', 'err');
+    } else {
+      setMsg('l-msg', 'Error al verificar. Intenta de nuevo.', 'err');
+    }
+  } catch(e) {
+    setMsg('l-msg', 'Sin conexión al servidor. Intenta de nuevo.', 'err');
+  }
 }
 function doLogout() {
   saveSession(null);

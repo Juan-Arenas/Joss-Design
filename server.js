@@ -2,10 +2,10 @@
 //  JOSS DESIGN — Backend con Base de Datos PostgreSQL
 //  Node.js + Express + pg
 //
-//  VARIABLES EN RAILWAY:
+//  VARIABLES EN RAILWAY (obligatorias):
 //    DATABASE_URL     → Railway lo pone automáticamente con PostgreSQL
 //    IZIPAY_SHOP_ID   → 19131378
-//    IZIPAY_PASSWORD  → prodpassword_4qOwaYvg...
+//    IZIPAY_PASSWORD  → testpassword_Hbop1JNTY49sTwOQA8Nlk6Ki0rUNaoemV5clQPedkXRE
 //    IZIPAY_API_URL   → https://api.micuentaweb.pe
 //    ADMIN_SECRET     → contraseña para endpoints admin (pon la que quieras)
 // ═══════════════════════════════════════════════════════════
@@ -17,7 +17,7 @@ const { Pool } = require('pg');
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: '*' }));
 
 // ── PostgreSQL pool ──────────────────────────────────────────
 const pool = new Pool({
@@ -27,10 +27,14 @@ const pool = new Pool({
 
 // ── Izipay config ────────────────────────────────────────────
 const SHOP_ID      = process.env.IZIPAY_SHOP_ID  || '19131378';
-const PASSWORD     = process.env.IZIPAY_PASSWORD || 'prodpassword_4qOwaYvgLvrBWaqp1ny8qBX3so9mxQJBXBAxlWsGKvzP5';
+const PASSWORD     = process.env.IZIPAY_PASSWORD || 'testpassword_Hbop1JNTY49sTwOQA8Nlk6Ki0rUNaoemV5clQPedkXRE';
 const API_URL      = process.env.IZIPAY_API_URL  || 'https://api.micuentaweb.pe';
 const AUTH         = 'Basic ' + Buffer.from(SHOP_ID + ':' + PASSWORD).toString('base64');
 const ADMIN_SECRET = process.env.ADMIN_SECRET    || 'jossdesign2025';
+
+console.log('[Config] SHOP_ID:', SHOP_ID);
+console.log('[Config] API_URL:', API_URL);
+console.log('[Config] AUTH header generado correctamente:', !!AUTH);
 
 async function izipayPost(endpoint, body) {
   const res = await fetch(API_URL + endpoint, {
@@ -38,7 +42,11 @@ async function izipayPost(endpoint, body) {
     headers: { 'Authorization': AUTH, 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
-  return res.json();
+  const json = await res.json();
+  if (json.status !== 'SUCCESS') {
+    console.error('[Izipay] Respuesta no exitosa:', JSON.stringify(json));
+  }
+  return json;
 }
 
 // ── Crear tablas ─────────────────────────────────────────────
@@ -99,7 +107,12 @@ async function log(action, type = 'lg') {
 //  PÚBLICOS
 // ════════════════════════════════════════════════════════════
 
-app.get('/', (req, res) => res.json({ status: 'ok', service: 'Joss Design Backend v2' }));
+app.get('/', (req, res) => res.json({
+  status: 'ok',
+  service: 'Joss Design Backend v2',
+  shop: SHOP_ID,
+  api: API_URL
+}));
 
 // ── POST /check-email ────────────────────────────────────────
 //  Verifica si un correo ya tiene solicitud pendiente o acceso aprobado
@@ -301,11 +314,9 @@ app.put('/admin/config', adminOnly, async (req, res) => {
 });
 
 // ── Izipay create-payment ────────────────────────────────────
-// Payload exacto según docs oficiales (imagen 2 y 3):
-// { amount: 180, currency: "PEN", orderId: "myOrderId-999999", customer: { email: "..." } }
 app.post('/create-payment', async (req, res) => {
   const { amount, currency = 'PEN', orderId, customer } = req.body;
-  if (!amount || amount <= 0) return res.status(400).json({ error: 'Monto inválido' });
+  if (!amount || isNaN(amount)) return res.status(400).json({ error: 'Monto inválido' });
 
   const cleanOrderId = (orderId || ('JD-' + Date.now()))
     .replace(/[^a-zA-Z0-9\-_]/g, '')
@@ -313,7 +324,7 @@ app.post('/create-payment', async (req, res) => {
 
   try {
     const payload = {
-      amount  : parseInt(amount, 10),   // integer obligatorio
+      amount  : parseInt(amount, 10),   // integer en centavos (100 = S/1.00)
       currency: currency,               // "PEN"
       orderId : cleanOrderId,           // alfanumérico + guiones
       customer: {
@@ -328,7 +339,8 @@ app.post('/create-payment', async (req, res) => {
     console.log('[Izipay] Response →', JSON.stringify({
       status: data.status,
       hasToken: !!data.answer?.formToken,
-      error: data.answer?.errorMessage
+      errorCode: data.answer?.errorCode,
+      errorMessage: data.answer?.errorMessage
     }));
 
     if (data.status === 'SUCCESS' && data.answer?.formToken) {
@@ -340,13 +352,13 @@ app.post('/create-payment', async (req, res) => {
 
     const errMsg = data.answer?.errorMessage
       || data.answer?.detailedErrorMessage
-      || ('Izipay status: ' + data.status);
-    console.error('[Izipay] Error:', errMsg, JSON.stringify(data));
-    return res.status(500).json({ error: errMsg });
+      || ('Izipay status: ' + data.status + ' code: ' + (data.answer?.errorCode || 'N/A'));
+    console.error('[Izipay] Error:', errMsg);
+    return res.status(502).json({ error: errMsg });
 
   } catch (e) {
     console.error('[Izipay] Exception:', e.message);
-    return res.status(500).json({ error: e.message });
+    return res.status(500).json({ error: 'Error interno: ' + e.message });
   }
 });
 
@@ -358,7 +370,7 @@ app.post('/ipn', async (req, res) => {
   const orderStatus = req.body?.vads_trans_status || req.body?.orderStatus;
   const orderId     = req.body?.vads_order_id     || req.body?.orderId;
   // Si el pago fue aprobado, activar automáticamente
-  if ((orderStatus === 'AUTHORISED' || orderStatus === 'CAPTURED') && orderId) {
+  if ((orderStatus === 'AUTHORISED' || orderStatus === 'CAPTURED' || orderStatus === 'PAID') && orderId) {
     try {
       const r = await pool.query(
         `SELECT * FROM pending_orders WHERE order_id = $1`, [orderId]
